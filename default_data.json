@@ -1,0 +1,15 @@
+{
+  "Devices": {
+    "Makine Pilot": {
+      "Makine Durumu": "Çalışıyor",
+      "Counter": "0",
+      "Son Reset Tarihi": "-",
+      "Düğüm göz büyüklüğü": "-",
+      "Toplam düğüm sayısı": "-",
+      "Kalan düğüm sayısı": "-",
+      "Çalışma süresi": "-",
+      "Çalışma hızı": "-",
+      "Tahmini kalan süre": "-"
+    }
+  }
+}

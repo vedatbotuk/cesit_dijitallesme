@@ -8,8 +8,7 @@ from RPLCD.i2c import CharLCD
 
 lcd = CharLCD('PCF8574', 0x27)
 
-system_time = ''
-system_time_state = 0
+system_time = None
 data_js = {}
 
 btn_kapali = 4
@@ -92,46 +91,35 @@ def change_json(what, state):
 
 
 def write_lcd(what, show):
-    # date_wl = get_date_time('basic')
-    global system_time
+    date_wl = get_date_time('basic')
 
     if what == 'kapali':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '    ' + u'kapali')
+        lcd.write_string(date_wl + '    ' + u'kapali')
 
     elif what == 'start':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + ' ' + u'calisiyor')
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + ' ' + u'calisiyor')
 
     elif what == 'stop':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + '   ' + u'duruyor')
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + '   ' + u'duruyor')
 
     elif what == 'bobin':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + '     ' + u'bobin')
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + '     ' + u'bobin')
 
     elif what == 'cozgu':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + '     ' + u'cozgu')
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + '     ' + u'cozgu')
 
     elif what == 'ariza':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + '     ' + u'ariza')
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + '     ' + u'ariza')
 
     elif what == 'ayar':
-        if system_time_state == 1:
-            lcd.cursor_pos = (0, 0)
-            lcd.write_string(system_time + '      ' + u'ayar')
-
-    elif what == 'reset':
-        lcd.cursor_pos = (1, 0)
-        lcd.write_string(u'Counter= ' + show)
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(date_wl + '      ' + u'ayar')
 
     elif what == 'counter':
         lcd.cursor_pos = (1, 0)
@@ -147,15 +135,21 @@ def get_date_time(which):
 
 def sync_time():
     global system_time
-    global system_time_state
     date_time_obj = datetime.now()
 
     if system_time != date_time_obj.strftime("%H:%M"):
-        system_time_state = 1
         system_time = date_time_obj.strftime("%H:%M")
-    else:
-        if system_time_state == 1:
-            system_time_state = 0
+
+
+def check_btn(name_btn, name_state, name_json, name_nr_status):
+    if name_btn == 1:
+        if name_state == 0:
+            if (type(name_nr_status)) == int:
+                name_nr = name_nr_status + 1
+
+            change_json(name_json, name_nr_status)
+            name_state = 1
+            print(name_json + '= ' + name_nr_status)
 
 
 def gpio_check():
@@ -175,7 +169,6 @@ def gpio_check():
             if counter_state == 0:
                 counter_nr = counter_nr + 1
                 # print('Counter Pressed = ' + str(counter_nr))
-                write_lcd('counter', counter_nr)
                 change_json('counter', counter_nr)
                 counter_state = 1
     else:
@@ -188,7 +181,6 @@ def gpio_check():
         if reset_state == 0:
             counter_nr = 0
             # print('Reset' + ":" + d2)
-            write_lcd('reset', counter_nr)
             change_json('reset', get_date_time('long'))
             change_json('counter', 0)
             reset_state = 1
@@ -212,7 +204,6 @@ def gpio_check():
         button_state_start_stop = GPIO.input(btn_start_stop)
         if button_state_start_stop:
             # switch on
-            write_lcd('start', None)
             if start_stop_state == 0:
                 # print('Start')
                 change_json('start', None)
@@ -225,7 +216,6 @@ def gpio_check():
             # switch off
             if start_stop_state == 1:
                 # print('Stop')
-                write_lcd('stop', None)
                 change_json('stop', None)
                 start_stop_state = 0
 
@@ -236,7 +226,6 @@ def gpio_check():
             if button_state_bobin:
                 if bobin_state == 0:
                     # print('Bobin')
-                    write_lcd('bobin', None)
                     change_json('bobin', None)
                     bobin_state = 1
             else:
@@ -248,7 +237,6 @@ def gpio_check():
             if button_state_cozgu:
                 if cozgu_state == 0:
                     # print('Cozgu')
-                    write_lcd('cozgu', None)
                     change_json('cozgu', None)
                     cozgu_state = 1
             else:
@@ -260,7 +248,6 @@ def gpio_check():
             if button_state_ariza:
                 if ariza_state == 0:
                     # print('Ariza')
-                    write_lcd('ariza', None)
                     change_json('ariza', None)
                     ariza_state = 1
             else:
@@ -272,7 +259,6 @@ def gpio_check():
             if button_state_ayar:
                 if ayar_state == 0:
                     # print('Ayar')
-                    write_lcd('ayar', None)
                     change_json('ayar', None)
                     ayar_state = 1
             else:
@@ -289,6 +275,7 @@ def gpio_check():
             kapali_state = 0
     # ##
     #
+
 
 
 def loop():

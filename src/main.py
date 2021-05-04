@@ -1,14 +1,16 @@
 # !/usr/bin/python3
 ''' Description '''
 
-import os
-import RPi.GPIO as GPIO
-from time import sleep
 import json
+import os
+from time import sleep
+
 from RPLCD.i2c import CharLCD
+import RPi.GPIO as GPIO
 import classes as classes
 
-time_obj = classes.Time();
+
+time_obj = classes.Time()
 bobin_btn = classes.ButtonSwitch(5)
 
 lcd = CharLCD('PCF8574', 0x27)
@@ -406,3 +408,4 @@ if __name__ == '__main__':
         print('keyboard interrupt detected')
         # endprogram()
         GPIO.cleanup()
+

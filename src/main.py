@@ -1,67 +1,106 @@
 # !/usr/bin/python3
 ''' Description '''
 
+import sys
+import pydevd
+sys.path.append(r'/home/pi/cesit_test/pysrc')
+pydevd.settrace('192.168.170.61') # replace IP with address # of Eclipse host machine
+
 import json
 import os
 from time import sleep
+
+i = 3
+p = 'Hello!' * i
+print(p)
+
+exit()
+
 
 from RPLCD.i2c import CharLCD
 import RPi.GPIO as GPIO
 import classes as classes
 
 
+### Logging
+# TODO logging
+
+
+with open('setup.json', 'r') as f:
+    config_json = json.load(f)
+
+path_json = config_json['main']['path_json']
+path_json_default = config_json['main']['path_json_default']
+
+lcd = classes.LcdModule
+
+btn_kapali = classes.ButtonSwitch(config_json['buttons']['btn_kapali'])
+
+btn_counter = classes.ButtonSwitch(config_json['buttons']['btn_counter'], callback=write_lcd_json_counter)
+
+btn_reset = classes.ButtonSwitch(config_json['buttons']['btn_reset'])
+btn_start_stop = classes.ButtonSwitch(config_json['buttons']['btn_start_stop'])
+btn_cozgu = classes.ButtonSwitch(config_json['buttons']['btn_cozgu'])
+btn_ariza = classes.ButtonSwitch(config_json['buttons']['btn_ariza'])
+btn_ayar = classes.ButtonSwitch(config_json['buttons']['btn_ayar'])
+
 time_obj = classes.Time()
 bobin_btn = classes.ButtonSwitch(5)
 
-lcd = CharLCD('PCF8574', 0x27)
+# in Gpios coded static
+# lcd_model = config.get('setup', 'lcd_model')
+# lcd_bit = config.get('setup','lcd_bit')
+
+
 
 system_time = ''
 
 data_js = {}
 
-btn_kapali = 4
+# btn_kapali = 4
 kapali_state = 0
 
-btn_counter = 17
+# btn_counter = 17
 counter_state = 0
 
-btn_reset = 27
+# btn_reset = 27
 reset_state = 0
 counter_nr = 0
 
-btn_start_stop = 22
+# btn_start_stop = 22
 start_stop_state = 0
 
 # btn_bobin = 5
 # bobin_state = 0
 
-btn_cozgu = 6
+# btn_cozgu = 6
 cozgu_state = 0
 
-btn_ariza = 13
+# btn_ariza = 13
 ariza_state = 0
 
-btn_ayar = 19
+# btn_ayar = 19
 ayar_state = 0
 
-path_json = '/var/www/html/data.json'
-path_json_default = 'default_data.json'
+
 
 
 def setup():
     '''Takes in a number n, returns the square of n'''
     global data_js
     global counter_nr
-
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(btn_kapali, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_counter, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_reset, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_start_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    # GPIO.setup(btn_bobin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_cozgu, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_ariza, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(btn_ayar, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+      
+    
+    
+    # GPIO.setmode(GPIO.BCM)
+    # GPIO.setup(btn_kapali, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_counter, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_reset, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_start_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # # GPIO.setup(btn_bobin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_cozgu, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_ariza, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(btn_ayar, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # if not exists create file
     if os.path.isfile(path_json):
@@ -111,40 +150,41 @@ def write_lcd(what, show):
     global system_time
 
     if what == 'kapali':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '    ' + u'kapali')
+        lcd.write_row1(system_time + '    ' + u'kapali')
 
     elif what == 'start':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + ' ' + u'calisiyor')
+        lcd.write_row1(system_time + ' ' + u'calisiyor')
 
     elif what == 'stop':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '   ' + u'duruyor')
+        lcd.write_row1(system_time + '   ' + u'duruyor')
 
     elif what == 'bobin':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'bobin')
+        lcd.write_row1(system_time + '     ' + u'bobin')
 
     elif what == 'cozgu':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'cozgu')
+        lcd.write_row1(system_time + '     ' + u'cozgu')
 
     elif what == 'ariza':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'ariza')
+        lcd.write_row1(system_time + '     ' + u'ariza')
 
     elif what == 'ayar':
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '      ' + u'ayar')
+        lcd.write_row1(system_time + '      ' + u'ayar')
 
     elif what == 'reset':
-        lcd.cursor_pos = (1, 0)
-        lcd.write_string(u'Counter= ' + '0      ')
+        lcd.write_row2(u'Counter= ' + '0      ')
 
     elif what == 'counter':
-        lcd.cursor_pos = (1, 0)
-        lcd.write_string(u'Counter= ' + str(show))
+        lcd.write_row2(u'Counter= ' + str(show))
+
+
+def write_lcd_json_counter(channel):
+    global counter_nr
+    global start_stop_state
+    
+    counter_nr = counter_nr + 1
+    # print('Counter Pressed = ' + str(counter_nr))
+    write_lcd('counter', counter_nr)
+    change_json('counter', counter_nr)
 
 
 def gpio_check():
@@ -160,7 +200,7 @@ def gpio_check():
     global counter_state
 
 
-    # AC/KAPA SWITCH ###########################
+    # AC/KAPA SWITCH ###########################    
     button_state_kapali = GPIO.input(btn_kapali)
     if button_state_kapali:
         # machine off, kapali
@@ -174,8 +214,7 @@ def gpio_check():
         # machine on, acik
         if kapali_state == 1:
             # print('Acik')
-            write_lcd('stop', None)
-            change_json('stop', None)
+
             kapali_state = 0
 
         # COUNTER BUTTON #############################

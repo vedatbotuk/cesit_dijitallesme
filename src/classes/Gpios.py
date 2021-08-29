@@ -8,18 +8,31 @@ class ButtonSwitch(object):
     """Library for quad 7-segment LED modules based on the TM1637 LED driver."""
 
     # def __init__(self, gpio_funk, gpio_no, json_value_if, json_value_else):
-    def __init__(self, gpio_no):
-
+    def __init__(self, gpio_no, callback = None):
+        
+        GPIO.setmode(GPIO.BCM)
+        
         # self.gpio_funk = gpio_funk
         self.gpio_no = gpio_no
-        self.sec_state = 0
-
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        self.callback = callback
+        
+        if callback:
+            GPIO.setup(self.gpio_no, GPIO.IN)
+            kwargs = {}
+            kwargs['callback']=callback
+            # GPIO.add_event_detect(self.gpio_no, GPIO.RISING, **kwargs, bouncetime=200)
+            GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
+        else:
+            self.sec_state = 0
+    
+            GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            self.btn_state = GPIO.input(self.gpio_no)
+            
 
     # GPIO.setwarnings(False)
     def check(self):
         ''' Test '''
+        
         self.btn_state = GPIO.input(self.gpio_no)
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
@@ -48,16 +61,17 @@ class LcdModule(object):
         self.address = address
 
         self.lcd = CharLCD(modell, address)
+        
 
-    def write_row1(self, text):
+    def write_row1(self):
         ''' Description '''
         self.lcd.cursor_pos = (0, 0)
-        self.lcd.write_string(text)
+        self.lcd.write_string(self)
 
-    def write_row2(self, text):
+    def write_row2(self):
         ''' Description '''
         self.lcd.cursor_pos = (1, 0)
-        self.lcd.write_string(text)
+        self.lcd.write_string(self)
 
 
 

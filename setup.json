@@ -1,0 +1,25 @@
+{
+  "main" : {
+    "path_json" : "/var/www/html/data.json",
+    "path_json_default" : "default_data.json"
+  },
+"Device": {"Network": "WLAN", "SSID": "xxx", "Password": "xxx"},
+  "buttons" : {
+    "btn_kapali" : 4,
+    "btn_counter" : 17,
+    "btn_reset" : 27,
+    "btn_start_stop" : 22,
+    "btn_cozgu" : 6,
+    "btn_ariza" : 13,
+    "btn_ayar" : 19,
+    "btn_bobin" : 5
+  },
+  "display" : {
+    "on_1" : "",
+    "off_1" : "",
+    "on_2" : "",
+    "off_2" : "",
+    "on_3" : "",
+    "off_3" : ""
+  }
+}

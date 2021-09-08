@@ -1,15 +1,17 @@
 #!/usr/bin/python3
-''' Description '''
+""" Description """
 
 from datetime import datetime
 
+
 class Time(object):
-    ''' Description '''
+    """ Description """
     def __init__(self):
+        self.date_time_obj = ''
         self.system_time = ''
 
     def sync(self):
-        ''' Description '''
+        """ Description """
 
         self.date_time_obj = datetime.now()
 
@@ -18,9 +20,8 @@ class Time(object):
 
         return self.system_time
 
-
     def get_date_time(self):
-        ''' Description '''
+        """ Description """
         self.date_time_obj = datetime.now()
 
         return self.date_time_obj.strftime("%d-%b-%Y (%H:%M:%S)")

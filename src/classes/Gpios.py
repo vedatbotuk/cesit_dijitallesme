@@ -27,7 +27,7 @@ class ButtonSwitch:
             GPIO.setup(self.gpio_no, GPIO.IN)
             # kwargs = {}
             # kwargs['callback'] = callback
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback, bouncetime=200)
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback, bouncetime=1000)
             # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
         else:
             self.sec_state = 0

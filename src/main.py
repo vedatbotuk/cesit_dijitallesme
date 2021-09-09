@@ -215,8 +215,10 @@ def gpio_check1():
         system_on = 0
         options_changed = 1
     elif btn_kapali_checked is True:
-        stop_options_array.remove('kapali')
+        if 'kapali' in stop_options_array: stop_options_array.remove('kapali')
+        stop_options_array.append('stop')
         system_on = 1
+        options_changed = 1
     # AC/KAPA SWITCH ------------
     # ---------------------------
 
@@ -250,7 +252,7 @@ def gpio_check1():
             stop_options_array.append('bobin')
             options_changed = 1
         elif btn_bobin_checked is True:
-            stop_options_array.remove('bobin')
+            if 'bobin' in stop_options_array: stop_options_array.remove('bobin')
             options_changed = 1
         # BOBIN SWITCH --------------
         # ---------------------------
@@ -262,7 +264,7 @@ def gpio_check1():
             stop_options_array.append('cozgu')
             options_changed = 1
         elif btn_cozgu_checked is True:
-            stop_options_array.remove('ariza')
+            if 'cozgu' in stop_options_array: stop_options_array.remove('cozgu')
             options_changed = 1
         # COZGU SWITCH --------------
         # ---------------------------
@@ -274,7 +276,7 @@ def gpio_check1():
             stop_options_array.append('ariza')
             options_changed = 1
         elif btn_ariza_checked is True:
-            stop_options_array.remove('ariza')
+            if 'ariza' in stop_options_array: stop_options_array.remove('ariza')
             options_changed = 1
         # ARIZA SWITCH --------------
         # ---------------------------
@@ -286,7 +288,7 @@ def gpio_check1():
             stop_options_array.append('ayar')
             options_changed = 1
         elif btn_ayar_checked is True:
-            stop_options_array.remove('ayar')
+            if 'ayar' in stop_options_array: stop_options_array.remove('ayar')
             options_changed = 1
         # AYAR SWITCH ---------------
         # ---------------------------
@@ -405,7 +407,7 @@ def loop():
     global system_time
 
     while True:
-        gpio_check()
+        gpio_check1()
         # test()
         system_time = time_obj.sync()
         sleep(0.2)

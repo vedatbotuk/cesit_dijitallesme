@@ -11,7 +11,7 @@ import classes as classes
 # TODO logging
 
 # Setup
-with open('../setup.json', 'r') as f:
+with open('/home/pi/cesit_dijitallesme/setup.json', 'r') as f:
     config_json = json.load(f)
 
 path_json = config_json['main']['path_json']

@@ -1,7 +1,8 @@
 {
   "main" : {
     "path_json" : "/var/www/html/data.json",
-    "path_json_default" : "default_data.json"
+    "path_json_default" : "default_data.json",
+    "maschine_name" : "Pilot"
   },
 "Device": {"Network": "WLAN", "SSID": "xxx", "Password": "xxx"},
   "buttons" : {

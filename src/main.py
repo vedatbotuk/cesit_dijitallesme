@@ -16,6 +16,8 @@ with open('../setup.json', 'r') as f:
 
 path_json = config_json['main']['path_json']
 path_json_default = config_json['main']['path_json_default']
+maschine_name = config_json['main']['maschine_name']
+
 
 lcd = classes.LcdModule
 
@@ -62,12 +64,12 @@ btn_bobin = classes.ButtonSwitch(config_json['buttons']['btn_bobin'])
 
 def setup():
     """Takes in a number n, returns the square of n"""
-    global data_js, counter_nr, path_json
+    global data_js, counter_nr, path_json, maschine_name
 
     # if not exists create file
     if os.path.isfile(path_json):
         data_js = json.load(open(path_json, 'r'))
-        counter_nr = int(data_js['Devices']['Pilot']['Counter'])
+        counter_nr = int(data_js['Devices'][maschine_name]['Counter'])
 
     else:
         with open(path_json_default, 'r') as json_file:
@@ -75,33 +77,34 @@ def setup():
 
 
 def change_json(what, state):
+    global maschine_name
     """change_json"""
     if what == 'kapali':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Kapalı'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Kapalı'
 
     elif what == 'start':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Çalışıyor'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Çalışıyor'
 
     elif what == 'stop':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Duruyor'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Duruyor'
 
     elif what == 'counter':
-        data_js['Devices']['Pilot']['Counter'] = state
+        data_js['Devices'][maschine_name]['Counter'] = state
 
     elif what == 'reset':
-        data_js['Devices']['Pilot']['Son Reset Tarihi'] = state
+        data_js['Devices'][maschine_name]['Son Reset Tarihi'] = state
 
     elif what == 'bobin':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Duruyor - Bobin değişimi'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Duruyor - Bobin değişimi'
 
     elif what == 'cozgu':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Duruyor - Çözgü'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Duruyor - Çözgü'
 
     elif what == 'ariza':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Duruyor - Arıza'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Duruyor - Arıza'
 
     elif what == 'ayar':
-        data_js['Devices']['Pilot']['Makine Durumu'] = 'Duruyor - Ayar'
+        data_js['Devices'][maschine_name]['Makine Durumu'] = 'Duruyor - Ayar'
 
     with open(path_json, 'w') as json_file:
         json.dump(data_js, json_file)

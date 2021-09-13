@@ -57,7 +57,7 @@ class JsonFuncs:
         self.counter_nr = int(self.data_js['Devices'][self.device_name]['Counter'])
 
         self.time_obj = Time()
-        self.system_time = self.time_obj.sync()
+        self.system_time = self.time_obj.get_date_time()
 
     def get_counter(self):
         """ Description """
@@ -80,7 +80,7 @@ class JsonFuncs:
             self.data_js['Devices'][self.device_name]['Counter'] = state
 
         elif what == 'reset':
-            self.system_time = self.time_obj.sync()
+            self.system_time = self.time_obj.get_date_time()
             self.data_js['Devices'][self.device_name]['Son Reset Tarihi'] = self.system_time
 
         elif what == 'bobin':

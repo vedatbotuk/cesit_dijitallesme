@@ -69,6 +69,7 @@ def write_lcd(what, show):
         lcd.cursor_pos = (1, 0)
         lcd.write_string(u'Counter= ' + str(show))
 
+
 def sync_time():
     """ Description """
     __write_time()

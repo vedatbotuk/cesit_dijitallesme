@@ -156,9 +156,13 @@ def gpio_check():
 
     if options_changed == 1 and stop_options_array:
         # last entry in array
-        classes.write_lcd(stop_options_array[len(stop_options_array) - 1], None)
-        JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
+        last_entry = stop_options_array[len(stop_options_array) - 1]
+        classes.write_lcd(str(last_entry), None)
+        JSON_FUNCS.change_json(str(last_entry))
 
+    if MACHINE_START_STOP == 1:
+        classes.write_lcd('counter', COUNTER_NR)
+        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
 
 def loop():
     """ Description """
@@ -178,8 +182,8 @@ def write_lcd_json_counter(channel):
 
     if MACHINE_START_STOP == 1:
         COUNTER_NR = COUNTER_NR + 1
-        classes.write_lcd('counter', COUNTER_NR)
-        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+        # classes.write_lcd('counter', COUNTER_NR)
+        # JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
         LOGGING.log_info(channel)
 
 

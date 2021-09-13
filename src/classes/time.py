@@ -1,10 +1,11 @@
-#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 """ Description """
 
+# imports
 from datetime import datetime
 
 
-class Time(object):
+class Time:
     """ Description """
     def __init__(self):
         self.date_time_obj = ''
@@ -18,7 +19,7 @@ class Time(object):
         if self.system_time != self.date_time_obj.strftime("%H:%M"):
             self.system_time = self.date_time_obj.strftime("%H:%M")
 
-        return self.system_time
+            return self.system_time
 
     def get_date_time(self):
         """ Description """

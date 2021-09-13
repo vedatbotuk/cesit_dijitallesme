@@ -2,76 +2,64 @@
 """ Description """
 
 from RPLCD.i2c import CharLCD
-from .json_funcs import get_setup
 from .time import Time
-from .log_info import LogInfo
+# from .log_info import LogInfo
 
-class LcdModule:
+lcd = CharLCD('PCF8574', address=0x27)
+time_obj = Time()
+# logging.log_info('Module: ' + 'PCF8574' + ' loaded')
+
+
+def __write_row1(text):
+    """ Description """
+    lcd.cursor_pos = (0, 6)
+    lcd.write_string(text)
+
+
+def __write_row2(text):
+    """ Description """
+    lcd.cursor_pos = (1, 0)
+    lcd.write_string(text)
+
+
+def __write_time():
+    system_time = time_obj.sync()
+    if system_time is not None:
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string(system_time)
+
+
+def write_lcd(what, show):
     """ Description """
 
-    def __init__(self, model='PCF8574', address=0x27):
+    if what == 'kapali':
+        __write_row1(u'kapali')
 
-        config_json = get_setup()
-        logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
+    elif what == 'start':
+        __write_row1(u'calisiyor')
 
-        self.text = ''
-        self.model = model
-        self.address = address
-        self.time_obj = Time()
-        self.system_time = self.time_obj.sync()
+    elif what == 'stop':
+        __write_row1(u'duruyor')
 
-        self.lcd = CharLCD(model, address)
+    elif what == 'bobin':
+        __write_row1(u'bobin')
 
-        logging.log_info('Module: ' + self.model + ' loaded')
+    elif what == 'cozgu':
+        __write_row1(u'cozgu')
 
-    def __write_row1(self, text):
-        """ Description """
-        self.lcd.cursor_pos = (0, 6)
-        self.lcd.write_string(text)
+    elif what == 'ariza':
+        __write_row1(u'ariza')
 
-    def __write_row2(self, text):
-        """ Description """
-        self.lcd.cursor_pos = (1, 0)
-        self.lcd.write_string(text)
+    elif what == 'ayar':
+        __write_row1(u'ayar')
 
-    def __write_time(self):
-        self.system_time = self.time_obj.sync()
-        if self.system_time:
-            self.lcd.cursor_pos = (0, 0)
-            self.lcd.write_string(self.system_time)
+    elif what == 'reset':
+        __write_row2(u'Counter= ' + '0      ')
 
-    def write_lcd(self, what, show):
-        """ Description """
+    elif what == 'counter':
+        __write_row2(u'Counter= ' + str(show))
 
-        if what == 'kapali':
-            self.__write_row1(u'kapali')
 
-        elif what == 'start':
-            self.__write_row1(u'calisiyor')
-
-        elif what == 'stop':
-            self.__write_row1(u'duruyor')
-
-        elif what == 'bobin':
-            self.__write_row1(u'bobin')
-
-        elif what == 'cozgu':
-            self.__write_row1(u'cozgu')
-
-        elif what == 'ariza':
-            self.__write_row1(u'ariza')
-
-        elif what == 'ayar':
-            self.__write_row1(u'ayar')
-
-        elif what == 'reset':
-            self.__write_row2(u'Counter= ' + '0      ')
-
-        elif what == 'counter':
-            self.__write_row2(u'Counter= ' + str(show))
-
-    def sync_time(self):
-        """ Description """
-        self.__write_time()
+def sync_time():
+    """ Description """
+    __write_time()

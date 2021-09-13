@@ -27,7 +27,6 @@ class ButtonSwitch:
                           config_json['main']['log_level'],
                           config_json['main']['log_path'])
 
-
         # self.gpio_funk = gpio_funk
         self.gpio_no = gpio_no
         self.callback = callback
@@ -36,7 +35,7 @@ class ButtonSwitch:
             GPIO.setup(self.gpio_no, GPIO.IN)
             # kwargs = {}
             # kwargs['callback'] = callback
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, self.callback, bouncetime=800)
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback, bouncetime=800)
             logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
             # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
         else:

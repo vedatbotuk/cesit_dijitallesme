@@ -6,8 +6,6 @@
 from time import sleep
 import classes
 
-# TODO create branch with this version. Next ver with database
-
 # Setup
 CONFIG_JSON = classes.get_setup()
 
@@ -25,7 +23,7 @@ stop_options_array = []
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
 
-# LCD = classes.lc
+LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
 BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
 BTN_COZGU = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_cozgu'])
@@ -156,13 +154,9 @@ def gpio_check():
 
     if options_changed == 1 and stop_options_array:
         # last entry in array
-        last_entry = stop_options_array[len(stop_options_array) - 1]
-        classes.write_lcd(str(last_entry), None)
-        JSON_FUNCS.change_json(str(last_entry))
+        LCD.write_lcd(stop_options_array[len(stop_options_array) - 1], None)
+        JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
 
-    if MACHINE_START_STOP == 1:
-        classes.write_lcd('counter', COUNTER_NR)
-        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
 
 def loop():
     """ Description """
@@ -171,7 +165,7 @@ def loop():
     LOGGING.log_info('gpio_check loop begins.')
     while True:
         gpio_check()
-        # SYSTEM_TIME = LCD.sync_time()
+        SYSTEM_TIME = LCD.sync_time()
         # classes.lcd_module.sync_time()
         sleep(0.2)
 
@@ -182,9 +176,9 @@ def write_lcd_json_counter(channel):
 
     if MACHINE_START_STOP == 1:
         COUNTER_NR = COUNTER_NR + 1
-        # classes.write_lcd('counter', COUNTER_NR)
-        # JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
-        LOGGING.log_info(channel)
+        LCD.write_lcd('counter', COUNTER_NR)
+        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+        # LOGGING.log_info(channel)
 
 
 def write_lcd_json_btn_reset(channel):
@@ -193,11 +187,11 @@ def write_lcd_json_btn_reset(channel):
 
     if MACHINE_START_STOP == 0:
         COUNTER_NR = 0
-        classes.write_lcd('reset', COUNTER_NR)
+        LCD.write_lcd('reset', COUNTER_NR)
         JSON_FUNCS.change_json(what='reset')
         JSON_FUNCS.change_json(what='counter', state=0)
         LOGGING.log_info('Counter rested.')
-        LOGGING.log_info(channel)
+        # LOGGING.log_info(channel)
 
 
 classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'], callback=write_lcd_json_counter)

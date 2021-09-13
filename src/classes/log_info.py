@@ -31,6 +31,5 @@ class LogInfo:
             logging.info(text)
         elif (self.log_on_off == "on") and (self.log_level == "debug"):
             logging.debug(text)
-            # TODO log_info to log
         else:
             pass

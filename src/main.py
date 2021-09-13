@@ -31,6 +31,8 @@ BTN_ARIZA = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ariza'])
 BTN_AYAR = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ayar'])
 BTN_BOBIN = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_bobin'])
 
+BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
+
 
 def gpio_check():
     """ Description """
@@ -166,24 +168,26 @@ def loop():
     while True:
         gpio_check()
         SYSTEM_TIME = LCD.sync_time()
-        # classes.lcd_module.sync_time()
         sleep(0.2)
 
 
 def write_lcd_json_counter(channel):
     """ Description """
-    global COUNTER_NR
+    global COUNTER_NR, MACHINE_START_STOP, BTN_COUNTER
 
     if MACHINE_START_STOP == 1:
-        COUNTER_NR = COUNTER_NR + 1
-        LCD.write_lcd('counter', COUNTER_NR)
-        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
-        # LOGGING.log_info(channel)
+        btn_counter_checked = BTN_COUNTER.check_switch()
+        if btn_counter_checked is False:
+            sleep(0.1)
+            COUNTER_NR = COUNTER_NR + 1
+            LCD.write_lcd('counter', COUNTER_NR)
+            JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+            # LOGGING.log_info(channel)
 
 
 def write_lcd_json_btn_reset(channel):
     """ Description """
-    global COUNTER_NR
+    global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 0:
         COUNTER_NR = 0
@@ -207,4 +211,5 @@ if __name__ == '__main__':
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
+        LCD.lcd_close()
     # end of program

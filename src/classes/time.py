@@ -18,9 +18,8 @@ class Time:
 
         if self.system_time != self.date_time_obj.strftime("%H:%M"):
             self.system_time = self.date_time_obj.strftime("%H:%M")
-            return self.system_time
-        else:
-            return None
+
+        return self.system_time
 
     def get_date_time(self):
         """ Description """

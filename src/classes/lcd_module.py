@@ -27,52 +27,47 @@ class LcdModule:
 
         logging.log_info('Module: ' + self.model + ' loaded')
 
-    def __write_row1(self, text):
-        """ Description """
-        self.lcd.cursor_pos = (0, 5)
-        self.lcd.write_string(text)
-
-    def __write_row2(self, text):
-        """ Description """
-        self.lcd.cursor_pos = (1, 0)
-        self.lcd.write_string(text)
-
-    def __write_time(self):
-        self.system_time = self.time_obj.sync()
-        if self.system_time:
-            self.lcd.cursor_pos = (0, 0)
-            self.lcd.write_string(self.system_time)
-
     def write_lcd(self, what, show):
-        """ Description """
 
         if what == 'kapali':
-            self.__write_row1(u' kapali    ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '    ' + u'kapali')
 
         elif what == 'start':
-            self.__write_row1(u' calisiyor ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + ' ' + u'calisiyor')
 
         elif what == 'stop':
-            self.__write_row1(u' duruyor   ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '   ' + u'duruyor')
 
         elif what == 'bobin':
-            self.__write_row1(u' bobin     ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '     ' + u'bobin')
 
         elif what == 'cozgu':
-            self.__write_row1(u' cozgu     ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '     ' + u'cozgu')
 
         elif what == 'ariza':
-            self.__write_row1(u' ariza     ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '     ' + u'ariza')
 
         elif what == 'ayar':
-            self.__write_row1(u' ayar      ')
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.system_time + '      ' + u'ayar')
 
         elif what == 'reset':
-            self.__write_row2(u'Counter= ' + '0      ')
+            self.lcd.cursor_pos = (1, 0)
+            self.lcd.write_string(u'Counter= ' + '0      ')
 
         elif what == 'counter':
-            self.__write_row2(u'Counter=' + str(show))
+            self.lcd.cursor_pos = (1, 0)
+            self.lcd.write_string(u'Counter= ' + str(show))
 
     def sync_time(self):
         """ Description """
-        self.__write_time()
+        self.system_time = self.time_obj.sync()
+
+    def lcd_close(self):
+        self.lcd.close(clear=True)

@@ -31,35 +31,35 @@ def __write_time():
 
 def write_lcd(what, show):
     # date_wl = get_date_time('basic')
-    global system_time
+    # global system_time
 
     if what == 'kapali':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '    ' + u'kapali')
+        lcd.write_string('     ' + '    ' + u'kapali')
 
     elif what == 'start':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + ' ' + u'calisiyor')
+        lcd.write_string('     ' + ' ' + u'calisiyor')
 
     elif what == 'stop':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '   ' + u'duruyor')
+        lcd.write_string('     ' + '   ' + u'duruyor')
 
     elif what == 'bobin':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'bobin')
+        lcd.write_string('     ' + '     ' + u'bobin')
 
     elif what == 'cozgu':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'cozgu')
+        lcd.write_string('     ' + '     ' + u'cozgu')
 
     elif what == 'ariza':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '     ' + u'ariza')
+        lcd.write_string('     ' + '     ' + u'ariza')
 
     elif what == 'ayar':
         lcd.cursor_pos = (0, 0)
-        lcd.write_string(system_time + '      ' + u'ayar')
+        lcd.write_string('     ' + '      ' + u'ayar')
 
     elif what == 'reset':
         lcd.cursor_pos = (1, 0)

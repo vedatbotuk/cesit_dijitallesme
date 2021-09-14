@@ -179,13 +179,13 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP, BTN_COUNTER
 
     if MACHINE_START_STOP == 1:
-        btn_counter_checked = BTN_COUNTER.check_switch()
-        if btn_counter_checked is False:
-            sleep(0.05)
-            COUNTER_NR = COUNTER_NR + 1
-            # LCD.write_lcd('counter', COUNTER_NR)
-            JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
-            LOGGING.log_info(channel)
+        # sleep(0.1)
+        # btn_counter_checked = BTN_COUNTER.check_switch()
+        # if btn_counter_checked is False:
+        COUNTER_NR = COUNTER_NR + 1
+        # LCD.write_lcd('counter', COUNTER_NR)
+        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+        LOGGING.log_info(channel)
 
 
 def write_lcd_json_btn_reset(channel):

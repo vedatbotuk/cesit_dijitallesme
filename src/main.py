@@ -154,12 +154,13 @@ def gpio_check():
         # AYAR SWITCH ---------------
         # ---------------------------
 
-    LCD.refresh_lcd(stop_options_array[len(stop_options_array) - 1], COUNTER_NR)
+    if stop_options_array:
+        LCD.refresh_lcd(stop_options_array[len(stop_options_array) - 1], COUNTER_NR)
 
-    # if options_changed == 1 and stop_options_array:
-    #     # last entry in array
-    #     LCD.write_lcd(stop_options_array[len(stop_options_array) - 1], None)
-    #     JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
+    if options_changed == 1 and stop_options_array:
+        #     # last entry in array
+        #     LCD.write_lcd(stop_options_array[len(stop_options_array) - 1], None)
+        JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
 
 
 def loop():
@@ -180,10 +181,10 @@ def write_lcd_json_counter(channel):
     if MACHINE_START_STOP == 1:
         btn_counter_checked = BTN_COUNTER.check_switch()
         if btn_counter_checked is False:
-            sleep(0.1)
+            sleep(0.05)
             COUNTER_NR = COUNTER_NR + 1
             # LCD.write_lcd('counter', COUNTER_NR)
-            # JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+            JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
             LOGGING.log_info(channel)
 
 
@@ -195,7 +196,7 @@ def write_lcd_json_btn_reset(channel):
         COUNTER_NR = 0
         # LCD.write_lcd('reset', COUNTER_NR)
         # JSON_FUNCS.change_json(what='reset')
-        # JSON_FUNCS.change_json(what='counter', state=0)
+        JSON_FUNCS.change_json(what='counter', state=0)
         LOGGING.log_info('Counter rested.')
         LOGGING.log_info(channel)
 

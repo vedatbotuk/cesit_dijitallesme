@@ -17,6 +17,7 @@ LOGGING.log_info('--- System starting ---')
 
 SYSTEM_TIME = ''
 MACHINE_START_STOP = 0
+BTN_COUNTER = None
 system_on = 0
 stop_options_array = []
 
@@ -74,8 +75,8 @@ def gpio_check():
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
         if btn_start_stop_checked is False:
-            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'], callback=write_lcd_json_counter, event='add')
             classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'], callback=write_lcd_json_btn_reset, event='remove')
+            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'], callback=write_lcd_json_counter, event='add')
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
             stop_options_array.append('start')

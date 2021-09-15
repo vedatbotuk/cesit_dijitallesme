@@ -195,7 +195,7 @@ def write_lcd_json_btn_reset(channel):
     if MACHINE_START_STOP == 0:
         COUNTER_NR = 0
         # LCD.write_lcd('reset', COUNTER_NR)
-        # JSON_FUNCS.change_json(what='reset')
+        JSON_FUNCS.change_json(what='reset')
         JSON_FUNCS.change_json(what='counter', state=0)
         LOGGING.log_info('Counter rested.')
         LOGGING.log_info(channel)

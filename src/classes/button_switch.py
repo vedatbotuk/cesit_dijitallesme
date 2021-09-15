@@ -20,7 +20,7 @@ class ButtonSwitch:
     # gpio_no = None
     GPIO.setmode(GPIO.BCM)
 
-    def __init__(self, gpio_no, callback=None):
+    def __init__(self, gpio_no, callback=None, event=None):
         """ Description """
 
         config_json = get_setup()
@@ -31,12 +31,17 @@ class ButtonSwitch:
         # self.gpio_funk = gpio_funk
         self.gpio_no = gpio_no
         self.callback = callback
+        self.event = event
 
         if self.callback:
             GPIO.setup(self.gpio_no, GPIO.IN)
             # kwargs = {}
             # kwargs['callback'] = callback
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback)
+            if self.event == 'add':
+                GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback)
+            elif self.event == 'remove':
+                GPIO.remove_event_detect(self.gpio_no)
+
             logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
             # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
         else:

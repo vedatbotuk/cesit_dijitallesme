@@ -36,7 +36,7 @@ class ButtonSwitch:
             GPIO.setup(self.gpio_no, GPIO.IN)
             # kwargs = {}
             # kwargs['callback'] = callback
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback, bouncetime=100)
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback)
             logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
             # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
         else:

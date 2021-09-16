@@ -20,43 +20,32 @@ class ButtonSwitch:
     # gpio_no = None
     GPIO.setmode(GPIO.BCM)
 
-    def __init__(self, gpio_no, callback=None, event=None):
+    def __init__(self, gpio_no):
         """ Description """
 
         config_json = get_setup()
-        logging = LogInfo(config_json['main']['log'],
+        self.logging = LogInfo(config_json['main']['log'],
                           config_json['main']['log_level'],
                           config_json['main']['log_path'])
 
-        # self.gpio_funk = gpio_funk
         self.gpio_no = gpio_no
-        self.callback = callback
-        self.event = event
+        self.sec_state = 0
+        self.btn_state = None
 
-        if self.callback:
-            GPIO.setup(self.gpio_no, GPIO.IN)
-            # kwargs = {}
-            # kwargs['callback'] = callback
-            if self.event == 'add':
-                GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback)
-            elif self.event == 'remove':
-                GPIO.remove_event_detect(self.gpio_no)
+        GPIO.setup(self.gpio_no, GPIO.IN)
 
-            logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
-            # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
-        else:
-            self.sec_state = 0
+    def add_callback(self, callback):
+        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
-            GPIO.setup(self.gpio_no, GPIO.IN)
-            self.btn_state = GPIO.input(self.gpio_no)
+    def remove_callback(self):
+        GPIO.remove_event_detect(self.gpio_no)
+        self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
 
-            logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
+    def add_switches(self):
+        self.sec_state = 0
 
-    # GPIO.setwarnings(False)
-
-    # @classmethod
-    # def add_event_detect(cls, func):
-    #     GPIO.add_event_detect(cls.gpio_no, GPIO.RISING, func, bouncetime=200)
+        self.btn_state = GPIO.input(self.gpio_no)
+        self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
 
     def check_switch(self):
         """ Test """

@@ -17,7 +17,6 @@ LOGGING.log_info('--- System starting ---')
 
 SYSTEM_TIME = ''
 MACHINE_START_STOP = 0
-BTN_COUNTER = None
 system_on = 0
 stop_options_array = []
 
@@ -26,12 +25,20 @@ COUNTER_NR = JSON_FUNCS.get_counter()
 
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
+BTN_KAPALI.add_switches()
 BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
+BTN_START_STOP.add_switches()
 BTN_COZGU = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_cozgu'])
+BTN_COZGU.add_switches()
 BTN_ARIZA = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ariza'])
+BTN_ARIZA.add_switches()
 BTN_AYAR = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ayar'])
+BTN_AYAR.add_switches()
 BTN_BOBIN = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_bobin'])
+BTN_BOBIN.add_switches()
 
+BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
+BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 # BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 
 
@@ -75,8 +82,8 @@ def gpio_check():
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
         if btn_start_stop_checked is False:
-            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'], callback=write_lcd_json_btn_reset, event='remove')
-            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'], callback=write_lcd_json_counter, event='add')
+            BTN_RESET.remove_callback()
+            BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
             stop_options_array.append('start')
@@ -86,8 +93,8 @@ def gpio_check():
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
         elif btn_start_stop_checked is True:
-            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'], callback=write_lcd_json_counter, event='remove')
-            classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'], callback=write_lcd_json_btn_reset, event='add')
+            BTN_COUNTER.remove_callback()
+            BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
             if 'start' in stop_options_array:
                 stop_options_array.remove('start')
             stop_options_array.append('stop')
@@ -181,7 +188,7 @@ def loop():
 
 def write_lcd_json_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, BTN_COUNTER
+    global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1:
         # sleep(0.1)

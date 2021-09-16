@@ -17,7 +17,7 @@ LOGGING.log_info('--- System starting ---')
 
 SYSTEM_TIME = ''
 MACHINE_START_STOP = 0
-system_on = 0
+SYSTEM_ON = 0
 stop_options_array = []
 
 JSON_FUNCS = classes.JsonFuncs()
@@ -52,7 +52,7 @@ def gpio_check():
         BTN_ARIZA,\
         BTN_AYAR,\
         BTN_KAPALI,\
-        system_on, \
+        SYSTEM_ON, \
         stop_options_array
 
     options_changed = 0
@@ -61,28 +61,29 @@ def gpio_check():
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is False:
+        BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
         stop_options_array.append('kapali')
-        system_on = 0
+        SYSTEM_ON = 0
         options_changed = 1
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is True:
+        BTN_RESET.remove_callback()
         if 'kapali' in stop_options_array:
             stop_options_array.remove('kapali')
         stop_options_array.append('stop')
-        system_on = 1
+        SYSTEM_ON = 1
         options_changed = 1
         LOGGING.log_info('Device stopped')
     # AC/KAPA SWITCH ------------
     # ---------------------------
 
-    if system_on == 1:
+    if SYSTEM_ON == 1:
         # START/STOP SWITCH ##############
         # ################################
         # start stop und nebenarbeiten an der maschine
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
         if btn_start_stop_checked is False:
-            BTN_RESET.remove_callback()
             BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
@@ -94,7 +95,6 @@ def gpio_check():
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
         elif btn_start_stop_checked is True:
             BTN_COUNTER.remove_callback()
-            BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
             if 'start' in stop_options_array:
                 stop_options_array.remove('start')
             stop_options_array.append('stop')
@@ -104,7 +104,7 @@ def gpio_check():
         # START/STOP SWITCH --------
         # ---------------------------
 
-    if MACHINE_START_STOP == 0 and system_on == 1:
+    if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
         # BOBIN SWITCH ##############
         # ###########################
         # ab hier testet alle nebenarbeiten an der maschine
@@ -202,9 +202,9 @@ def write_lcd_json_counter(channel):
 
 def write_lcd_json_btn_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP
-
-    if MACHINE_START_STOP == 0:
+    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON
+    # BTN_RESET.remove_callback()
+    if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
         COUNTER_NR = 0
         # LCD.write_lcd('reset', COUNTER_NR)
         JSON_FUNCS.change_json(what='reset')

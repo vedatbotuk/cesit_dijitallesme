@@ -41,6 +41,10 @@ class ButtonSwitch:
         GPIO.remove_event_detect(self.gpio_no)
         self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
 
+    def wait_for(self):
+        callback = GPIO.wait_for_edge(self.gpio_no, GPIO.FALLING, timeout=2000)
+        return callback
+
     def add_switches(self):
         self.sec_state = 0
 

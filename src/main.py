@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 """ Description """
 
+# #######
 # Imports
 from time import sleep
 import classes
 
+
+# #####
 # Setup
 CONFIG_JSON = classes.get_setup()
 
@@ -39,7 +42,8 @@ BTN_BOBIN.add_switches()
 
 BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
-# BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
+# end of setup
+# ############
 
 
 def gpio_check():
@@ -83,7 +87,7 @@ def gpio_check():
         # start stop und nebenarbeiten an der maschine
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
-        if btn_start_stop_checked is False:
+        if btn_start_stop_checked is True:
             BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
@@ -93,7 +97,7 @@ def gpio_check():
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is True:
+        elif btn_start_stop_checked is False:
             BTN_COUNTER.remove_callback()
             if 'start' in stop_options_array:
                 stop_options_array.remove('start')
@@ -109,28 +113,28 @@ def gpio_check():
         # ###########################
         # ab hier testet alle nebenarbeiten an der maschine
         btn_bobin_checked = BTN_BOBIN.check_switch()
-        if btn_bobin_checked is False:
-            stop_options_array.append('bobin')
-            options_changed = 1
-            LOGGING.log_info('Device at bobin-status')
-        elif btn_bobin_checked is True:
+        if btn_bobin_checked is True:
             if 'bobin' in stop_options_array:
                 stop_options_array.remove('bobin')
             options_changed = 1
             LOGGING.log_info('Device exited bobin-status')
+        elif btn_bobin_checked is False:
+            stop_options_array.append('bobin')
+            options_changed = 1
+            LOGGING.log_info('Device at bobin-status')
         # BOBIN SWITCH --------------
         # ---------------------------
 
         # COZGU SWITCH ##############
         # ###########################
         btn_cozgu_checked = BTN_COZGU.check_switch()
-        if btn_cozgu_checked is False:
-            stop_options_array.append('cozgu')
-            options_changed = 1
-            LOGGING.log_info('Device exited cozgu-status')
-        elif btn_cozgu_checked is True:
+        if btn_cozgu_checked is True:
             if 'cozgu' in stop_options_array:
                 stop_options_array.remove('cozgu')
+            options_changed = 1
+            LOGGING.log_info('Device exited cozgu-status')
+        elif btn_cozgu_checked is False:
+            stop_options_array.append('cozgu')
             options_changed = 1
             LOGGING.log_info('Device exited cozgu-status')
         # COZGU SWITCH --------------
@@ -139,28 +143,28 @@ def gpio_check():
         # ARIZA SWITCH ##############
         # ###########################
         btn_ariza_checked = BTN_ARIZA.check_switch()
-        if btn_ariza_checked is False:
-            stop_options_array.append('ariza')
-            options_changed = 1
-            LOGGING.log_info('Device exited ariza-status')
-        elif btn_ariza_checked is True:
+        if btn_ariza_checked is True:
             if 'ariza' in stop_options_array:
                 stop_options_array.remove('ariza')
             options_changed = 1
             LOGGING.log_info('Device exited azriza-status')
+        elif btn_ariza_checked is False:
+            stop_options_array.append('ariza')
+            options_changed = 1
+            LOGGING.log_info('Device exited ariza-status')
         # ARIZA SWITCH --------------
         # ---------------------------
 
         # AYAR SWITCH ###############
         # ###########################
         btn_ayar_checked = BTN_AYAR.check_switch()
-        if btn_ayar_checked is False:
-            stop_options_array.append('ayar')
-            options_changed = 1
-            LOGGING.log_info('Device exited ayar-status')
-        elif btn_ayar_checked is True:
+        if btn_ayar_checked is True:
             if 'ayar' in stop_options_array:
                 stop_options_array.remove('ayar')
+            options_changed = 1
+            LOGGING.log_info('Device exited ayar-status')
+        elif btn_ayar_checked is False:
+            stop_options_array.append('ayar')
             options_changed = 1
             LOGGING.log_info('Device exited ayar-status')
         # AYAR SWITCH ---------------
@@ -170,8 +174,6 @@ def gpio_check():
         LCD.refresh_lcd(stop_options_array[len(stop_options_array) - 1], COUNTER_NR)
 
     if options_changed == 1 and stop_options_array:
-        #     # last entry in array
-        #     LCD.write_lcd(stop_options_array[len(stop_options_array) - 1], None)
         JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
 
 
@@ -182,7 +184,6 @@ def loop():
     LOGGING.log_info('gpio_check loop begins.')
     while True:
         gpio_check()
-        # SYSTEM_TIME = LCD.sync_time()
         sleep(0.2)
 
 
@@ -191,11 +192,7 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1:
-        # sleep(0.1)
-        # btn_counter_checked = BTN_COUNTER.check_switch()
-        # if btn_counter_checked is False:
         COUNTER_NR = COUNTER_NR + 1
-        # LCD.write_lcd('counter', COUNTER_NR)
         JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
         LOGGING.log_info(channel)
 
@@ -203,10 +200,8 @@ def write_lcd_json_counter(channel):
 def write_lcd_json_btn_reset(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON
-    # BTN_RESET.remove_callback()
     if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
         COUNTER_NR = 0
-        # LCD.write_lcd('reset', COUNTER_NR)
         JSON_FUNCS.change_json(what='reset')
         JSON_FUNCS.change_json(what='counter', state=0)
         LOGGING.log_info('Counter rested.')
@@ -225,3 +220,4 @@ if __name__ == '__main__':
         classes.gpio_cleanup()
         LCD.lcd_close()
     # end of program
+    # ##############

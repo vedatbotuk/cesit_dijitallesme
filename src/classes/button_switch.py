@@ -15,9 +15,6 @@ def gpio_cleanup():
 
 class ButtonSwitch:
     """Library for quad 7-segment LED modules based on the TM1637 LED driver."""
-
-    # def __init__(self, gpio_funk, gpio_no, json_value_if, json_value_else):
-    # gpio_no = None
     GPIO.setmode(GPIO.BCM)
 
     def __init__(self, gpio_no):
@@ -25,8 +22,8 @@ class ButtonSwitch:
 
         config_json = get_setup()
         self.logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
+                               config_json['main']['log_level'],
+                               config_json['main']['log_path'])
 
         self.gpio_no = gpio_no
         self.sec_state = 0
@@ -35,17 +32,21 @@ class ButtonSwitch:
         GPIO.setup(self.gpio_no, GPIO.IN)
 
     def add_callback(self, callback):
+        """ Test """
         GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
     def remove_callback(self):
+        """ Test """
         GPIO.remove_event_detect(self.gpio_no)
         self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
 
     def wait_for(self):
+        """ Test """
         callback = GPIO.wait_for_edge(self.gpio_no, GPIO.FALLING, timeout=2000)
         return callback
 
     def add_switches(self):
+        """ Test """
         self.sec_state = 0
 
         self.btn_state = GPIO.input(self.gpio_no)
@@ -53,25 +54,15 @@ class ButtonSwitch:
 
     def check_switch(self):
         """ Test """
-
         self.btn_state = GPIO.input(self.gpio_no)
 
-        # self.btn_state = GPIO.input(self.gpio_no)
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
         if self.btn_state:
-            # machine on, hat Strom
             if self.sec_state == 0:
-                # print('kapali')
-                # write_lcd('kapali', None)
-                # change_json('kapali', None)
                 self.sec_state = 1
                 return True
         else:
-            # machine off
             if self.sec_state == 1:
-                # print('Acik')
-                # write_lcd('stop', None)
-                # change_json('stop', None)
                 self.sec_state = 0
                 return False

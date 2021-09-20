@@ -92,7 +92,7 @@ def gpio_check():
         # start stop und nebenarbeiten an der maschine
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
-        if btn_start_stop_checked is False:
+        if btn_start_stop_checked is True:
             BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
@@ -102,7 +102,7 @@ def gpio_check():
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is True:
+        elif btn_start_stop_checked is False:
             BTN_COUNTER.remove_callback()
             if 'start' in stop_options_array:
                 stop_options_array.remove('start')
@@ -126,7 +126,7 @@ def gpio_check():
         elif btn_bobin_checked is False:
             stop_options_array.append('bobin')
             options_changed = 1
-            LOGGING.log_info('Device at bobin-status')
+            LOGGING.log_info('Device on bobin-status')
         # BOBIN SWITCH --------------
         # ---------------------------
 
@@ -141,7 +141,7 @@ def gpio_check():
         elif btn_cozgu_checked is False:
             stop_options_array.append('cozgu')
             options_changed = 1
-            LOGGING.log_info('Device exited cozgu-status')
+            LOGGING.log_info('Device on cozgu-status')
         # COZGU SWITCH --------------
         # ---------------------------
 
@@ -156,7 +156,7 @@ def gpio_check():
         elif btn_ariza_checked is False:
             stop_options_array.append('ariza')
             options_changed = 1
-            LOGGING.log_info('Device exited ariza-status')
+            LOGGING.log_info('Device on ariza-status')
         # ARIZA SWITCH --------------
         # ---------------------------
 
@@ -171,7 +171,7 @@ def gpio_check():
         elif btn_ayar_checked is False:
             stop_options_array.append('ayar')
             options_changed = 1
-            LOGGING.log_info('Device exited ayar-status')
+            LOGGING.log_info('Device on ayar-status')
         # AYAR SWITCH ---------------
         # ---------------------------
 

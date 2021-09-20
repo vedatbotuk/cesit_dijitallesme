@@ -71,6 +71,10 @@ class LcdModule:
             self.line1 = '       ' + u'ayar'
             self.line2 = u'Counter=' + str(state)
 
+        elif what == 'start_system':
+            self.line1 = ''
+            self.line2 = u'Starting...'
+
         if state == 0:
             self.line2 = u'Counter=' + '0       '
         else:

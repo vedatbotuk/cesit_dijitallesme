@@ -26,14 +26,14 @@ class ButtonSwitch:
                                config_json['main']['log_path'])
 
         self.gpio_no = gpio_no
-        self.sec_state = 0
+        self.sec_state = None
         self.btn_state = None
 
         GPIO.setup(self.gpio_no, GPIO.IN)
 
     def add_callback(self, callback):
         """ Test """
-        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
+        GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback)
 
     def remove_callback(self):
         """ Test """
@@ -47,7 +47,6 @@ class ButtonSwitch:
 
     def add_switches(self):
         """ Test """
-        self.sec_state = 0
 
         self.btn_state = GPIO.input(self.gpio_no)
         self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
@@ -59,17 +58,10 @@ class ButtonSwitch:
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
         if self.btn_state:
-            if self.sec_state == 0:
+            if self.sec_state == 0 or self.sec_state is None:
                 self.sec_state = 1
                 return True
         else:
-            if self.sec_state == 1:
+            if self.sec_state == 1 or self.sec_state is None:
                 self.sec_state = 0
                 return False
-
-    def check_switch_once(self):
-        self.btn_state = GPIO.input(self.gpio_no)
-        if self.btn_state:
-            return True
-        else:
-            return False

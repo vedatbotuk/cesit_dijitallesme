@@ -47,7 +47,7 @@ BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 
 
 def gpio_check_start():
-    """ Description """
+    """ Check status at all Switches """
     global MACHINE_START_STOP,\
         COUNTER_NR,\
         BTN_START_STOP,\
@@ -58,7 +58,6 @@ def gpio_check_start():
         BTN_KAPALI,\
         SYSTEM_ON, \
         stop_options_array
-
 
     # AC/KAPA SWITCH
     # ###########################
@@ -132,8 +131,6 @@ def gpio_check_start():
     # AYAR SWITCH ---------------
     # ---------------------------
 
-    # JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
-
 
 def gpio_check():
     """ Description """
@@ -154,11 +151,13 @@ def gpio_check():
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is False:
+        BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
         stop_options_array.append('kapali')
         SYSTEM_ON = 0
         options_changed = 1
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is True:
+        BTN_RESET.remove_callback()
         if 'kapali' in stop_options_array:
             stop_options_array.remove('kapali')
         stop_options_array.append('stop')
@@ -175,7 +174,6 @@ def gpio_check():
         # wenn start switch on, zeigt nur start bzw. calisiyor
         btn_start_stop_checked = BTN_START_STOP.check_switch()
         if btn_start_stop_checked is True:
-            BTN_RESET.remove_callback()
             BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
             if 'stop' in stop_options_array:
                 stop_options_array.remove('stop')
@@ -187,7 +185,6 @@ def gpio_check():
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
         elif btn_start_stop_checked is False:
             BTN_COUNTER.remove_callback()
-            BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
             if 'start' in stop_options_array:
                 stop_options_array.remove('start')
             stop_options_array.append('stop')

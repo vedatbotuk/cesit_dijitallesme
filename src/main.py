@@ -62,10 +62,10 @@ def gpio_check_start():
     # AC/KAPA SWITCH
     # ###########################
     btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
-    if btn_kapali_checked_once is False:
+    if btn_kapali_checked_once is True:
         SYSTEM_ON = 0
         LOGGING.log_info('Device off')
-    elif btn_kapali_checked_once is True:
+    elif btn_kapali_checked_once is False:
         SYSTEM_ON = 1
         LOGGING.log_info('Device stopped')
     # AC/KAPA SWITCH ------------
@@ -150,13 +150,13 @@ def gpio_check():
     # AC/KAPA SWITCH
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
-    if btn_kapali_checked is False:
+    if btn_kapali_checked is True:
         BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
         stop_options_array.append('kapali')
         SYSTEM_ON = 0
         options_changed = 1
         LOGGING.log_info('Device off')
-    elif btn_kapali_checked is True:
+    elif btn_kapali_checked is False:
         BTN_RESET.remove_callback()
         if 'kapali' in stop_options_array:
             stop_options_array.remove('kapali')

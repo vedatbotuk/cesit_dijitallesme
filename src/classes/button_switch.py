@@ -65,3 +65,9 @@ class ButtonSwitch:
             else:
                 self.sec_state = 0
                 return False
+
+    def check_switch_once(self):
+        if self.btn_state:
+            return True
+        else:
+            return False

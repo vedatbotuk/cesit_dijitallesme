@@ -157,7 +157,7 @@ def gpio_check():
 
         # AYAR SWITCH ###############
         # ###########################
-        btn_ayar_checked = BTN_AYAR.check_switch()
+        btn_ayar_checked = BTN_AYAR.check_switch_once()
         if btn_ayar_checked is True:
             if 'ayar' in stop_options_array:
                 stop_options_array.remove('ayar')

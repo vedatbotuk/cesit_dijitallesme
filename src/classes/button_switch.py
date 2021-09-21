@@ -15,70 +15,62 @@ def gpio_cleanup():
 
 class ButtonSwitch:
     """Library for quad 7-segment LED modules based on the TM1637 LED driver."""
-
-    # def __init__(self, gpio_funk, gpio_no, json_value_if, json_value_else):
-    # gpio_no = None
     GPIO.setmode(GPIO.BCM)
 
-    def __init__(self, gpio_no, callback=None, event=None):
+    def __init__(self, gpio_no):
         """ Description """
 
         config_json = get_setup()
-        logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
+        self.logging = LogInfo(config_json['main']['log'],
+                               config_json['main']['log_level'],
+                               config_json['main']['log_path'])
 
-        # self.gpio_funk = gpio_funk
         self.gpio_no = gpio_no
-        self.callback = callback
-        self.event = event
+        self.sec_state = None
+        self.btn_state = None
 
-        if self.callback:
-            GPIO.setup(self.gpio_no, GPIO.IN)
-            # kwargs = {}
-            # kwargs['callback'] = callback
-            if self.event == 'add':
-                GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=self.callback)
-            elif self.event == 'remove':
-                GPIO.remove_event_detect(self.gpio_no)
+        GPIO.setup(self.gpio_no, GPIO.IN)
 
-            logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
-            # GPIO.add_event_detect(gpio_no, GPIO.RISING, **kwargs)
-        else:
-            self.sec_state = 0
+    def add_callback(self, callback):
+        """ Test """
+        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
-            GPIO.setup(self.gpio_no, GPIO.IN)
-            self.btn_state = GPIO.input(self.gpio_no)
+    def remove_callback(self):
+        """ Test """
+        GPIO.remove_event_detect(self.gpio_no)
 
-            logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
-
-    # GPIO.setwarnings(False)
-
-    # @classmethod
-    # def add_event_detect(cls, func):
-    #     GPIO.add_event_detect(cls.gpio_no, GPIO.RISING, func, bouncetime=200)
+    def add_switches(self):
+        """ Test """
+        self.btn_state = GPIO.input(self.gpio_no)
 
     def check_switch(self):
         """ Test """
-
         self.btn_state = GPIO.input(self.gpio_no)
 
-        # self.btn_state = GPIO.input(self.gpio_no)
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
         if self.btn_state:
-            # machine on, hat Strom
             if self.sec_state == 0:
-                # print('kapali')
-                # write_lcd('kapali', None)
-                # change_json('kapali', None)
                 self.sec_state = 1
                 return True
         else:
-            # machine off
             if self.sec_state == 1:
-                # print('Acik')
-                # write_lcd('stop', None)
-                # change_json('stop', None)
                 self.sec_state = 0
                 return False
+
+        if self.sec_state is None:
+            if self.btn_state:
+                self.sec_state = 1
+                return True
+            else:
+                self.sec_state = 0
+                return False
+
+    def check_switch_once(self):
+        """ Test """
+        self.btn_state = GPIO.input(self.gpio_no)
+
+        if self.btn_state:
+            return True
+        else:
+            return False

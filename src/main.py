@@ -157,7 +157,7 @@ def gpio_check():
 
         # AYAR SWITCH ###############
         # ###########################
-        btn_ayar_checked = BTN_AYAR.check_switch_once()
+        btn_ayar_checked = BTN_AYAR.check_switch()
         if btn_ayar_checked is True:
             if 'ayar' in stop_options_array:
                 stop_options_array.remove('ayar')
@@ -192,7 +192,7 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1 and SYSTEM_ON == 1:
-        btn_start_stop_checked = BTN_START_STOP.check_switch()
+        btn_start_stop_checked = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked is True:
             COUNTER_NR = COUNTER_NR + 1
             JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)

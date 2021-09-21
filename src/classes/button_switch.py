@@ -59,3 +59,14 @@ class ButtonSwitch:
             if self.sec_state == 1:
                 self.sec_state = 0
                 return False
+
+    def check_switch_once(self):
+        """ Test """
+        self.btn_state = GPIO.input(self.gpio_no)
+
+        # if changes the state of button return something.
+        # If stay the state, will be returned nothing.
+        if self.btn_state:
+            return True
+        else:
+            return False

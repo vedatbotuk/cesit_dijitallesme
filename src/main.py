@@ -46,92 +46,6 @@ BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 # ############
 
 
-def gpio_check_start():
-    """ Check status at all Switches """
-    global MACHINE_START_STOP,\
-        COUNTER_NR,\
-        BTN_START_STOP,\
-        BTN_BOBIN,\
-        BTN_COZGU,\
-        BTN_ARIZA,\
-        BTN_AYAR,\
-        BTN_KAPALI,\
-        SYSTEM_ON, \
-        stop_options_array
-
-    # AC/KAPA SWITCH
-    # ###########################
-    btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
-    if btn_kapali_checked_once is True:
-        SYSTEM_ON = 0
-        LOGGING.log_info('Device off')
-    elif btn_kapali_checked_once is False:
-        SYSTEM_ON = 1
-        LOGGING.log_info('Device stopped')
-    # AC/KAPA SWITCH ------------
-    # ---------------------------
-
-    # START/STOP SWITCH ##############
-    # ################################
-    # start stop und nebenarbeiten an der maschine
-    # wenn start switch on, zeigt nur start bzw. calisiyor
-    btn_start_stop_checked_once = BTN_START_STOP.check_switch_once()
-    if btn_start_stop_checked_once is True:
-        MACHINE_START_STOP = 1
-        LOGGING.log_info('Program Start - Device started')
-        LCD.refresh_lcd('stop', COUNTER_NR)
-    # maschiene gestopt
-    # zusatzlich kann signalisiert werden, warum die maschine gestopt
-    elif btn_start_stop_checked_once is False:
-        MACHINE_START_STOP = 0
-        LOGGING.log_info('Program Start - Device stopped')
-        LCD.refresh_lcd('kapali', COUNTER_NR)
-
-    # START/STOP SWITCH --------
-    # ---------------------------
-
-    # BOBIN SWITCH ##############
-    # ###########################
-    # ab hier testet alle nebenarbeiten an der maschine
-    btn_bobin_checked_once = BTN_BOBIN.check_switch_once()
-    if btn_bobin_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited bobin-status')
-    elif btn_bobin_checked_once is False:
-        LOGGING.log_info('Program Start - Device at bobin-status')
-    # BOBIN SWITCH --------------
-    # ---------------------------
-
-    # COZGU SWITCH ##############
-    # ###########################
-    btn_cozgu_checked_once = BTN_COZGU.check_switch_once()
-    if btn_cozgu_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited cozgu-status')
-    elif btn_cozgu_checked_once is False:
-        LOGGING.log_info('Program Start - Device exited cozgu-status')
-    # COZGU SWITCH --------------
-    # ---------------------------
-
-    # ARIZA SWITCH ##############
-    # ###########################
-    btn_ariza_checked_once = BTN_ARIZA.check_switch_once()
-    if btn_ariza_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited azriza-status')
-    elif btn_ariza_checked_once is False:
-        LOGGING.log_info('Program Start - Device exited ariza-status')
-    # ARIZA SWITCH --------------
-    # ---------------------------
-
-    # AYAR SWITCH ###############
-    # ###########################
-    btn_ayar_checked_once = BTN_AYAR.check_switch_once()
-    if btn_ayar_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited ayar-status')
-    elif btn_ayar_checked_once is False:
-        LOGGING.log_info('Program Start - Device exited ayar-status')
-    # AYAR SWITCH ---------------
-    # ---------------------------
-
-
 def gpio_check():
     """ Description """
     global MACHINE_START_STOP,\
@@ -270,7 +184,7 @@ def loop():
     LOGGING.log_info('gpio_check loop begins.')
     while True:
         gpio_check()
-        sleep(0.2)
+        sleep(0.1)
 
 
 def write_lcd_json_counter(channel):
@@ -278,9 +192,11 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1 and SYSTEM_ON == 1:
-        COUNTER_NR = COUNTER_NR + 1
-        JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
-        LOGGING.log_info(channel)
+        btn_start_stop_checked = BTN_START_STOP.check_switch()
+        if btn_start_stop_checked is True:
+            COUNTER_NR = COUNTER_NR + 1
+            JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
+            LOGGING.log_info(channel)
 
 
 def write_lcd_json_btn_reset(channel):
@@ -299,7 +215,6 @@ def write_lcd_json_btn_reset(channel):
 if __name__ == '__main__':
     LOGGING.log_info('System loaded.')
     try:
-        gpio_check_start()
         loop()
         classes.gpio_cleanup()
 

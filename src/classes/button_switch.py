@@ -26,7 +26,7 @@ class ButtonSwitch:
                                config_json['main']['log_path'])
 
         self.gpio_no = gpio_no
-        self.sec_state = 0
+        self.sec_state = None
         self.btn_state = None
 
         GPIO.setup(self.gpio_no, GPIO.IN)
@@ -58,13 +58,10 @@ class ButtonSwitch:
                 self.sec_state = 0
                 return False
 
-    def check_switch_once(self):
-        """ Test """
-        self.btn_state = GPIO.input(self.gpio_no)
-
-        # if changes the state of button return something.
-        # If stay the state, will be returned nothing.
-        if self.btn_state:
-            return True
-        else:
-            return False
+        if self.sec_state is None:
+            if self.btn_state:
+                self.sec_state = 1
+                return True
+            else:
+                self.sec_state = 0
+                return False

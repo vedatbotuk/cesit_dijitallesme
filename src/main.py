@@ -18,7 +18,6 @@ LOGGING = classes.LogInfo(CONFIG_JSON['main']['log'],
 
 LOGGING.log_info('--- System starting ---')
 
-SYSTEM_TIME = ''
 MACHINE_START_STOP = 0
 SYSTEM_ON = 0
 stop_options_array = []
@@ -177,16 +176,6 @@ def gpio_check():
         JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
 
 
-def loop():
-    """ Description """
-    global SYSTEM_TIME
-
-    LOGGING.log_info('gpio_check loop begins.')
-    while True:
-        gpio_check()
-        sleep(0.1)
-
-
 def write_lcd_json_counter(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP
@@ -210,6 +199,15 @@ def write_lcd_json_btn_reset(channel):
         JSON_FUNCS.change_json(what='counter', state=0)
         LOGGING.log_info('Counter rested.')
         LOGGING.log_info(channel)
+
+
+def loop():
+    """ Description """
+
+    LOGGING.log_info('gpio_check loop begins.')
+    while True:
+        gpio_check()
+        sleep(0.1)
 
 
 if __name__ == '__main__':

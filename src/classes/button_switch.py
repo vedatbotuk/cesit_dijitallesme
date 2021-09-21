@@ -33,7 +33,7 @@ class ButtonSwitch:
 
     def add_callback(self, callback):
         """ Test """
-        GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback)
+        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
     def remove_callback(self):
         """ Test """
@@ -41,9 +41,7 @@ class ButtonSwitch:
 
     def add_switches(self):
         """ Test """
-
         self.btn_state = GPIO.input(self.gpio_no)
-        self.logging.log_info('Switch configured at GPIO' + str(self.gpio_no))
 
     def check_switch(self):
         """ Test """

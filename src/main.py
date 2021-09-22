@@ -178,7 +178,6 @@ def event_start_stop(channel):
     if SYSTEM_ON == 1:
         btn_start_stop_checked = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked is True:
-            # BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
             if 'stop' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('stop')
             STOP_OPTIONS_ARRAY.append('start')
@@ -188,8 +187,6 @@ def event_start_stop(channel):
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
         elif btn_start_stop_checked is False:
-            # BTN_COUNTER.remove_callback()
-
             if 'start' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('start')
             STOP_OPTIONS_ARRAY.append('stop')
@@ -204,7 +201,7 @@ def event_counter(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED
 
-    if SYSTEM_ON == 1:
+    if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
         # sleep(0.1)
         btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_cnt is True:
@@ -218,9 +215,9 @@ def event_reset(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED
 
-    if MACHINE_START_STOP == 0:
-        btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
-        if btn_start_stop_checked_rst is False:
+    if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
+        btn_kapali_checked_rst = BTN_KAPALI.check_switch_once()
+        if btn_kapali_checked_rst is False:
             COUNTER_NR = 0
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=0)
@@ -252,8 +249,8 @@ if __name__ == '__main__':
         loop()
         classes.gpio_cleanup()
 
-    except KeyboardInterrupt:
-        print('keyboard interrupt detected')
+    except (KeyboardInterrupt, SystemExit):
+        # print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
         LCD.lcd_close()

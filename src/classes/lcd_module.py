@@ -41,6 +41,7 @@ class LcdModule:
         logging.log_info('Module: ' + self.model + ' loaded')
 
     def refresh_lcd(self, what, state):
+        """ Description """
         # self.line1 =
 
         if what == 'kapali':
@@ -92,4 +93,5 @@ class LcdModule:
         return self.system_time
 
     def lcd_close(self):
+        """ Description """
         self.lcd.close(clear=True)

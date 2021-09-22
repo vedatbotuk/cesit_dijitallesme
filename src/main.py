@@ -7,7 +7,6 @@
 from time import sleep
 import classes
 
-
 # #####
 # Setup
 CONFIG_JSON = classes.get_setup()
@@ -20,7 +19,8 @@ LOGGING.log_info('--- System starting ---')
 
 MACHINE_START_STOP = 0
 SYSTEM_ON = 0
-stop_options_array = []
+OPTIONS_CHANGED = 1
+STOP_OPTIONS_ARRAY = []
 
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
@@ -45,135 +45,158 @@ BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 # ############
 
 
-def gpio_check():
+def check_kapali():
     """ Description """
-    global MACHINE_START_STOP,\
-        COUNTER_NR,\
-        BTN_START_STOP,\
-        BTN_BOBIN,\
-        BTN_COZGU,\
-        BTN_ARIZA,\
-        BTN_AYAR,\
-        BTN_KAPALI,\
-        SYSTEM_ON, \
-        stop_options_array
-
-    options_changed = 0
-
+    global SYSTEM_ON, OPTIONS_CHANGED
     # AC/KAPA SWITCH
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is True:
         BTN_RESET.add_callback(callback=write_lcd_json_btn_reset)
-        stop_options_array.append('kapali')
+        STOP_OPTIONS_ARRAY.append('kapali')
         SYSTEM_ON = 0
-        options_changed = 1
+        OPTIONS_CHANGED = 1
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is False:
         BTN_RESET.remove_callback()
-        if 'kapali' in stop_options_array:
-            stop_options_array.remove('kapali')
-        stop_options_array.append('stop')
+        if 'kapali' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('kapali')
+        STOP_OPTIONS_ARRAY.append('stop')
         SYSTEM_ON = 1
-        options_changed = 1
+        OPTIONS_CHANGED = 1
         LOGGING.log_info('Device stopped')
     # AC/KAPA SWITCH ------------
     # ---------------------------
 
+
+def check_start_stop():
+    """ Description """
+    global MACHINE_START_STOP, OPTIONS_CHANGED
+    # START/STOP SWITCH ##############
+    # ################################
+    # start stop und nebenarbeiten an der maschine
+    # wenn start switch on, zeigt nur start bzw. calisiyor
+    btn_start_stop_checked = BTN_START_STOP.check_switch()
+    if btn_start_stop_checked is True:
+        BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
+        if 'stop' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('stop')
+        STOP_OPTIONS_ARRAY.append('start')
+        MACHINE_START_STOP = 1
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device started')
+    # maschiene gestopt
+    # zusatzlich kann signalisiert werden, warum die maschine gestopt
+    elif btn_start_stop_checked is False:
+        BTN_COUNTER.remove_callback()
+        if 'start' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('start')
+        STOP_OPTIONS_ARRAY.append('stop')
+        MACHINE_START_STOP = 0
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device stopped')
+    # START/STOP SWITCH --------
+    # ---------------------------
+
+
+def check_bobin():
+    """ Description """
+    global OPTIONS_CHANGED
+    # BOBIN SWITCH ##############
+    # ###########################
+    # ab hier testet alle nebenarbeiten an der maschine
+    btn_bobin_checked = BTN_BOBIN.check_switch()
+    if btn_bobin_checked is True:
+        if 'bobin' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('bobin')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited bobin-status')
+    elif btn_bobin_checked is False:
+        STOP_OPTIONS_ARRAY.append('bobin')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device at bobin-status')
+    # BOBIN SWITCH --------------
+    # ---------------------------
+
+
+def check_cozgu():
+    """ Description """
+    global OPTIONS_CHANGED
+    # COZGU SWITCH ##############
+    # ###########################
+    btn_cozgu_checked = BTN_COZGU.check_switch()
+    if btn_cozgu_checked is True:
+        if 'cozgu' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('cozgu')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited cozgu-status')
+    elif btn_cozgu_checked is False:
+        STOP_OPTIONS_ARRAY.append('cozgu')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited cozgu-status')
+    # COZGU SWITCH --------------
+    # ---------------------------
+
+
+def check_ariza():
+    """ Description """
+    global OPTIONS_CHANGED
+    # ARIZA SWITCH ##############
+    # ###########################
+    btn_ariza_checked = BTN_ARIZA.check_switch()
+    if btn_ariza_checked is True:
+        if 'ariza' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('ariza')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited azriza-status')
+    elif btn_ariza_checked is False:
+        STOP_OPTIONS_ARRAY.append('ariza')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ariza-status')
+    # ARIZA SWITCH --------------
+    # ---------------------------
+
+
+def check_ayar():
+    """ Description """
+    global OPTIONS_CHANGED
+    # AYAR SWITCH ###############
+    # ###########################
+    btn_ayar_checked = BTN_AYAR.check_switch()
+    if btn_ayar_checked is True:
+        if 'ayar' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('ayar')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ayar-status')
+    elif btn_ayar_checked is False:
+        STOP_OPTIONS_ARRAY.append('ayar')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ayar-status')
+    # AYAR SWITCH ---------------
+    # ---------------------------
+
+
+def gpio_check():
+    """ Description """
+    global OPTIONS_CHANGED
+    OPTIONS_CHANGED = 0
+
+    check_kapali()
+
     if SYSTEM_ON == 1:
-        # START/STOP SWITCH ##############
-        # ################################
-        # start stop und nebenarbeiten an der maschine
-        # wenn start switch on, zeigt nur start bzw. calisiyor
-        btn_start_stop_checked = BTN_START_STOP.check_switch()
-        if btn_start_stop_checked is True:
-            BTN_COUNTER.add_callback(callback=write_lcd_json_counter)
-            if 'stop' in stop_options_array:
-                stop_options_array.remove('stop')
-            stop_options_array.append('start')
-            MACHINE_START_STOP = 1
-            options_changed = 1
-            LOGGING.log_info('Device started')
-        # maschiene gestopt
-        # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is False:
-            BTN_COUNTER.remove_callback()
-            if 'start' in stop_options_array:
-                stop_options_array.remove('start')
-            stop_options_array.append('stop')
-            MACHINE_START_STOP = 0
-            options_changed = 1
-            LOGGING.log_info('Device stopped')
-        # START/STOP SWITCH --------
-        # ---------------------------
+        check_start_stop()
 
     if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
-        # BOBIN SWITCH ##############
-        # ###########################
-        # ab hier testet alle nebenarbeiten an der maschine
-        btn_bobin_checked = BTN_BOBIN.check_switch()
-        if btn_bobin_checked is True:
-            if 'bobin' in stop_options_array:
-                stop_options_array.remove('bobin')
-            options_changed = 1
-            LOGGING.log_info('Device exited bobin-status')
-        elif btn_bobin_checked is False:
-            stop_options_array.append('bobin')
-            options_changed = 1
-            LOGGING.log_info('Device at bobin-status')
-        # BOBIN SWITCH --------------
-        # ---------------------------
+        check_bobin()
+        check_cozgu()
+        check_ariza()
+        check_ayar()
 
-        # COZGU SWITCH ##############
-        # ###########################
-        btn_cozgu_checked = BTN_COZGU.check_switch()
-        if btn_cozgu_checked is True:
-            if 'cozgu' in stop_options_array:
-                stop_options_array.remove('cozgu')
-            options_changed = 1
-            LOGGING.log_info('Device exited cozgu-status')
-        elif btn_cozgu_checked is False:
-            stop_options_array.append('cozgu')
-            options_changed = 1
-            LOGGING.log_info('Device exited cozgu-status')
-        # COZGU SWITCH --------------
-        # ---------------------------
+    if STOP_OPTIONS_ARRAY:
+        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
-        # ARIZA SWITCH ##############
-        # ###########################
-        btn_ariza_checked = BTN_ARIZA.check_switch()
-        if btn_ariza_checked is True:
-            if 'ariza' in stop_options_array:
-                stop_options_array.remove('ariza')
-            options_changed = 1
-            LOGGING.log_info('Device exited azriza-status')
-        elif btn_ariza_checked is False:
-            stop_options_array.append('ariza')
-            options_changed = 1
-            LOGGING.log_info('Device exited ariza-status')
-        # ARIZA SWITCH --------------
-        # ---------------------------
-
-        # AYAR SWITCH ###############
-        # ###########################
-        btn_ayar_checked = BTN_AYAR.check_switch()
-        if btn_ayar_checked is True:
-            if 'ayar' in stop_options_array:
-                stop_options_array.remove('ayar')
-            options_changed = 1
-            LOGGING.log_info('Device exited ayar-status')
-        elif btn_ayar_checked is False:
-            stop_options_array.append('ayar')
-            options_changed = 1
-            LOGGING.log_info('Device exited ayar-status')
-        # AYAR SWITCH ---------------
-        # ---------------------------
-
-    if stop_options_array:
-        LCD.refresh_lcd(stop_options_array[len(stop_options_array) - 1], COUNTER_NR)
-
-    if options_changed == 1 and stop_options_array:
-        JSON_FUNCS.change_json(what=stop_options_array[len(stop_options_array) - 1])
+    if OPTIONS_CHANGED == 1 and STOP_OPTIONS_ARRAY:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
 
 
 def write_lcd_json_counter(channel):
@@ -181,8 +204,8 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1 and SYSTEM_ON == 1:
-        btn_start_stop_checked = BTN_START_STOP.check_switch_once()
-        if btn_start_stop_checked is True:
+        btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
+        if btn_start_stop_checked_cnt is True:
             COUNTER_NR = COUNTER_NR + 1
             JSON_FUNCS.change_json(what='counter', state=COUNTER_NR)
             LOGGING.log_info(channel)
@@ -192,8 +215,7 @@ def write_lcd_json_btn_reset(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON
 
-    # if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
-    if MACHINE_START_STOP == 0:
+    if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
         COUNTER_NR = 0
         JSON_FUNCS.change_json(what='reset')
         JSON_FUNCS.change_json(what='counter', state=0)
@@ -207,7 +229,7 @@ def loop():
     LOGGING.log_info('gpio_check loop begins.')
     while True:
         gpio_check()
-        sleep(0.1)
+        sleep(0.2)
 
 
 if __name__ == '__main__':

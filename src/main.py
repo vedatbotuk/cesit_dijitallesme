@@ -241,6 +241,7 @@ def loop():
 
 def add_events():
     """ Description """
+    check_kapali()
     event_start_stop(None)
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
 

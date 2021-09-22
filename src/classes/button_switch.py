@@ -31,15 +31,9 @@ class ButtonSwitch:
 
         GPIO.setup(self.gpio_no, GPIO.IN)
 
-    def add_callback(self,mode, callback):
+    def add_callback(self, callback):
         """ Test """
-
-        if mode == 'falling':
-            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback)
-        elif mode == 'both':
-            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback)
-        elif mode == 'rising':
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
+        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
     def remove_callback(self):
         """ Test """

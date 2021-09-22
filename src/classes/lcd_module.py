@@ -7,15 +7,16 @@ from .json_funcs import get_setup
 from .time import Time
 from .log_info import LogInfo
 
-config_json = get_setup()
-logging = LogInfo(config_json['main']['log'],
-                  config_json['main']['log_level'],
-                  config_json['main']['log_path'])
 
 class LcdModule:
     """ Description """
 
     def __init__(self, model='PCF8574', address=0x27):
+
+        config_json = get_setup()
+        logging = LogInfo(config_json['main']['log'],
+                          config_json['main']['log_level'],
+                          config_json['main']['log_path'])
 
         self.text = ''
         self.line1 = ''
@@ -27,18 +28,15 @@ class LcdModule:
 
         # cols is because of linebreak and line return 17. Like bellow.
         # self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
-        try:
-            self.lcd = CharLCD(self.model,
-                               self.address,
-                               port=1,
-                               cols=17,
-                               rows=2,
-                               dotsize=8,
-                               charmap='A02',
-                               auto_linebreaks=False,
-                               backlight_enabled=True)
-        except Exception as e:
-            logging.log_info(e)
+        self.lcd = CharLCD(self.model,
+                           self.address,
+                           port=1,
+                           cols=17,
+                           rows=2,
+                           dotsize=8,
+                           charmap='A02',
+                           auto_linebreaks=False,
+                           backlight_enabled=True)
 
         logging.log_info('Module: ' + self.model + ' loaded')
 
@@ -86,11 +84,8 @@ class LcdModule:
         text_old = self.text
         self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
         if text_old != self.text:
-            try:
-                self.lcd.cursor_pos = (0, 0)
-                self.lcd.write_string(self.text)
-            except Exception as e:
-                logging.log_info(e)
+            self.lcd.cursor_pos = (0, 0)
+            self.lcd.write_string(self.text)
 
     def __sync_time(self):
         """ Description """

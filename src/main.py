@@ -204,6 +204,7 @@ def write_lcd_json_counter(channel):
     global COUNTER_NR, MACHINE_START_STOP
 
     if MACHINE_START_STOP == 1 and SYSTEM_ON == 1:
+        sleep(0.1)
         btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_cnt is True:
             COUNTER_NR = COUNTER_NR + 1

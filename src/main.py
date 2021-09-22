@@ -63,7 +63,7 @@ def check_kapali():
         STOP_OPTIONS_ARRAY.append('stop')
         SYSTEM_ON = 1
         OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device stopped')
+        LOGGING.log_info('Device on')
     # AC/KAPA SWITCH ------------
     # ---------------------------
 
@@ -144,6 +144,7 @@ def check_ayar():
     # AYAR SWITCH ---------------
     # ---------------------------
 
+
 def gpio_check():
     """ Description """
     global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY
@@ -220,13 +221,14 @@ def event_reset(channel):
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED
 
     if MACHINE_START_STOP == 0:
+        sleep(0.5)
         btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_rst is False:
             COUNTER_NR = 0
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=0)
             OPTIONS_CHANGED = 1
-            LOGGING.log_info('Counter rested.')
+            LOGGING.log_info('Counter reset')
             LOGGING.log_info(channel)
 
 
@@ -254,7 +256,7 @@ if __name__ == '__main__':
         loop()
         classes.gpio_cleanup()
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit):
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()

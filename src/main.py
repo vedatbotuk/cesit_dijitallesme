@@ -216,7 +216,7 @@ def write_lcd_json_btn_reset(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON
 
-    if MACHINE_START_STOP == 0 and SYSTEM_ON == 0:
+    if SYSTEM_ON == 0:
         COUNTER_NR = 0
         JSON_FUNCS.change_json(what='reset')
         JSON_FUNCS.change_json(what='counter', state=0)

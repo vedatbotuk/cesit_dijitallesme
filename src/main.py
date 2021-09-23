@@ -179,8 +179,6 @@ def event_start_stop(channel):
     if SYSTEM_ON == 1:
         btn_start_stop_checked = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked is True:
-            BTN_RESET.remove_callback()
-            BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
             if 'stop' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('stop')
             STOP_OPTIONS_ARRAY.append('start')
@@ -190,8 +188,6 @@ def event_start_stop(channel):
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
         elif btn_start_stop_checked is False:
-            BTN_COUNTER.remove_callback()
-            BTN_RESET.add_callback(mode='rising', callback=event_reset)
             if 'start' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('start')
             STOP_OPTIONS_ARRAY.append('stop')
@@ -246,6 +242,8 @@ def add_events():
     check_kapali()
     event_start_stop(None)
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
+    BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
 
 if __name__ == '__main__':

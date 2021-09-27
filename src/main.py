@@ -246,7 +246,6 @@ def loop():
 
 def add_events():
     """ Description """
-    check_kapali()
     btn_kapali_checked_start = BTN_KAPALI.check_switch_once()
     if btn_kapali_checked_start is False:
         event_start_stop(None)

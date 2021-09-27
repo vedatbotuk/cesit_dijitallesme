@@ -35,7 +35,7 @@ class StartStopWatch:
         self.date_time_obj = datetime.now()
         self.start_time = self.__get_unix_time()
         self.stop_time = self.__get_unix_time()
-        self.total_time = None
+        self.total_time = 0
         # self.tmp_time = 0
 
     def __get_unix_time(self):

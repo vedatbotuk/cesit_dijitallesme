@@ -21,12 +21,12 @@ class JsonFuncs:
     def __init__(self, setup_path="/home/pi/cesit_dijitallesme/setup.json"):
 
         config_json = get_setup()
+
         logging = LogInfo(config_json['main']['log'],
                           config_json['main']['log_level'],
                           config_json['main']['log_path'])
 
         self.data_js = {}
-
         self.setup_json = get_setup(setup_path)
         self.device_name = self.setup_json['main']['device_name']
         self.path_json = self.setup_json['main']['path_json']
@@ -39,16 +39,16 @@ class JsonFuncs:
             logging.log_info('Database loaded from ' + self.path_json)
         else:
             self.data_js = {
-                    "id": self.device_name,
-                    "Makine Durumu": "Çalışıyor",
-                    "Counter": 0,
-                    "Son Reset Tarihi": "-",
-                    "Düğüm göz büyüklüğü": "-",
-                    "Toplam düğüm sayısı": 30000,
-                    "Kalan düğüm sayısı": "",
-                    "Çalışma süresi": "-",
-                    "Çalışma hızı": "-",
-                    "Tahmini kalan süre": "-"
+                "id": self.device_name,
+                "Makine Durumu": "Çalışıyor",
+                "Counter": 0,
+                "Son Reset Tarihi": "-",
+                "Düğüm göz büyüklüğü": "-",
+                "Toplam düğüm sayısı": 30000,
+                "Kalan düğüm sayısı": "",
+                "Çalışma süresi": "-",
+                "Çalışma hızı": "-",
+                "Tahmini kalan süre": "-"
             }
             logging.log_info('Created database with default_json')
 
@@ -84,7 +84,7 @@ class JsonFuncs:
             self.speed = round(state[0] / state[1]*60, 1)
             self.data_js['Çalışma hızı'] = str(self.speed) + ' düğüm/dakkika'
             self.data_js['Çalışma süresi'] = str(state[1] / 60) + ' Saat'
-            self.data_js['Tahmini kalan süre'] = str((self.toplam_dugum / self.speed) / 60) + ' Saat'
+            self.data_js['Tahmini kalan süre'] = str((self.toplam_dugum/self.speed)/60) + ' Saat'
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()

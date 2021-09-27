@@ -14,15 +14,18 @@ class LcdModule:
     def __init__(self, model='PCF8574', address=0x27):
 
         config_json = get_setup()
+
         logging = LogInfo(config_json['main']['log'],
                           config_json['main']['log_level'],
                           config_json['main']['log_path'])
 
+        self.model = model
+        self.address = address
+
         self.text = ''
         self.line1 = ''
         self.line2 = ''
-        self.model = model
-        self.address = address
+
         self.time_obj = Time()
         self.system_time = self.time_obj.sync()
 

@@ -7,6 +7,7 @@ import logging
 class LogInfo:
     """ Description """
     def __init__(self, log_on_off, log_level, log_path):
+
         self.log_on_off = log_on_off
         self.log_path = log_path
         self.log_level = log_level

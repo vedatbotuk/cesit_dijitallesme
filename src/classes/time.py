@@ -9,6 +9,7 @@ from datetime import datetime
 class Time:
     """ Description """
     def __init__(self):
+
         self.date_time_obj = ''
         self.system_time = ''
 
@@ -32,6 +33,7 @@ class Time:
 class StartStopWatch:
     """ Description """
     def __init__(self):
+
         self.date_time_obj = datetime.now()
         self.start_time = self.__get_unix_time()
         self.stop_time = self.__get_unix_time()

@@ -45,6 +45,7 @@ class StartStopWatch:
 
     def start(self):
         """ Description """
+        self.tmp_time = 0
         self.start_time = self.__get_unix_time()
 
     def stop(self):
@@ -56,4 +57,4 @@ class StartStopWatch:
         """ Description """
         total_time = self.tmp_time + self.__get_unix_time() - self.start_time
         # print(int(total_time))
-        return int(total_time)
+        return round(total_time, 1)

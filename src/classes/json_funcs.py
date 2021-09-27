@@ -80,7 +80,7 @@ class JsonFuncs:
         elif what == 'counter':
             self.data_js['Counter'] = state[0]
             self.data_js['Kalan düğüm sayısı'] = self.toplam_dugum - state[0]
-            self.data_js['Çalışma hızı'] = str(int(state[0] / state[1]*60)) + ' düğüm/dakkika'
+            self.data_js['Çalışma hızı'] = str(state[0] / state[1]*60) + ' düğüm/dakkika'
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()

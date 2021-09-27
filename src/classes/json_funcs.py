@@ -56,7 +56,7 @@ class JsonFuncs:
                 json.dump(self.data_js, json_file)
 
         self.counter_nr = int(self.data_js['Counter'])
-        # self.toplam_dugum = int(self.data_js[self.device_name]['Toplam düğüm sayısı'])
+        self.toplam_dugum = int(self.data_js['Toplam düğüm sayısı'])
 
         self.time_obj = Time()
         self.system_time = self.time_obj.get_date_time()
@@ -79,7 +79,7 @@ class JsonFuncs:
 
         elif what == 'counter':
             self.data_js['Counter'] = state[0]
-            # self.data_js['Kalan düğüm sayısı'] = self.toplam_dugum - state[0]
+            self.data_js['Kalan düğüm sayısı'] = self.toplam_dugum - state[0]
             # self.data_js['Çalışma hızı'] = str(state[0] / state[1]*60) + 'düğüm/dakkika'
 
         elif what == 'reset':

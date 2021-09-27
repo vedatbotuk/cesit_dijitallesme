@@ -41,7 +41,7 @@ class StartStopWatch:
         """ Description """
         self.date_time_obj = datetime.now()
 
-        return int(datetime.timestamp(self.date_time_obj))
+        return datetime.timestamp(self.date_time_obj)
 
     def start(self):
         """ Description """
@@ -55,4 +55,4 @@ class StartStopWatch:
     def get_run_time(self):
         """ Description """
         total_time = self.tmp_time + self.__get_unix_time() - self.start_time
-        return total_time
+        return int(total_time)

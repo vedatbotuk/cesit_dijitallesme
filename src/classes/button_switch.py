@@ -29,7 +29,7 @@ class ButtonSwitch:
         self.sec_state = None
         self.btn_state = None
 
-        GPIO.setup(self.gpio_no, GPIO.IN)
+        GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
     def add_callback(self,mode, callback):
         """ Test """
@@ -43,7 +43,7 @@ class ButtonSwitch:
 
     def remove_callback(self):
         """ Test """
-        GPIO.remove_event_detect(self.gpio_no)
+        GPIO.remove_event_detect(self.gpio_no, )
 
     def add_switches(self):
         """ Test """

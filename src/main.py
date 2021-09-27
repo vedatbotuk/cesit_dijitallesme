@@ -213,7 +213,8 @@ def event_counter(channel):
         btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_cnt is True:
             COUNTER_NR = COUNTER_NR + 1
-            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, run_time.get_run_time()])
+            # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, run_time.get_run_time()])
+            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
             OPTIONS_CHANGED = 1
             LOGGING.log_info(channel)
 

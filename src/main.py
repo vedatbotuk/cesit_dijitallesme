@@ -186,7 +186,7 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.append('start')
             MACHINE_START_STOP = 1
             OPTIONS_CHANGED = 1
-            run_time.start_time()
+            start_time = run_time.start_time
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
@@ -196,7 +196,7 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.append('stop')
             MACHINE_START_STOP = 0
             OPTIONS_CHANGED = 1
-            run_time.stop_time()
+            stop_time = run_time.stop_time
             LOGGING.log_info('Device stopped')
 
     LOGGING.log_info(channel)

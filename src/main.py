@@ -224,15 +224,19 @@ def event_reset(channel):
     global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED
 
     if MACHINE_START_STOP == 0:
-        sleep(0.5)
+        sleep(0.25)
         btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_rst is False:
-            COUNTER_NR = 0
-            JSON_FUNCS.change_json(what='reset')
-            JSON_FUNCS.change_json(what='counter', state=[0, 1])
-            OPTIONS_CHANGED = 1
-            LOGGING.log_info('Counter reset')
-            LOGGING.log_info(channel)
+            sleep(0.25)
+            btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
+            if btn_start_stop_checked_rst is True:
+                COUNTER_NR = 0
+                RUN_TIME.reset_time()
+                JSON_FUNCS.change_json(what='reset')
+                JSON_FUNCS.change_json(what='counter', state=[0, 1])
+                OPTIONS_CHANGED = 1
+                LOGGING.log_info('Counter reset')
+                LOGGING.log_info(channel)
 
 
 def loop():

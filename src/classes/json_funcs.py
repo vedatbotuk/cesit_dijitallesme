@@ -85,7 +85,7 @@ class JsonFuncs:
             self.data_js['Kalan düğüm sayısı'] = self.toplam_dugum - state[0]
             self.speed = round(state[0] / state[1]*60, 1)
             self.data_js['Çalışma hızı'] = str(self.speed) + ' düğüm/dakkika'
-            self.calisma_suresi = round(state[1] / 360, 2)
+            self.calisma_suresi = round(state[1] / 3600, 2)
             self.data_js['Çalışma süresi'] = str(self.calisma_suresi) + ' Saat'
             self.tahmini_kalan_sure = round((self.toplam_dugum/self.speed)/60, 2)
             self.data_js['Tahmini kalan süre'] = str(self.tahmini_kalan_sure) + ' Saat'

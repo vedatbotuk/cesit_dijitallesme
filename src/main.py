@@ -308,7 +308,7 @@ def gpio_check():
 
     if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-        JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
 
 
 def event_start_stop(channel):

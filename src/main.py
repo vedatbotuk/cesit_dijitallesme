@@ -169,9 +169,11 @@ def gpio_check_start():
     # ###########################
     btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
     if btn_kapali_checked_once is True:
+        STOP_OPTIONS_ARRAY.append('kapali')
         SYSTEM_ON = 0
         LOGGING.log_info('Program Start - Device off')
     elif btn_kapali_checked_once is False:
+        STOP_OPTIONS_ARRAY.append('stop')
         SYSTEM_ON = 1
         LOGGING.log_info('Program Start - Device on')
     # AC/KAPA SWITCH ------------

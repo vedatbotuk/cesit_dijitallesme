@@ -43,7 +43,6 @@ class JsonFuncs:
                 "Makine Durumu": "Çalışıyor",
                 "Counter": 0,
                 "Son Reset Tarihi": "-",
-                "Düğüm göz büyüklüğü": "-",
                 "Toplam düğüm sayısı": 30000,
                 "Kalan düğüm sayısı": "",
                 "Çalışma süresi": "-",
@@ -51,9 +50,11 @@ class JsonFuncs:
                 "Tahmini kalan süre": "-"
             }
             self.logging.log_info('Created database with default_json')
-
-            with open(self.path_json, 'w') as json_file:
-                json.dump(self.data_js, json_file)
+            try:
+                with open(self.path_json, 'w') as json_file:
+                    json.dump(self.data_js, json_file)
+            except Exception as e:
+                self.logging.log_info(e)
 
         # self.tmp_data_js = ""
         self.counter_nr = int(self.data_js['Counter'])
@@ -68,6 +69,10 @@ class JsonFuncs:
     def get_counter(self):
         """ Description """
         return self.counter_nr
+
+    def get_total_counter(self):
+        """ Description """
+        return self.toplam_dugum
 
     def change_json(self, what, state=None):
         """change_json"""

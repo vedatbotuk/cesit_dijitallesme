@@ -21,10 +21,10 @@ MACHINE_START_STOP = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 STOP_OPTIONS_ARRAY = []
-TOTAL_COUNTER = 0
 
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
+TOTAL_COUNTER = JSON_FUNCS.get_total_counter()
 
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
@@ -242,32 +242,44 @@ def check_keypad():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        button_to_give_counter = KEY_PAD.check_button('#')
-        if button_to_give_counter is True:
-            # print('button_to_give_counter')
+        # button_to_give_counter = KEY_PAD.check_button('#')
+        if KEY_PAD.check_button('#') is True:
+
             given_number = ''
 
             while True:
-                get_number = str(KEY_PAD.get_given())
-
-                if get_number is not None or not 'None':
-                    print(get_number)
-                    given_number = given_number + str(get_number)
-                # given_number = str(KEY_PAD.get_given())
-                LCD.refresh_lcd('Given_Counter', given_number)
-
-                button_to_delete = KEY_PAD.check_button('D')
-                if button_to_delete is True:
+                get_button = str(KEY_PAD.get_given())
+                if get_button == 'C':
+                    break
+                elif get_button == 'D':
                     given_number = ''
+                elif get_button == '*':
+                    try:
+                        LCD.refresh_lcd('successfully', given_number)
+                        print('given_number= ' + given_number)
+                        TOTAL_COUNTER = int(given_number)
+                        print('TOTAL_COUNTER= ' + str(TOTAL_COUNTER))
+                    except Exception as e:
+                        COUNTER_NR = 0
+                        print(e)
+                        LOGGING.log_info(e)
+                    JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
 
-                button_to_exit = KEY_PAD.check_button('*')
-                if button_to_exit is True:
-                    exit()
+                    break
+                else:
+                    given_number = given_number + get_button
+                    LCD.refresh_lcd('Given_Counter', given_number)
 
                 sleep(0.2)
-            # TOTAL_COUNTER = int(given_number)
-            COUNTER_NR = 0
-            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+
+
+def show_remainder_counter():
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        if KEY_PAD.check_button('A') is True:
+            LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER-COUNTER_NR)
+            sleep(3)
 
 
 def gpio_check():
@@ -277,6 +289,8 @@ def gpio_check():
     OPTIONS_CHANGED = 0
 
     check_kapali()
+
+    show_remainder_counter()
 
     # if SYSTEM_ON == 1:
     #     check_start_stop()
@@ -291,11 +305,7 @@ def gpio_check():
         check_ayar()
 
     if STOP_OPTIONS_ARRAY:
-        if KEYPAD_INSTALL is True:
-            show = TOTAL_COUNTER - COUNTER_NR
-        else:
-            show = COUNTER_NR
-        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], show)
+        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
         JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
 
 
@@ -338,10 +348,15 @@ def event_counter(channel):
 
     # TODO: nach start zahlt der Counter + 1
 
-    if SYSTEM_ON == 1:
+    if SYSTEM_ON == 1 and MACHINE_START_STOP == 1:
         # sleep(0.1)
-        btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
-        if btn_start_stop_checked_cnt is True:
+        cnt = 0
+        for x in range(0, 5):
+            btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
+            if btn_start_stop_checked_cnt is True:
+                cnt = cnt + 1
+
+        if cnt == 5 and MACHINE_START_STOP == 1:
             COUNTER_NR = COUNTER_NR + 1
             JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
             # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
@@ -362,6 +377,7 @@ def event_reset(channel):
             if btn_start_stop_checked_rst is True:
                 COUNTER_NR = 0
                 RUN_TIME.reset_time()
+                LCD.refresh_lcd(what='reset', state=None)
                 JSON_FUNCS.change_json(what='reset')
                 JSON_FUNCS.change_json(what='counter', state=[0, 1])
                 OPTIONS_CHANGED = 1

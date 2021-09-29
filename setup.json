@@ -14,7 +14,7 @@
   },
   "module": {
     "keypad": {
-      "install": false
+      "install": true
     },
     "lcd": {
       "install": true

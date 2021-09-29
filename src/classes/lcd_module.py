@@ -79,14 +79,29 @@ class LcdModule:
             self.line1 = '     ' + u'kapali'
             self.line2 = u'...'
 
-        elif what == 'Given_Counter':
+        elif what == 'reset':
+            self.lcd.clear()
             self.line1 = ''
+            self.line2 = u'Counter=' + '0       '
+
+        elif what == 'Given_Counter':
+            self.lcd.clear()
+            # self.line1 = ''
             self.line2 = u'-> ' + str(state)
 
-        if state == 0:
-            self.line2 = u'Counter=' + '0       '
-        else:
-            self.line2 = u'Counter=' + str(state)
+        elif what == 'successfully':
+            self.lcd.clear()
+            # self.line1 = ''
+            self.line2 = u'-> Basarili'
+
+        elif what == 'show_remainder':
+            self.line1 = ''
+            self.line2 = u'Kalan= ' + str(state)
+
+        # if state == 0:
+        #     self.line2 = u'Counter=' + '0       '
+        # else:
+        #     self.line2 = u'Counter=' + str(state)
 
         text_old = self.text
         self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2

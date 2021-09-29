@@ -7,3 +7,5 @@ from .time import *
 from .json_funcs import *
 from .lcd_module import *
 from .log_info import *
+from .keypad import *
+

@@ -15,7 +15,7 @@ class LcdModule:
 
         config_json = get_setup()
 
-        logging = LogInfo(config_json['main']['log'],
+        self.logging = LogInfo(config_json['main']['log'],
                           config_json['main']['log_level'],
                           config_json['main']['log_path'])
 
@@ -41,7 +41,7 @@ class LcdModule:
                            auto_linebreaks=False,
                            backlight_enabled=True)
 
-        logging.log_info('Module: ' + self.model + ' loaded')
+        self.logging.log_info('Module: ' + self.model + ' loaded')
 
     def refresh_lcd(self, what, state):
         """ Description """
@@ -79,6 +79,10 @@ class LcdModule:
             self.line1 = '     ' + u'kapali'
             self.line2 = u'...'
 
+        elif what == 'Given_Counter':
+            self.line1 = ''
+            self.line2 = u'-> ' + str(state)
+
         if state == 0:
             self.line2 = u'Counter=' + '0       '
         else:
@@ -87,8 +91,12 @@ class LcdModule:
         text_old = self.text
         self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
         if text_old != self.text:
-            self.lcd.cursor_pos = (0, 0)
-            self.lcd.write_string(self.text)
+            try:
+                self.lcd.cursor_pos = (0, 0)
+                self.lcd.write_string(self.text)
+            except Exception as e:
+                self.lcd.clear()
+                self.logging.log_info(e)
 
     def __sync_time(self):
         """ Description """

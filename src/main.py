@@ -21,6 +21,7 @@ MACHINE_START_STOP = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 STOP_OPTIONS_ARRAY = []
+TOTAL_COUNTER = 0
 
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
@@ -44,6 +45,10 @@ BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 
 RUN_TIME = classes.StartStopWatch()
+
+KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
+if KEYPAD_INSTALL is True:
+    KEY_PAD = classes.KeyPad()
 # end of setup
 # ############
 
@@ -147,9 +152,127 @@ def check_ayar():
     # ---------------------------
 
 
+def gpio_check_start():
+    """ Description """
+    global MACHINE_START_STOP,\
+        COUNTER_NR,\
+        BTN_START_STOP,\
+        BTN_BOBIN,\
+        BTN_COZGU,\
+        BTN_ARIZA,\
+        BTN_AYAR,\
+        BTN_KAPALI,\
+        SYSTEM_ON, \
+        STOP_OPTIONS_ARRAY
+
+    # AC/KAPA SWITCH
+    # ###########################
+    btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
+    if btn_kapali_checked_once is True:
+        SYSTEM_ON = 0
+        LOGGING.log_info('Program Start - Device off')
+    elif btn_kapali_checked_once is False:
+        SYSTEM_ON = 1
+        LOGGING.log_info('Program Start - Device on')
+    # AC/KAPA SWITCH ------------
+    # ---------------------------
+
+    # START/STOP SWITCH ##############
+    # ################################
+    # start stop und nebenarbeiten an der maschine
+    # wenn start switch on, zeigt nur start bzw. calisiyor
+    btn_start_stop_checked_once = BTN_START_STOP.check_switch_once()
+    if btn_start_stop_checked_once is True:
+        MACHINE_START_STOP = 1
+        LOGGING.log_info('Program Start - Device started')
+        LCD.refresh_lcd('stop', COUNTER_NR)
+    # maschiene gestopt
+    # zusatzlich kann signalisiert werden, warum die maschine gestopt
+    elif btn_start_stop_checked_once is False:
+        MACHINE_START_STOP = 0
+        LOGGING.log_info('Program Start - Device stopped')
+        LCD.refresh_lcd('kapali', COUNTER_NR)
+
+    # START/STOP SWITCH --------
+    # ---------------------------
+
+    # BOBIN SWITCH ##############
+    # ###########################
+    # ab hier testet alle nebenarbeiten an der maschine
+    btn_bobin_checked_once = BTN_BOBIN.check_switch_once()
+    if btn_bobin_checked_once is True:
+        LOGGING.log_info('Program Start - Device exited bobin-status')
+    elif btn_bobin_checked_once is False:
+        LOGGING.log_info('Program Start - Device at bobin-status')
+    # BOBIN SWITCH --------------
+    # ---------------------------
+
+    # COZGU SWITCH ##############
+    # ###########################
+    btn_cozgu_checked_once = BTN_COZGU.check_switch_once()
+    if btn_cozgu_checked_once is True:
+        LOGGING.log_info('Program Start - Device exited cozgu-status')
+    elif btn_cozgu_checked_once is False:
+        LOGGING.log_info('Program Start - Device at cozgu-status')
+    # COZGU SWITCH --------------
+    # ---------------------------
+
+    # ARIZA SWITCH ##############
+    # ###########################
+    btn_ariza_checked_once = BTN_ARIZA.check_switch_once()
+    if btn_ariza_checked_once is True:
+        LOGGING.log_info('Program Start - Device exited azriza-status')
+    elif btn_ariza_checked_once is False:
+        LOGGING.log_info('Program Start - Device at ariza-status')
+    # ARIZA SWITCH --------------
+    # ---------------------------
+
+    # AYAR SWITCH ###############
+    # ###########################
+    btn_ayar_checked_once = BTN_AYAR.check_switch_once()
+    if btn_ayar_checked_once is True:
+        LOGGING.log_info('Program Start - Device exited ayar-status')
+    elif btn_ayar_checked_once is False:
+        LOGGING.log_info('Program Start - Device at ayar-status')
+    # AYAR SWITCH ---------------
+    # ---------------------------
+
+
+def check_keypad():
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        button_to_give_counter = KEY_PAD.check_button('#')
+        if button_to_give_counter is True:
+            # print('button_to_give_counter')
+            given_number = ''
+
+            while True:
+                get_number = str(KEY_PAD.get_given())
+
+                if get_number is not None or not 'None':
+                    print(get_number)
+                    given_number = given_number + str(get_number)
+                # given_number = str(KEY_PAD.get_given())
+                LCD.refresh_lcd('Given_Counter', given_number)
+
+                button_to_delete = KEY_PAD.check_button('D')
+                if button_to_delete is True:
+                    given_number = ''
+
+                button_to_exit = KEY_PAD.check_button('*')
+                if button_to_exit is True:
+                    exit()
+
+                sleep(0.2)
+            # TOTAL_COUNTER = int(given_number)
+            COUNTER_NR = 0
+            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+
+
 def gpio_check():
     """ Description """
-    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY
+    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR
 
     OPTIONS_CHANGED = 0
 
@@ -159,16 +282,21 @@ def gpio_check():
     #     check_start_stop()
 
     if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
+
+        check_keypad()
+
         check_bobin()
         check_cozgu()
         check_ariza()
         check_ayar()
 
     if STOP_OPTIONS_ARRAY:
-        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-
-    if OPTIONS_CHANGED == 1 and STOP_OPTIONS_ARRAY:
-        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        if KEYPAD_INSTALL is True:
+            show = TOTAL_COUNTER - COUNTER_NR
+        else:
+            show = COUNTER_NR
+        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], show)
+        JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
 
 
 def event_start_stop(channel):
@@ -206,7 +334,9 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED
+    global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED, TOTAL_COUNTER
+
+    # TODO: nach start zahlt der Counter + 1
 
     if SYSTEM_ON == 1:
         # sleep(0.1)
@@ -250,10 +380,10 @@ def loop():
 
 def add_events():
     """ Description """
-    check_kapali()
-    btn_kapali_checked_start = BTN_KAPALI.check_switch_once()
-    if btn_kapali_checked_start is False:
-        event_start_stop(None)
+    # check_kapali()
+    # btn_kapali_checked_start = BTN_KAPALI.check_switch_once()
+    # if btn_kapali_checked_start is False:
+    #     event_start_stop(None)
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
@@ -263,6 +393,7 @@ if __name__ == '__main__':
 
     LOGGING.log_info('System loaded.')
     try:
+        gpio_check_start()
         add_events()
         loop()
         classes.gpio_cleanup()

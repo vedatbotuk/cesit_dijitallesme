@@ -3,14 +3,22 @@
     "path_json": "/var/www/html/data.json",
     "path_json_default": "default_data.json",
     "device_name": "Pilot",
-    "log": "off",
+    "log": "on",
     "log_level": "info",
     "log_path": "/var/www/html/cesit_dijitallesme.log"
   },
-  "Device": {
-    "Network": "WLAN",
-    "SSID": "xxx",
-    "Password": "xxx"
+  "device": {
+    "network": "WLAN",
+    "ssid": "xxx",
+    "password": "xxx"
+  },
+  "module": {
+    "keypad": {
+      "install": false
+    },
+    "lcd": {
+      "install": true
+    }
   },
   "buttons": {
     "btn_counter": 17,

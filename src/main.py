@@ -169,75 +169,77 @@ def gpio_check_start():
     # ###########################
     btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
     if btn_kapali_checked_once is True:
-        STOP_OPTIONS_ARRAY.append('kapali')
         SYSTEM_ON = 0
         LOGGING.log_info('Program Start - Device off')
     elif btn_kapali_checked_once is False:
-        STOP_OPTIONS_ARRAY.append('stop')
         SYSTEM_ON = 1
         LOGGING.log_info('Program Start - Device on')
     # AC/KAPA SWITCH ------------
     # ---------------------------
 
-    # START/STOP SWITCH ##############
-    # ################################
-    # start stop und nebenarbeiten an der maschine
-    # wenn start switch on, zeigt nur start bzw. calisiyor
-    btn_start_stop_checked_once = BTN_START_STOP.check_switch_once()
-    if btn_start_stop_checked_once is True:
-        MACHINE_START_STOP = 1
-        LOGGING.log_info('Program Start - Device started')
-        LCD.refresh_lcd('stop', COUNTER_NR)
-    # maschiene gestopt
-    # zusatzlich kann signalisiert werden, warum die maschine gestopt
-    elif btn_start_stop_checked_once is False:
-        MACHINE_START_STOP = 0
-        LOGGING.log_info('Program Start - Device stopped')
-        LCD.refresh_lcd('kapali', COUNTER_NR)
+    if SYSTEM_ON == 1:
+        # START/STOP SWITCH ##############
+        # ################################
+        # start stop und nebenarbeiten an der maschine
+        # wenn start switch on, zeigt nur start bzw. calisiyor
+        btn_start_stop_checked_once = BTN_START_STOP.check_switch_once()
+        if btn_start_stop_checked_once is True:
+            STOP_OPTIONS_ARRAY.append('start')
+            MACHINE_START_STOP = 1
+            LOGGING.log_info('Program Start - Device started')
+            LCD.refresh_lcd('stop', COUNTER_NR)
+        # maschiene gestopt
+        # zusatzlich kann signalisiert werden, warum die maschine gestopt
+        elif btn_start_stop_checked_once is False:
+            STOP_OPTIONS_ARRAY.append('stop')
+            MACHINE_START_STOP = 0
+            LOGGING.log_info('Program Start - Device stopped')
+            LCD.refresh_lcd('kapali', COUNTER_NR)
 
-    # START/STOP SWITCH --------
-    # ---------------------------
+        # START/STOP SWITCH --------
+        # ---------------------------
 
-    # BOBIN SWITCH ##############
-    # ###########################
-    # ab hier testet alle nebenarbeiten an der maschine
-    btn_bobin_checked_once = BTN_BOBIN.check_switch_once()
-    if btn_bobin_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited bobin-status')
-    elif btn_bobin_checked_once is False:
-        LOGGING.log_info('Program Start - Device at bobin-status')
-    # BOBIN SWITCH --------------
-    # ---------------------------
+        if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
+            # BOBIN SWITCH ##############
+            # ###########################
+            # ab hier testet alle nebenarbeiten an der maschine
+            btn_bobin_checked_once = BTN_BOBIN.check_switch_once()
+            if btn_bobin_checked_once is True:
+                LOGGING.log_info('Program Start - Device exited bobin-status')
+            elif btn_bobin_checked_once is False:
+                LOGGING.log_info('Program Start - Device at bobin-status')
+            # BOBIN SWITCH --------------
+            # ---------------------------
 
-    # COZGU SWITCH ##############
-    # ###########################
-    btn_cozgu_checked_once = BTN_COZGU.check_switch_once()
-    if btn_cozgu_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited cozgu-status')
-    elif btn_cozgu_checked_once is False:
-        LOGGING.log_info('Program Start - Device at cozgu-status')
-    # COZGU SWITCH --------------
-    # ---------------------------
+            # COZGU SWITCH ##############
+            # ###########################
+            btn_cozgu_checked_once = BTN_COZGU.check_switch_once()
+            if btn_cozgu_checked_once is True:
+                LOGGING.log_info('Program Start - Device exited cozgu-status')
+            elif btn_cozgu_checked_once is False:
+                LOGGING.log_info('Program Start - Device at cozgu-status')
+            # COZGU SWITCH --------------
+            # ---------------------------
 
-    # ARIZA SWITCH ##############
-    # ###########################
-    btn_ariza_checked_once = BTN_ARIZA.check_switch_once()
-    if btn_ariza_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited azriza-status')
-    elif btn_ariza_checked_once is False:
-        LOGGING.log_info('Program Start - Device at ariza-status')
-    # ARIZA SWITCH --------------
-    # ---------------------------
+            # ARIZA SWITCH ##############
+            # ###########################
+            btn_ariza_checked_once = BTN_ARIZA.check_switch_once()
+            if btn_ariza_checked_once is True:
+                LOGGING.log_info('Program Start - Device exited azriza-status')
+            elif btn_ariza_checked_once is False:
+                LOGGING.log_info('Program Start - Device at ariza-status')
+            # ARIZA SWITCH --------------
+            # ---------------------------
 
-    # AYAR SWITCH ###############
-    # ###########################
-    btn_ayar_checked_once = BTN_AYAR.check_switch_once()
-    if btn_ayar_checked_once is True:
-        LOGGING.log_info('Program Start - Device exited ayar-status')
-    elif btn_ayar_checked_once is False:
-        LOGGING.log_info('Program Start - Device at ayar-status')
-    # AYAR SWITCH ---------------
-    # ---------------------------
+            # AYAR SWITCH ###############
+            # ###########################
+            btn_ayar_checked_once = BTN_AYAR.check_switch_once()
+            if btn_ayar_checked_once is True:
+                LOGGING.log_info('Program Start - Device exited ayar-status')
+            elif btn_ayar_checked_once is False:
+                LOGGING.log_info('Program Start - Device at ayar-status')
+            # AYAR SWITCH ---------------
+            # ---------------------------
 
 
 def check_keypad():

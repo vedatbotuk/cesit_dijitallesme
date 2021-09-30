@@ -167,7 +167,7 @@ def gpio_check_start():
 
     # AC/KAPA SWITCH
     # ###########################
-    btn_kapali_checked_once = BTN_KAPALI.check_switch_once()
+    btn_kapali_checked_once = BTN_KAPALI.check_switch()
     if btn_kapali_checked_once is True:
         SYSTEM_ON = 0
         LOGGING.log_info('Program Start - Device off')
@@ -182,7 +182,7 @@ def gpio_check_start():
         # ################################
         # start stop und nebenarbeiten an der maschine
         # wenn start switch on, zeigt nur start bzw. calisiyor
-        btn_start_stop_checked_once = BTN_START_STOP.check_switch_once()
+        btn_start_stop_checked_once = BTN_START_STOP.check_switch()
         if btn_start_stop_checked_once is True:
             STOP_OPTIONS_ARRAY.append('start')
             MACHINE_START_STOP = 1
@@ -203,7 +203,7 @@ def gpio_check_start():
             # BOBIN SWITCH ##############
             # ###########################
             # ab hier testet alle nebenarbeiten an der maschine
-            btn_bobin_checked_once = BTN_BOBIN.check_switch_once()
+            btn_bobin_checked_once = BTN_BOBIN.check_switch()
             if btn_bobin_checked_once is True:
                 LOGGING.log_info('Program Start - Device exited bobin-status')
             elif btn_bobin_checked_once is False:
@@ -213,7 +213,7 @@ def gpio_check_start():
 
             # COZGU SWITCH ##############
             # ###########################
-            btn_cozgu_checked_once = BTN_COZGU.check_switch_once()
+            btn_cozgu_checked_once = BTN_COZGU.check_switch()
             if btn_cozgu_checked_once is True:
                 LOGGING.log_info('Program Start - Device exited cozgu-status')
             elif btn_cozgu_checked_once is False:
@@ -223,7 +223,7 @@ def gpio_check_start():
 
             # ARIZA SWITCH ##############
             # ###########################
-            btn_ariza_checked_once = BTN_ARIZA.check_switch_once()
+            btn_ariza_checked_once = BTN_ARIZA.check_switch()
             if btn_ariza_checked_once is True:
                 LOGGING.log_info('Program Start - Device exited azriza-status')
             elif btn_ariza_checked_once is False:
@@ -233,7 +233,7 @@ def gpio_check_start():
 
             # AYAR SWITCH ###############
             # ###########################
-            btn_ayar_checked_once = BTN_AYAR.check_switch_once()
+            btn_ayar_checked_once = BTN_AYAR.check_switch()
             if btn_ayar_checked_once is True:
                 LOGGING.log_info('Program Start - Device exited ayar-status')
             elif btn_ayar_checked_once is False:

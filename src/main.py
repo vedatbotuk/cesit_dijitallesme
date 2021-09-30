@@ -76,21 +76,25 @@ def check_kapali():
 
 
 def check_start_stop():
+    global MACHINE_START_STOP, COUNTER_NR
+
     # START/STOP SWITCH ##############
     # ################################
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
-    btn_start_stop_checked_once = BTN_START_STOP.check_switch()
-    if btn_start_stop_checked_once is True:
+    btn_start_stop_checked = BTN_START_STOP.check_switch()
+    if btn_start_stop_checked is True:
         STOP_OPTIONS_ARRAY.append('start')
         MACHINE_START_STOP = 1
+        OPTIONS_CHANGED = 1
         LOGGING.log_info('Device started')
         LCD.refresh_lcd('stop', COUNTER_NR)
     # maschiene gestopt
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
-    elif btn_start_stop_checked_once is False:
+    elif btn_start_stop_checked is False:
         STOP_OPTIONS_ARRAY.append('stop')
         MACHINE_START_STOP = 0
+        OPTIONS_CHANGED = 1
         LOGGING.log_info('Device stopped')
         LCD.refresh_lcd('kapali', COUNTER_NR)
 
@@ -360,8 +364,8 @@ if __name__ == '__main__':
 
     LOGGING.log_info('System loaded.')
     try:
-        gpio_check_start()
         add_events()
+        gpio_check_start()
         loop()
         classes.gpio_cleanup()
 

@@ -75,6 +75,29 @@ def check_kapali():
     # ---------------------------
 
 
+def check_start_stop():
+    # START/STOP SWITCH ##############
+    # ################################
+    # start stop und nebenarbeiten an der maschine
+    # wenn start switch on, zeigt nur start bzw. calisiyor
+    btn_start_stop_checked_once = BTN_START_STOP.check_switch()
+    if btn_start_stop_checked_once is True:
+        STOP_OPTIONS_ARRAY.append('start')
+        MACHINE_START_STOP = 1
+        LOGGING.log_info('Device started')
+        LCD.refresh_lcd('stop', COUNTER_NR)
+    # maschiene gestopt
+    # zusatzlich kann signalisiert werden, warum die maschine gestopt
+    elif btn_start_stop_checked_once is False:
+        STOP_OPTIONS_ARRAY.append('stop')
+        MACHINE_START_STOP = 0
+        LOGGING.log_info('Device stopped')
+        LCD.refresh_lcd('kapali', COUNTER_NR)
+
+    # START/STOP SWITCH --------
+    # ---------------------------
+
+
 def check_bobin():
     """ Description """
     global OPTIONS_CHANGED
@@ -154,92 +177,16 @@ def check_ayar():
 
 def gpio_check_start():
     """ Description """
-    global MACHINE_START_STOP,\
-        COUNTER_NR,\
-        BTN_START_STOP,\
-        BTN_BOBIN,\
-        BTN_COZGU,\
-        BTN_ARIZA,\
-        BTN_AYAR,\
-        BTN_KAPALI,\
-        SYSTEM_ON, \
-        STOP_OPTIONS_ARRAY
+    global MACHINE_START_STOP, STOP_OPTIONS_ARRAY
 
-    # AC/KAPA SWITCH
-    # ###########################
-    btn_kapali_checked_once = BTN_KAPALI.check_switch()
-    if btn_kapali_checked_once is True:
-        SYSTEM_ON = 0
-        LOGGING.log_info('Program Start - Device off')
-    elif btn_kapali_checked_once is False:
-        SYSTEM_ON = 1
-        LOGGING.log_info('Program Start - Device on')
-    # AC/KAPA SWITCH ------------
-    # ---------------------------
-
+    check_kapali()
     if SYSTEM_ON == 1:
-        # START/STOP SWITCH ##############
-        # ################################
-        # start stop und nebenarbeiten an der maschine
-        # wenn start switch on, zeigt nur start bzw. calisiyor
-        btn_start_stop_checked_once = BTN_START_STOP.check_switch()
-        if btn_start_stop_checked_once is True:
-            STOP_OPTIONS_ARRAY.append('start')
-            MACHINE_START_STOP = 1
-            LOGGING.log_info('Program Start - Device started')
-            LCD.refresh_lcd('stop', COUNTER_NR)
-        # maschiene gestopt
-        # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked_once is False:
-            STOP_OPTIONS_ARRAY.append('stop')
-            MACHINE_START_STOP = 0
-            LOGGING.log_info('Program Start - Device stopped')
-            LCD.refresh_lcd('kapali', COUNTER_NR)
-
-        # START/STOP SWITCH --------
-        # ---------------------------
-
-        if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
-            # BOBIN SWITCH ##############
-            # ###########################
-            # ab hier testet alle nebenarbeiten an der maschine
-            btn_bobin_checked_once = BTN_BOBIN.check_switch()
-            if btn_bobin_checked_once is True:
-                LOGGING.log_info('Program Start - Device exited bobin-status')
-            elif btn_bobin_checked_once is False:
-                LOGGING.log_info('Program Start - Device at bobin-status')
-            # BOBIN SWITCH --------------
-            # ---------------------------
-
-            # COZGU SWITCH ##############
-            # ###########################
-            btn_cozgu_checked_once = BTN_COZGU.check_switch()
-            if btn_cozgu_checked_once is True:
-                LOGGING.log_info('Program Start - Device exited cozgu-status')
-            elif btn_cozgu_checked_once is False:
-                LOGGING.log_info('Program Start - Device at cozgu-status')
-            # COZGU SWITCH --------------
-            # ---------------------------
-
-            # ARIZA SWITCH ##############
-            # ###########################
-            btn_ariza_checked_once = BTN_ARIZA.check_switch()
-            if btn_ariza_checked_once is True:
-                LOGGING.log_info('Program Start - Device exited azriza-status')
-            elif btn_ariza_checked_once is False:
-                LOGGING.log_info('Program Start - Device at ariza-status')
-            # ARIZA SWITCH --------------
-            # ---------------------------
-
-            # AYAR SWITCH ###############
-            # ###########################
-            btn_ayar_checked_once = BTN_AYAR.check_switch()
-            if btn_ayar_checked_once is True:
-                LOGGING.log_info('Program Start - Device exited ayar-status')
-            elif btn_ayar_checked_once is False:
-                LOGGING.log_info('Program Start - Device at ayar-status')
-            # AYAR SWITCH ---------------
-            # ---------------------------
+        check_start_stop()
+        if SYSTEM_ON == 1 and MACHINE_START_STOP == 0:
+            check_bobin()
+            check_cozgu()
+            check_ariza()
+            check_ayar()
 
 
 def check_keypad():

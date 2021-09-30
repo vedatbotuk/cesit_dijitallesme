@@ -318,7 +318,7 @@ def event_start_stop(channel):
     # ################################
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
-    if SYSTEM_ON == 1:
+    if SYSTEM_ON == 1 and MACHINE_START_STOP == 0:
         btn_start_stop_checked = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked is True:
             if 'stop' in STOP_OPTIONS_ARRAY:
@@ -330,7 +330,7 @@ def event_start_stop(channel):
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is False:
+        elif btn_start_stop_checked is False and MACHINE_START_STOP ==1:
             if 'start' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('start')
             STOP_OPTIONS_ARRAY.append('stop')

@@ -4,6 +4,7 @@
 
 # imports
 from datetime import datetime
+import classes
 
 
 class Time:
@@ -39,7 +40,7 @@ class StartStopWatch:
         self.date_time_obj = datetime.now()
         self.start_time = self.__get_unix_time()
         self.stop_time = self.__get_unix_time()
-        self.total_time = 0
+        self.run_time = classes.JsonFuncs().get_saved_run_time()
         self.tmp_time = 0
 
     def __get_unix_time(self):
@@ -57,15 +58,15 @@ class StartStopWatch:
         """ Description """
         # self.stop_time = self.__get_unix_time()
         # self.tmp_time = self.stop_time - self.start_time
-        self.tmp_time = self.total_time
+        self.tmp_time = self.run_time
 
     def get_run_time(self):
         """ Description """
         # total_time = self.tmp_time + self.__get_unix_time() - self.start_time
-        self.total_time = self.tmp_time + self.__get_unix_time() - self.start_time
+        self.run_time = self.tmp_time + self.__get_unix_time() - self.start_time
         # print(int(total_time))
-        return round(self.total_time, 1)
+        return round(self.run_time, 1)
 
     def reset_time(self):
-        self.total_time = 0
+        self.run_time = 0
         self.tmp_time = 0

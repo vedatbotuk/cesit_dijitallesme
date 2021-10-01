@@ -16,8 +16,8 @@ class LcdModule:
         config_json = get_setup()
 
         self.logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
+                               config_json['main']['log_level'],
+                               config_json['main']['log_path'])
 
         self.model = model
         self.address = address
@@ -45,7 +45,6 @@ class LcdModule:
 
     def refresh_lcd(self, what, state):
         """ Description """
-        # self.line1 =
 
         if what == 'kapali':
             self.line1 = '     ' + u'kapali'
@@ -80,18 +79,13 @@ class LcdModule:
             self.line2 = u'...'
 
         elif what == 'reset':
-            # self.lcd.clear()
             self.line1 = ''
             self.line2 = u'Counter=' + '0'
 
         elif what == 'Given_Counter':
-            # self.lcd.clear()
-            # self.line1 = ''
             self.line2 = u'-> ' + str(state)
 
         elif what == 'successfully':
-            # self.lcd.clear()
-            # self.line1 = ''
             self.line2 = u'-> Basarili'
 
         elif what == 'show_remainder':
@@ -103,10 +97,9 @@ class LcdModule:
             self.line2 = u'Toplam= ' + str(state)
 
         text_old = self.text
-        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' '*(16-len(self.line2))
+        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
         if text_old != self.text:
             try:
-                # self.lcd.clear()
                 self.lcd.cursor_pos = (0, 0)
                 self.lcd.write_string(self.text)
             except Exception as e:

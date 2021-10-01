@@ -23,8 +23,8 @@ class JsonFuncs:
         config_json = get_setup()
 
         self.logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
+                               config_json['main']['log_level'],
+                               config_json['main']['log_path'])
 
         self.data_js = {}
         self.setup_json = get_setup(setup_path)
@@ -40,14 +40,14 @@ class JsonFuncs:
         else:
             self.data_js = {
                 "id": self.device_name,
-                "Makine Durumu": "Çalışıyor",
+                "Makine Durumu": "Kapalı",
                 "Counter": 0,
-                "Son Reset Tarihi": "-",
-                "Toplam düğüm sayısı": 30000,
-                "Kalan düğüm sayısı": "",
-                "Çalışma süresi": "-",
-                "Çalışma hızı": "-",
-                "Tahmini kalan süre": "-"
+                "Son Reset Tarihi": "",
+                "Toplam düğüm sayısı": 0,
+                "Kalan düğüm sayısı": 0,
+                "Çalışma süresi": "",
+                "Çalışma hızı": "",
+                "Tahmini kalan süre": ""
             }
             self.logging.log_info('Created database with default_json')
             try:
@@ -56,12 +56,17 @@ class JsonFuncs:
             except Exception as e:
                 self.logging.log_info(e)
 
-        # self.tmp_data_js = ""
         self.counter_nr = int(self.data_js['Counter'])
         self.speed = None
-        self.toplam_dugum = int(self.data_js['Toplam düğüm sayısı'])
-        self.calisma_suresi = None
-        self.tahmini_kalan_sure = None
+        self.total_counter = int(self.data_js['Toplam düğüm sayısı'])
+
+        try:
+            self.run_time = float(self.data_js['Çalışma süresi'].split(' ', 1)[0]) * 3600
+        except Exception as e:
+            self.run_time = 0
+            self.logging.log_info(e)
+
+        self.remainder_time = None
 
         self.time_obj = Time()
         self.system_time = self.time_obj.get_date_time()
@@ -72,12 +77,13 @@ class JsonFuncs:
 
     def get_total_counter(self):
         """ Description """
-        return self.toplam_dugum
+        return self.total_counter
+
+    def get_saved_run_time(self):
+        return self.run_time
 
     def change_json(self, what, state=None):
         """change_json"""
-
-        # self.tmp_data_js = self.data_js
 
         if what == 'kapali':
             self.data_js['Makine Durumu'] = 'Kapalı'
@@ -90,18 +96,22 @@ class JsonFuncs:
 
         elif what == 'counter':
             self.data_js['Counter'] = state[0]
-            self.data_js['Kalan düğüm sayısı'] = self.toplam_dugum - state[0]
-            self.speed = round(state[0] / state[1]*60, 1)
-            if self.speed < 40:
+            self.data_js['Kalan düğüm sayısı'] = self.total_counter - state[0]
+
+            self.speed = round(state[0] / state[1] * 60, 1)
+
+            if 0 < self.speed < 40:
                 self.data_js['Çalışma hızı'] = str(self.speed) + ' düğüm/dakkika'
+
+                self.run_time = round(state[1] / 3600, 2)
+                self.data_js['Çalışma süresi'] = str(self.run_time) + ' Saat'
+
+                self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
+                self.data_js['Tahmini kalan süre'] = str(self.remainder_time) + ' Saat'
             else:
                 self.data_js['Çalışma hızı'] = 'hesaplanıyor...'
-
-            self.calisma_suresi = round(state[1] / 3600, 2)
-            self.data_js['Çalışma süresi'] = str(self.calisma_suresi) + ' Saat'
-            if self.speed > 0:
-                self.tahmini_kalan_sure = round((self.toplam_dugum/self.speed)/60, 2)
-            self.data_js['Tahmini kalan süre'] = str(self.tahmini_kalan_sure) + ' Saat'
+                self.data_js['Çalışma süresi'] = 'hesaplanıyor...'
+                self.data_js['Tahmini kalan süre'] = 'hesaplanıyor...'
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
@@ -120,7 +130,7 @@ class JsonFuncs:
             self.data_js['Makine Durumu'] = 'Duruyor - Ayar'
 
         elif what == 'Given_Counter':
-            self.toplam_dugum = state
+            self.total_counter = state
             self.data_js['Kalan düğüm sayısı'] = state
             self.data_js['Toplam düğüm sayısı'] = state
 

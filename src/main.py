@@ -219,7 +219,6 @@ def check_keypad():
                     try:
                         LCD.refresh_lcd('successfully', given_number)
                         sleep(2)
-                        print('given_number= ' + given_number)
                         TOTAL_COUNTER = int(given_number)
                     except Exception as e:
                         # COUNTER_NR = 0
@@ -311,7 +310,7 @@ def event_start_stop(channel):
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is False and MACHINE_START_STOP ==1:
+        elif btn_start_stop_checked is False and MACHINE_START_STOP == 1:
             if 'start' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('start')
             STOP_OPTIONS_ARRAY.append('stop')
@@ -379,10 +378,7 @@ def loop():
 
 def add_events():
     """ Description """
-    # check_kapali()
-    # btn_kapali_checked_start = BTN_KAPALI.check_switch_once()
-    # if btn_kapali_checked_start is False:
-    #     event_start_stop(None)
+
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)

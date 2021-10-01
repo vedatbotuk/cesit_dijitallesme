@@ -58,6 +58,7 @@ def check_kapali():
     global SYSTEM_ON, OPTIONS_CHANGED
     # AC/KAPA SWITCH
     # ###########################
+    # TODO: sleep? wie wird die Maschine ausgeschaltet.
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is True:
         STOP_OPTIONS_ARRAY.append('kapali')
@@ -76,7 +77,7 @@ def check_kapali():
 
 
 def check_start_stop():
-    global MACHINE_START_STOP, COUNTER_NR
+    global MACHINE_START_STOP, COUNTER_NR, OPTIONS_CHANGED
 
     # START/STOP SWITCH ##############
     # ################################
@@ -88,7 +89,7 @@ def check_start_stop():
         MACHINE_START_STOP = 1
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device started')
-        LCD.refresh_lcd('stop', COUNTER_NR)
+        LCD.refresh_lcd('start', COUNTER_NR)
     # maschiene gestopt
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
     elif btn_start_stop_checked is False:
@@ -96,8 +97,7 @@ def check_start_stop():
         MACHINE_START_STOP = 0
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device stopped')
-        LCD.refresh_lcd('kapali', COUNTER_NR)
-
+        LCD.refresh_lcd('stop', COUNTER_NR)
     # START/STOP SWITCH --------
     # ---------------------------
 
@@ -197,44 +197,71 @@ def check_keypad():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        # button_to_give_counter = KEY_PAD.check_button('#')
-        if KEY_PAD.check_button('#') is True:
+        button_to_give_counter = KEY_PAD.check_button()
+        if button_to_give_counter is '#':
 
             given_number = ''
+            LCD.refresh_lcd('Given_Counter', given_number)
 
             while True:
-                get_button = str(KEY_PAD.get_given())
+                get_button = str(KEY_PAD.check_button())
                 if get_button == 'C':
+                    # given_number = ''
+                    # LCD.refresh_lcd('Given_Counter', given_number)
                     break
+
                 elif get_button == 'D':
-                    given_number = ''
+                    # TODO: tek tek silme
+                    given_number = given_number[:-1]
+                    LCD.refresh_lcd('Given_Counter', given_number)
+
                 elif get_button == '*':
                     try:
                         LCD.refresh_lcd('successfully', given_number)
+                        sleep(2)
                         print('given_number= ' + given_number)
                         TOTAL_COUNTER = int(given_number)
-                        print('TOTAL_COUNTER= ' + str(TOTAL_COUNTER))
                     except Exception as e:
-                        COUNTER_NR = 0
-                        print(e)
+                        # COUNTER_NR = 0
                         LOGGING.log_info(e)
+                        break
+
                     JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
 
                     break
+
                 else:
+                    # TODO: Kalan dugum sayisi refresh, calculate
                     given_number = given_number + get_button
                     LCD.refresh_lcd('Given_Counter', given_number)
 
                 sleep(0.2)
+        else:
+            pass
+
+
+def total_total_counter():
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        button_to_give_total = KEY_PAD.check_button()
+        if button_to_give_total is 'A':
+            LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
+            sleep(3)
+        else:
+            pass
 
 
 def show_remainder_counter():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        if KEY_PAD.check_button('A') is True:
+        button_to_give_remainder = KEY_PAD.check_button()
+        if button_to_give_remainder is 'B':
             LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER-COUNTER_NR)
             sleep(3)
+        else:
+            pass
 
 
 def gpio_check():
@@ -246,6 +273,7 @@ def gpio_check():
     check_kapali()
 
     show_remainder_counter()
+    total_total_counter()
 
     # if SYSTEM_ON == 1:
     #     check_start_stop()

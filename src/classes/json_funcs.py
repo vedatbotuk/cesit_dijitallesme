@@ -120,6 +120,8 @@ class JsonFuncs:
             self.data_js['Makine Durumu'] = 'Duruyor - Ayar'
 
         elif what == 'Given_Counter':
+            self.toplam_dugum = state
+            self.data_js['Kalan düğüm sayısı'] = state
             self.data_js['Toplam düğüm sayısı'] = state
 
         # if self.tmp_data_js != self.data_js:

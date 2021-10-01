@@ -30,25 +30,30 @@ class KeyPad:
             GPIO.setup(self.rows_pins[j], GPIO.IN,
                        pull_up_down=GPIO.PUD_UP)
 
-    def check_button(self, check_character):
-        for jj in range(4):
-            GPIO.output(self.cols_pins[jj], 0)
-            for ii in range(4):
-                if GPIO.input(self.rows_pins[ii]) == 0:
-                    buttons_input = self.matrix[ii][jj]
-                    while GPIO.input(self.rows_pins[ii]) == 0:
-                        pass
-                    if buttons_input == check_character:
-                        return True
-            GPIO.output(self.cols_pins[jj], 1)
+        self.buttons_input = None
 
-    def get_given(self):
-        buttons_input = ''
+    # def check_button(self, check_character):
+    #     for j1 in range(4):
+    #         GPIO.output(self.cols_pins[j1], 0)
+    #         for ii in range(4):
+    #             if GPIO.input(self.rows_pins[ii]) == 0:
+    #                 self.buttons_input = self.matrix[ii][j1]
+    #                 while GPIO.input(self.rows_pins[ii]) == 0:
+    #                     pass
+    #                 # if self.buttons_input == check_character:
+    #                 #     return True
+    #         GPIO.output(self.cols_pins[j1], 1)
+    #
+    #     if self.buttons_input == check_character:
+    #         return True
+
+    def check_button(self):
+        self.buttons_input = ''
         for jj in range(4):
             GPIO.output(self.cols_pins[jj], 0)
             for ii in range(4):
                 if GPIO.input(self.rows_pins[ii]) == 0:
-                    buttons_input = self.matrix[ii][jj]
+                    self.buttons_input = self.matrix[ii][jj]
                     while GPIO.input(self.rows_pins[ii]) == 0:
                         pass
                     # if buttons_input is not None or not 'None':
@@ -57,4 +62,4 @@ class KeyPad:
                     #     return ''
             GPIO.output(self.cols_pins[jj], 1)
 
-        return buttons_input
+        return self.buttons_input

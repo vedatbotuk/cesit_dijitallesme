@@ -31,8 +31,8 @@ class LcdModule:
 
         # cols is because of linebreak and line return 17. Like bellow.
         # self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
-        self.lcd = CharLCD(self.model,
-                           self.address,
+        self.lcd = CharLCD(i2c_expander=self.model,
+                           address=self.address,
                            port=1,
                            cols=17,
                            rows=2,
@@ -80,17 +80,17 @@ class LcdModule:
             self.line2 = u'...'
 
         elif what == 'reset':
-            self.lcd.clear()
+            # self.lcd.clear()
             self.line1 = ''
-            self.line2 = u'Counter=' + '0       '
+            self.line2 = u'Counter=' + '0'
 
         elif what == 'Given_Counter':
-            self.lcd.clear()
+            # self.lcd.clear()
             # self.line1 = ''
             self.line2 = u'-> ' + str(state)
 
         elif what == 'successfully':
-            self.lcd.clear()
+            # self.lcd.clear()
             # self.line1 = ''
             self.line2 = u'-> Basarili'
 
@@ -98,15 +98,15 @@ class LcdModule:
             self.line1 = ''
             self.line2 = u'Kalan= ' + str(state)
 
-        # if state == 0:
-        #     self.line2 = u'Counter=' + '0       '
-        # else:
-        #     self.line2 = u'Counter=' + str(state)
+        elif what == 'show_total':
+            self.line1 = ''
+            self.line2 = u'Toplam= ' + str(state)
 
         text_old = self.text
-        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
+        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' '*(16-len(self.line2))
         if text_old != self.text:
             try:
+                # self.lcd.clear()
                 self.lcd.cursor_pos = (0, 0)
                 self.lcd.write_string(self.text)
             except Exception as e:

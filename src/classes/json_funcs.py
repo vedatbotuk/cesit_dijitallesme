@@ -96,7 +96,12 @@ class JsonFuncs:
 
         elif what == 'counter':
             self.data_js['Counter'] = state[0]
-            self.data_js['Kalan düğüm sayısı'] = self.total_counter - state[0]
+
+            remainder_counter = self.total_counter - state[0]
+            if remainder_counter >= 0:
+                self.data_js['Kalan düğüm sayısı'] = remainder_counter
+            else:
+                self.data_js['Kalan düğüm sayısı'] = 0
 
             self.speed = round(state[0] / state[1] * 60, 1)
 

@@ -40,7 +40,6 @@ BTN_AYAR.add_switches()
 BTN_BOBIN = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_bobin'])
 BTN_BOBIN.add_switches()
 
-
 BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 
@@ -49,6 +48,8 @@ RUN_TIME = classes.StartStopWatch()
 KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
+
+
 # end of setup
 # ############
 
@@ -257,7 +258,7 @@ def show_remainder_counter():
     if KEYPAD_INSTALL is True:
         button_to_give_remainder = KEY_PAD.check_button()
         if button_to_give_remainder is 'B':
-            LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER-COUNTER_NR)
+            LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER - COUNTER_NR)
             sleep(3)
         else:
             pass
@@ -278,7 +279,6 @@ def gpio_check():
     #     check_start_stop()
 
     if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
-
         check_keypad()
 
         check_bobin()

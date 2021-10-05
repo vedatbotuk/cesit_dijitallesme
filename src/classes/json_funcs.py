@@ -36,6 +36,7 @@ class JsonFuncs:
         # tinydb database
         if path_exists.isfile(self.path_database):
             self.db = TinyDB(self.path_database)
+            self.table = self.db.table('main')
             self.logging.log_info('Tiny-Database exists')
             self.logging.log_info('Tiny-Database loaded from ' + self.path_database)
         else:

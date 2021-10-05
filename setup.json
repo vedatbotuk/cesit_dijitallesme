@@ -5,7 +5,8 @@
     "device_name": "Pilot",
     "log": "on",
     "log_level": "info",
-    "log_path": "/var/www/html/cesit_dijitallesme.log"
+    "log_path": "/var/www/html/cesit_dijitallesme.log",
+    "path_database": "/var/www/html/db.json"
   },
   "device": {
     "network": "WLAN",

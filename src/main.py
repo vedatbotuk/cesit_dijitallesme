@@ -288,7 +288,12 @@ def gpio_check():
 
     if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        try:
+            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+            # JSON_FUNCS.create_backup(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        except Exception as e:
+            # JSON_FUNCS.create_from_backup()
+            LOGGING.log_info(e)
 
 
 def event_start_stop(channel):

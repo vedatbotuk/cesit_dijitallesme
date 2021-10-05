@@ -7,6 +7,60 @@ from .json_funcs import get_setup
 from .time import Time
 from .log_info import LogInfo
 
+character_c = (0b00000,
+               0b00000,
+               0b01110,
+               0b10000,
+               0b10000,
+               0b10000,
+               0b01110,
+               0b00100)
+
+character_g = (0b01110,
+               0b00000,
+               0b01111,
+               0b10001,
+               0b10001,
+               0b01111,
+               0b00001,
+               0b01110)
+
+character_i = (0b00000,
+               0b00000,
+               0b01100,
+               0b00100,
+               0b00100,
+               0b00100,
+               0b01110,
+               0b00000)
+
+character_o = (0b01010,
+               0b00000,
+               0b01110,
+               0b10001,
+               0b10001,
+               0b10001,
+               0b01110,
+               0b00000)
+
+character_s = (0b00000,
+               0b00000,
+               0b01110,
+               0b10000,
+               0b01110,
+               0b00001,
+               0b11110,
+               0b00100)
+
+character_u = (0b01010,
+               0b00000,
+               0b10001,
+               0b10001,
+               0b10001,
+               0b10011,
+               0b01101,
+               0b00000)
+
 
 class LcdModule:
     """ Description """
@@ -43,15 +97,22 @@ class LcdModule:
 
         self.logging.log_info('Module: ' + self.model + ' loaded')
 
+        self.lcd.create_char(0, character_c)
+        self.lcd.create_char(1, character_g)
+        self.lcd.create_char(2, character_i)
+        self.lcd.create_char(3, character_o)
+        self.lcd.create_char(4, character_s)
+        self.lcd.create_char(5, character_u)
+
     def refresh_lcd(self, what, state):
         """ Description """
 
         if what == 'kapali':
-            self.line1 = '     ' + u'kapali'
+            self.line1 = '     ' + u'kapal\x02'
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'start':
-            self.line1 = '  ' + u'calisiyor'
+            self.line1 = '  ' + u'\x00al\x02\x04\x02yor'
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'stop':
@@ -63,11 +124,11 @@ class LcdModule:
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'cozgu':
-            self.line1 = '      ' + u'cozgu'
+            self.line1 = '      ' + u'\x00\x03zg\x05'
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'ariza':
-            self.line1 = '      ' + u'ariza'
+            self.line1 = '      ' + u'ar\x02za'
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'ayar':
@@ -75,7 +136,7 @@ class LcdModule:
             self.line2 = u'Counter=' + str(state)
 
         elif what == 'start_system':
-            self.line1 = '     ' + u'kapali'
+            self.line1 = '     ' + u'kapal\x02'
             self.line2 = u'...'
 
         elif what == 'reset':
@@ -86,7 +147,7 @@ class LcdModule:
             self.line2 = u'-> ' + str(state)
 
         elif what == 'successfully':
-            self.line2 = u'-> Basarili'
+            self.line2 = u'-> Ba\x04ar\x02l\x02'
 
         elif what == 'show_remainder':
             self.line1 = ''

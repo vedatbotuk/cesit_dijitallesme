@@ -51,22 +51,24 @@ class JsonFuncs:
                 "Tahmini kalan süre": ""
             }
             self.db = TinyDB(self.path_database)
-            self.db.insert(db_js)
+            self.table = self.db.table('main')
+            self.table.insert(db_js)
             self.logging.log_info('Tiny-Database creating')
 
         # self.db_backup = ''
         # ###############
 
-        self.counter_nr = int(self.db.all()[0]['Counter'])
+        self.counter_nr = int(self.table.all()[0]['Counter'])
 
         self.speed = None
-        self.total_counter = int(self.db.all()[0]['Toplam düğüm sayısı'])
+        self.total_counter = int(self.table.all()[0]['Toplam düğüm sayısı'])
 
         try:
-            self.run_time = float(self.db.all()[0]['Çalışma süresi'].split(' ', 1)[0]) * 3600
+            self.run_time = float(self.table.all()[0]['Çalışma süresi'].split(' ', 1)[0]) * 3600
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)
+            self.logging.log_info('decelerated run_time = 0')
 
         self.remainder_time = None
 
@@ -88,58 +90,62 @@ class JsonFuncs:
         """change_json"""
 
         if what == 'kapali':
-            self.db.update({'Makine Durumu' : 'Kapalı'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Kapalı'}, doc_ids=[1])
 
         elif what == 'start':
-            self.db.update({'Makine Durumu': 'Çalışıyor'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Çalışıyor'}, doc_ids=[1])
 
         elif what == 'stop':
-            self.db.update({'Makine Durumu': 'Duruyor'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Duruyor'}, doc_ids=[1])
 
         elif what == 'counter':
-            self.db.update({'Counter': state[0]}, doc_ids=[1])
+            self.table.update({'Counter': state[0]}, doc_ids=[1])
 
             remainder_counter = self.total_counter - state[0]
             if remainder_counter >= 0:
-                self.db.update({'Kalan düğüm sayısı': remainder_counter}, doc_ids=[1])
+                self.table.update({'Kalan düğüm sayısı': remainder_counter}, doc_ids=[1])
             else:
-                self.db.update({'Kalan düğüm sayısı': 0}, doc_ids=[1])
+                self.table.update({'Kalan düğüm sayısı': 0}, doc_ids=[1])
 
-            self.speed = round(state[0] / state[1] * 60, 1)
+            try:
+                self.speed = round(state[0] / state[1] * 60, 1)
+            except ZeroDivisionError as e:
+                self.speed = 0
+                self.logging.log_info(e)
 
             self.run_time = round(state[1] / 3600, 2)
-            self.db.update({'Çalışma süresi': str(self.run_time) + ' Saat'}, doc_ids=[1])
+            self.table.update({'Çalışma süresi': str(self.run_time) + ' Saat'}, doc_ids=[1])
 
             if 0 < self.speed < 40:
-                self.db.update({'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}, doc_ids=[1])
+                self.table.update({'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}, doc_ids=[1])
 
                 self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
-                self.db.update({'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}, doc_ids=[1])
+                self.table.update({'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}, doc_ids=[1])
             else:
-                self.db.update({'Çalışma hızı': 'hesaplanıyor...'}, doc_ids=[1])
-                self.db.update({'Tahmini kalan süre': 'hesaplanıyor...'}, doc_ids=[1])
+                self.table.update({'Çalışma hızı': 'hesaplanıyor...'}, doc_ids=[1])
+                self.table.update({'Tahmini kalan süre': 'hesaplanıyor...'}, doc_ids=[1])
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
-            self.db.update({'Son Reset Tarihi': self.system_time}, doc_ids=[1])
+            self.table.update({'Son Reset Tarihi': self.system_time}, doc_ids=[1])
 
         elif what == 'bobin':
-            self.db.update({'Makine Durumu': 'Duruyor - Bobin değişimi'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Duruyor - Bobin değişimi'}, doc_ids=[1])
 
         elif what == 'cozgu':
-            self.db.update({'Makine Durumu': 'Duruyor - Çözgü'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Duruyor - Çözgü'}, doc_ids=[1])
 
         elif what == 'ariza':
-            self.db.update({'Makine Durumu': 'Duruyor - Arıza'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Duruyor - Arıza'}, doc_ids=[1])
 
         elif what == 'ayar':
-            self.db.update({'Makine Durumu': 'Duruyor - Ayar'}, doc_ids=[1])
+            self.table.update({'Makine Durumu': 'Duruyor - Ayar'}, doc_ids=[1])
 
         elif what == 'Given_Counter':
             self.total_counter = state
 
-            self.db.update({'Kalan düğüm sayısı': state}, doc_ids=[1])
-            self.db.update({'Toplam düğüm sayısı': state}, doc_ids=[1])
+            self.table.update({'Kalan düğüm sayısı': state}, doc_ids=[1])
+            self.table.update({'Toplam düğüm sayısı': state}, doc_ids=[1])
 
     # def create_from_backup(self):
     #     self.db = TinyDB(self.db_backup)

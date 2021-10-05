@@ -34,8 +34,6 @@ class StartStopWatch:
     """ Description """
     def __init__(self, saved_run_time=None):
 
-        # TODO: get information from data.json
-
         self.date_time_obj = datetime.now()
         self.start_time = self.__get_unix_time()
         self.stop_time = self.__get_unix_time()

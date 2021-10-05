@@ -25,7 +25,7 @@ STOP_OPTIONS_ARRAY = []
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
 TOTAL_COUNTER = JSON_FUNCS.get_total_counter()
-SAVED_RUN_TIME = classes.JsonFuncs().get_saved_run_time()
+SAVED_RUN_TIME = JSON_FUNCS.get_saved_run_time()
 
 RUN_TIME = classes.StartStopWatch(saved_run_time=SAVED_RUN_TIME)
 

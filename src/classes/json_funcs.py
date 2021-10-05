@@ -40,7 +40,9 @@ class JsonFuncs:
             self.logging.log_info('Tiny-Database exists')
             self.logging.log_info('Tiny-Database loaded from ' + self.path_database)
         else:
-            db_js = {
+            self.db = TinyDB(self.path_database)
+            self.table = self.db.table('main')
+            self.table.insert({
                 "id": self.device_name,
                 "Makine Durumu": "Kapalı",
                 "Counter": 0,
@@ -50,10 +52,7 @@ class JsonFuncs:
                 "Çalışma süresi": "",
                 "Çalışma hızı": "",
                 "Tahmini kalan süre": ""
-            }
-            self.db = TinyDB(self.path_database)
-            self.table = self.db.table('main')
-            self.table.insert(db_js)
+            })
             self.logging.log_info('Tiny-Database creating')
 
         # self.db_backup = ''

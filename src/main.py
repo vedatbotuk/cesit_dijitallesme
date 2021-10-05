@@ -20,6 +20,7 @@ LOGGING.log_info('--- System starting ---')
 MACHINE_START_STOP = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
+COUNTER_CHANGED = 1
 STOP_OPTIONS_ARRAY = []
 
 JSON_FUNCS = classes.JsonFuncs()
@@ -50,7 +51,6 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
-
 # end of setup
 # ############
 
@@ -60,7 +60,6 @@ def check_kapali():
     global SYSTEM_ON, OPTIONS_CHANGED
     # AC/KAPA SWITCH
     # ###########################
-    # TODO: sleep? wie wird die Maschine ausgeschaltet.
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is True:
         STOP_OPTIONS_ARRAY.append('kapali')
@@ -208,12 +207,9 @@ def check_keypad():
             while True:
                 get_button = str(KEY_PAD.check_button())
                 if get_button == 'C':
-                    # given_number = ''
-                    # LCD.refresh_lcd('Given_Counter', given_number)
                     break
 
                 elif get_button == 'D':
-                    # TODO: tek tek silme
                     given_number = given_number[:-1]
                     LCD.refresh_lcd('Given_Counter', given_number)
 
@@ -223,7 +219,6 @@ def check_keypad():
                         sleep(2)
                         TOTAL_COUNTER = int(given_number)
                     except Exception as e:
-                        # COUNTER_NR = 0
                         LOGGING.log_info(e)
                         break
 
@@ -232,7 +227,6 @@ def check_keypad():
                     break
 
                 else:
-                    # TODO: Kalan dugum sayisi refresh, calculate
                     given_number = given_number + get_button
                     LCD.refresh_lcd('Given_Counter', given_number)
 
@@ -267,9 +261,7 @@ def show_remainder_counter():
 
 def gpio_check():
     """ Description """
-    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR
-
-    OPTIONS_CHANGED = 0
+    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED
 
     check_kapali()
 
@@ -287,14 +279,17 @@ def gpio_check():
         check_ariza()
         check_ayar()
 
-    if STOP_OPTIONS_ARRAY:
+    if STOP_OPTIONS_ARRAY and OPTIONS_CHANGED == 1:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-        try:
-            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+
+        if COUNTER_CHANGED == 1:
+            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
             # JSON_FUNCS.create_backup(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-        except Exception as e:
-            # JSON_FUNCS.create_from_backup()
-            LOGGING.log_info(e)
+
+            COUNTER_CHANGED = 0
+
+        OPTIONS_CHANGED = 0
 
 
 def event_start_stop(channel):
@@ -332,9 +327,7 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED, TOTAL_COUNTER
-
-    # TODO: nach start zahlt der Counter + 1
+    global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED, TOTAL_COUNTER, COUNTER_CHANGED
 
     if SYSTEM_ON == 1 and MACHINE_START_STOP == 1:
         # sleep(0.1)
@@ -346,15 +339,15 @@ def event_counter(channel):
 
         if cnt == 5 and MACHINE_START_STOP == 1:
             COUNTER_NR = COUNTER_NR + 1
-            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
             # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
             OPTIONS_CHANGED = 1
+            COUNTER_CHANGED = 1
             LOGGING.log_info(channel)
 
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED
+    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED, COUNTER_CHANGED
 
     if MACHINE_START_STOP == 0:
         sleep(0.25)
@@ -369,6 +362,7 @@ def event_reset(channel):
                 JSON_FUNCS.change_json(what='reset')
                 JSON_FUNCS.change_json(what='counter', state=[0, 1])
                 OPTIONS_CHANGED = 1
+                COUNTER_CHANGED = 1
                 LOGGING.log_info('Counter reset')
                 LOGGING.log_info(channel)
 
@@ -397,7 +391,6 @@ if __name__ == '__main__':
         add_events()
         gpio_check_start()
         loop()
-        classes.gpio_cleanup()
 
     except (KeyboardInterrupt, SystemExit):
         print('keyboard interrupt detected')

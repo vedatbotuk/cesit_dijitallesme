@@ -25,6 +25,9 @@ STOP_OPTIONS_ARRAY = []
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
 TOTAL_COUNTER = JSON_FUNCS.get_total_counter()
+SAVED_RUN_TIME = classes.JsonFuncs().get_saved_run_time()
+
+RUN_TIME = classes.StartStopWatch(saved_run_time=SAVED_RUN_TIME)
 
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
@@ -42,8 +45,6 @@ BTN_BOBIN.add_switches()
 
 BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
-
-RUN_TIME = classes.StartStopWatch()
 
 KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:

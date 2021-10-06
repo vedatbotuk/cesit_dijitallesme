@@ -99,7 +99,7 @@ class JsonFuncs:
         return self.run_time
 
     def __export_json(self):
-        cursor = self.mycol.find_one({"_id": self.device_name})
+        cursor = self.mycol.find({"_id": self.device_name})
         data_js = list(cursor)
 
         with open(self.path_json, 'w') as json_file:
@@ -146,6 +146,8 @@ class JsonFuncs:
             else:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
+
+            self.__export_json()
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()

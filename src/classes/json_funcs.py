@@ -3,9 +3,9 @@
 """ Description """
 
 import json
-from os import path as path_exists
 from .time import Time
 from .log_info import LogInfo
+import pymongo
 
 
 def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
@@ -21,80 +21,152 @@ class JsonFuncs:
     def __init__(self, setup_path="/home/pi/cesit_dijitallesme/setup.json"):
 
         config_json = get_setup()
-        logging = LogInfo(config_json['main']['log'],
-                          config_json['main']['log_level'],
-                          config_json['main']['log_path'])
 
-        self.data_js = {}
+        self.logging = LogInfo(config_json['main']['log'],
+                               config_json['main']['log_level'],
+                               config_json['main']['log_path'])
 
-        self.setup_json = get_setup(setup_path)
-        self.device_name = self.setup_json['main']['device_name']
-        self.path_json = self.setup_json['main']['path_json']
+        setup_json = get_setup(setup_path)
+        self.device_name = setup_json['main']['device_name']
+        self.path_json = setup_json['main']['path_json']
+        data_js = {
+            "_id": self.device_name,
+            "Makine Durumu": "Kapalı",
+            "Counter": 0,
+            "Son Reset Tarihi": "",
+            "Toplam düğüm sayısı": 0,
+            "Kalan düğüm sayısı": 0,
+            "Çalışma süresi": "",
+            "Çalışma hızı": "",
+            "Tahmini kalan süre": ""
+        }
 
-        # create or get data_js
-        # if not exists create file
-        if path_exists.isfile(self.path_json):
-            self.data_js = json.load(open(self.path_json, 'r'))
-            logging.log_info('Database exists')
-            logging.log_info('Database loaded from ' + self.path_json)
+        #################
+        # mongodb database
+        database_name = 'cesit_mensucat'
+        collection_name = 'cesit_dijitallesme'
+
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        mydb = myclient.database_names()
+        if database_name in mydb:
+            mydb = myclient[database_name]
+            self.logging.log_info("The database exists.")
+            collist = mydb.collection_names()
+            if collection_name in collist:
+                self.mycol = mydb[collection_name]
+                self.logging.log_info("The collection exists.")
+            else:
+                self.mycol = mydb[collection_name]
+                self.logging.log_info("Creating collection.")
+
         else:
-            self.data_js = {
-                "Devices": {
-                    self.device_name: {
-                        "Makine Durumu": "Çalışıyor",
-                        "Counter": "0",
-                        "Son Reset Tarihi": "-",
-                        "Düğüm göz büyüklüğü": "-",
-                        "Toplam düğüm sayısı": "-",
-                        "Kalan düğüm sayısı": "-",
-                        "Çalışma süresi": "-",
-                        "Çalışma hızı": "-",
-                        "Tahmini kalan süre": "-"
-                    }
-                }
-            }
-            logging.log_info('Created database with default_json')
+            mydb = myclient[database_name]
+            self.mycol = mydb[collection_name]
+            self.logging.log_info("Creating database.")
+            self.logging.log_info("Creating collection.")
 
-        self.counter_nr = int(self.data_js['Devices'][self.device_name]['Counter'])
+        if not self.mycol.find({"_id": self.device_name}).count() > 0:
+            self.mycol.insert_one(data_js)
+            self.logging.log_info("Data does not exists, inserting default data.")
+        # ###############
+
+        self.counter_nr = self.mycol.find_one({"_id": self.device_name})['Counter']
+        self.speed = None
+        self.total_counter = self.mycol.find_one({"_id": self.device_name})['Toplam düğüm sayısı']
+
+        try:
+            self.run_time = float(
+                self.mycol.find_one({"_id": self.device_name})['Çalışma süresi'].split(' ', 1)[0]) * 3600
+        except Exception as e:
+            self.run_time = 0
+            self.logging.log_info(e)
+            self.logging.log_info('decelerated run_time = 0')
+
+        self.remainder_time = None
 
         self.time_obj = Time()
         self.system_time = self.time_obj.get_date_time()
 
     def get_counter(self):
         """ Description """
-        # log_info('Counter : ' + str(self.counter_nr))
         return self.counter_nr
+
+    def get_total_counter(self):
+        """ Description """
+        return self.total_counter
+
+    def get_saved_run_time(self):
+        return self.run_time
+
+    def __export_json(self):
+        cursor = self.mycol.find({"_id": self.device_name})
+        data_js = list(cursor)
+
+        with open(self.path_json, 'w') as json_file:
+            json.dump(data_js, json_file)
 
     def change_json(self, what, state=None):
         """change_json"""
 
         if what == 'kapali':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Kapalı'
+            # self.db.update({'Makine Durumu': 'Kapalı'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Kapalı'}})
 
         elif what == 'start':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Çalışıyor'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
 
         elif what == 'stop':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Duruyor'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor'}})
 
         elif what == 'counter':
-            self.data_js['Devices'][self.device_name]['Counter'] = state
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Counter': state[0]}})
+
+            remainder_counter = self.total_counter - state[0]
+            if remainder_counter >= 0:
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': remainder_counter}})
+            else:
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
+
+            try:
+                self.speed = round(state[0] / state[1] * 60, 1)
+            except ZeroDivisionError as e:
+                self.speed = 0
+                self.logging.log_info(e)
+
+            self.run_time = round(state[1] / 3600, 2)
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma süresi': str(self.run_time) + ' Saat'}})
+
+            if 0 < self.speed < 40:
+                self.mycol.update_one({"_id": self.device_name},
+                                      {"$set": {'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}})
+
+                self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
+                self.mycol.update_one({"_id": self.device_name},
+                                      {"$set": {'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}})
+            else:
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
+
+            self.__export_json()
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
-            self.data_js['Devices'][self.device_name]['Son Reset Tarihi'] = self.system_time
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.system_time}})
 
         elif what == 'bobin':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Duruyor - Bobin değişimi'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})
 
         elif what == 'cozgu':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Duruyor - Çözgü'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Çözgü'}})
 
         elif what == 'ariza':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Duruyor - Arıza'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Arıza'}})
 
         elif what == 'ayar':
-            self.data_js['Devices'][self.device_name]['Makine Durumu'] = 'Duruyor - Ayar'
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
 
-        with open(self.path_json, 'w') as json_file:
-            json.dump(self.data_js, json_file)
+        elif what == 'Given_Counter':
+            self.total_counter = state
+
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': state}})
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})

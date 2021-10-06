@@ -21,6 +21,7 @@ class ButtonSwitch:
         """ Description """
 
         config_json = get_setup()
+
         self.logging = LogInfo(config_json['main']['log'],
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
@@ -29,11 +30,17 @@ class ButtonSwitch:
         self.sec_state = None
         self.btn_state = None
 
-        GPIO.setup(self.gpio_no, GPIO.IN)
+        GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    def add_callback(self, callback):
+    def add_callback(self, mode, callback):
         """ Test """
-        GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
+
+        if mode == 'falling':
+            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback)
+        elif mode == 'both':
+            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback)
+        elif mode == 'rising':
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback)
 
     def remove_callback(self):
         """ Test """
@@ -65,6 +72,7 @@ class ButtonSwitch:
             else:
                 self.sec_state = 0
                 return False
+        return None
 
     def check_switch_once(self):
         """ Test """

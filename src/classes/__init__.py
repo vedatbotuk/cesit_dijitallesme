@@ -3,7 +3,8 @@
 """ Description """
 
 from .button_switch import *
-from .time import Time
+from .time import *
 from .json_funcs import *
 from .lcd_module import *
 from .log_info import *
+from .keypad import *

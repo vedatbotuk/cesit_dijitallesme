@@ -73,9 +73,6 @@ class LcdModule:
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
 
-        self.model = model
-        self.address = address
-
         self.text = ''
         self.line1 = ''
         self.line2 = ''
@@ -85,8 +82,8 @@ class LcdModule:
 
         # cols is because of linebreak and line return 17. Like bellow.
         # self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2
-        self.lcd = CharLCD(i2c_expander=self.model,
-                           address=self.address,
+        self.lcd = CharLCD(i2c_expander=model,
+                           address=address,
                            port=1,
                            cols=17,
                            rows=2,
@@ -95,7 +92,7 @@ class LcdModule:
                            auto_linebreaks=False,
                            backlight_enabled=True)
 
-        self.logging.log_info('Module: ' + self.model + ' loaded')
+        self.logging.log_info('Module: ' + model + ' loaded')
 
         self.lcd.create_char(0, character_c)
         self.lcd.create_char(1, character_g)

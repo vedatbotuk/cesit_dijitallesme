@@ -9,7 +9,6 @@ class LogInfo:
     def __init__(self, log_on_off, log_level, log_path):
 
         self.log_on_off = log_on_off
-        self.log_path = log_path
         self.log_level = log_level
 
         self.logging_level = self.log_level
@@ -24,7 +23,7 @@ class LogInfo:
             logging.basicConfig(level=self.logging_level,
                                 format="%(asctime)s %(levelname)-8s %(message)s",
                                 datefmt='%a, %d %b %Y %H:%M:%S',
-                                filename=self.log_path,
+                                filename=log_path,
                                 )
 
     def log_info(self, text):

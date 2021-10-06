@@ -26,58 +26,57 @@ class JsonFuncs:
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
 
-        self.setup_json = get_setup(setup_path)
-        self.device_name = self.setup_json['main']['device_name']
-        self.path_json = self.setup_json['main']['path_json']
-        self.path_database = self.setup_json['main']['path_database']
+        setup_json = get_setup(setup_path)
+        self.device_name = setup_json['main']['device_name']
+        self.path_json = setup_json['main']['path_json']
+        data_js = {
+            "_id": self.device_name,
+            "Makine Durumu": "Kapalı",
+            "Counter": 0,
+            "Son Reset Tarihi": "",
+            "Toplam düğüm sayısı": 0,
+            "Kalan düğüm sayısı": 0,
+            "Çalışma süresi": "",
+            "Çalışma hızı": "",
+            "Tahmini kalan süre": ""
+        }
 
         #################
         # mongodb database
         database_name = 'cesit_mensucat'
         collection_name = 'cesit_dijitallesme'
 
-        self.myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-        self.mydb = self.myclient.database_names()
-        if database_name in self.mydb:
-            self.mydb = self.myclient[database_name]
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        mydb = myclient.database_names()
+        if database_name in mydb:
+            mydb = myclient[database_name]
             self.logging.log_info("The database exists.")
-            collist = self.mydb.collection_names()
+            collist = mydb.collection_names()
             if collection_name in collist:
-                self.mycol = self.mydb[collection_name]
+                self.mycol = mydb[collection_name]
                 self.logging.log_info("The collection exists.")
             else:
-                self.mycol = self.mydb[collection_name]
+                self.mycol = mydb[collection_name]
                 self.logging.log_info("Creating collection.")
 
         else:
-            self.mydb = self.myclient[database_name]
-            self.mycol = self.mydb[collection_name]
+            mydb = myclient[database_name]
+            self.mycol = mydb[collection_name]
             self.logging.log_info("Creating database.")
             self.logging.log_info("Creating collection.")
 
         if not self.mycol.find({"_id": self.device_name}).count() > 0:
-            data_js = {
-                "_id": self.device_name,
-                "Makine Durumu": "Kapalı",
-                "Counter": 0,
-                "Son Reset Tarihi": "",
-                "Toplam düğüm sayısı": 0,
-                "Kalan düğüm sayısı": 0,
-                "Çalışma süresi": "",
-                "Çalışma hızı": "",
-                "Tahmini kalan süre": ""
-            }
-
             self.mycol.insert_one(data_js)
             self.logging.log_info("Data does not exists, inserting default data.")
         # ###############
 
-        self.counter_nr = self.mycol.find_one()['Counter']
+        self.counter_nr = self.mycol.find_one({"_id": self.device_name})['Counter']
         self.speed = None
-        self.total_counter = self.mycol.find_one()['Toplam düğüm sayısı']
+        self.total_counter = self.mycol.find_one({"_id": self.device_name})['Toplam düğüm sayısı']
 
         try:
-            self.run_time = float(self.mycol.find_one()['Toplam düğüm sayısı'].split(' ', 1)[0]) * 3600
+            self.run_time = float(
+                self.mycol.find_one({"_id": self.device_name})['Çalışma süresi'].split(' ', 1)[0]) * 3600
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)
@@ -98,6 +97,13 @@ class JsonFuncs:
 
     def get_saved_run_time(self):
         return self.run_time
+
+    def __export_json(self):
+        cursor = self.mycol.find_one({"_id": self.device_name})
+        data_js = list(cursor)
+
+        with open(self.path_json, 'w') as json_file:
+            json.dump(data_js, json_file)
 
     def change_json(self, what, state=None):
         """change_json"""

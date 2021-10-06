@@ -51,6 +51,7 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
+
 # end of setup
 # ############
 
@@ -327,7 +328,7 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, TOTAL_COUNTER, COUNTER_CHANGED
+    global COUNTER_NR, MACHINE_START_STOP, TOTAL_COUNTER, COUNTER_CHANGED, OPTIONS_CHANGED
 
     if SYSTEM_ON == 1 and MACHINE_START_STOP == 1:
         # sleep(0.1)
@@ -340,7 +341,8 @@ def event_counter(channel):
         if cnt == 5 and MACHINE_START_STOP == 1:
             COUNTER_NR = COUNTER_NR + 1
             # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
-            COUNTER_CHANGED = 1
+            COUNTER_CHANGED = 1  # for refresh JSON
+            OPTIONS_CHANGED = 1  # for refresh LCD
             # LOGGING.log_info(channel)
 
 

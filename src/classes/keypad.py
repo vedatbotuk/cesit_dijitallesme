@@ -35,20 +35,12 @@ class KeyPad:
         pressed_button = None
         GPIO.output(line, GPIO.HIGH)
         if GPIO.input(self.cols_pins[0]) == 1:
-            while GPIO.input(self.rows_pins[0]) == 0:
-                pass
             pressed_button = characters[0]
         if GPIO.input(self.cols_pins[1]) == 1:
-            while GPIO.input(self.rows_pins[1]) == 0:
-                pass
             pressed_button = characters[1]
         if GPIO.input(self.cols_pins[2]) == 1:
-            while GPIO.input(self.rows_pins[2]) == 0:
-                pass
             pressed_button = characters[2]
         if GPIO.input(self.cols_pins[3]) == 1:
-            while GPIO.input(self.rows_pins[3]) == 0:
-                pass
             pressed_button = characters[3]
         GPIO.output(line, GPIO.LOW)
         return pressed_button

@@ -215,18 +215,18 @@ def check_keypad():
 
                 elif get_button == '*':
                     try:
-                        LCD.refresh_lcd('successfully', given_number)
-                        sleep(2)
                         TOTAL_COUNTER = int(given_number)
                     except Exception as e:
                         LOGGING.log_info(e)
                         break
 
                     JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
+                    LCD.refresh_lcd('successfully', given_number)
+                    sleep(2)
 
                     break
 
-                else:
+                elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                     given_number = given_number + get_button
                     LCD.refresh_lcd('Given_Counter', given_number)
 
@@ -279,17 +279,17 @@ def gpio_check():
         check_ariza()
         check_ayar()
 
-    if STOP_OPTIONS_ARRAY and OPTIONS_CHANGED == 1:
+    if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
+
+    if OPTIONS_CHANGED == 1:
         JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-
-        if COUNTER_CHANGED == 1:
-            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
-            # JSON_FUNCS.create_backup(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-
-            COUNTER_CHANGED = 0
-
         OPTIONS_CHANGED = 0
+
+    if COUNTER_CHANGED == 1:
+        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
+        # JSON_FUNCS.create_backup(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        COUNTER_CHANGED = 0
 
 
 def event_start_stop(channel):
@@ -327,7 +327,7 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, OPTIONS_CHANGED, TOTAL_COUNTER, COUNTER_CHANGED
+    global COUNTER_NR, MACHINE_START_STOP, TOTAL_COUNTER, COUNTER_CHANGED
 
     if SYSTEM_ON == 1 and MACHINE_START_STOP == 1:
         # sleep(0.1)
@@ -340,14 +340,13 @@ def event_counter(channel):
         if cnt == 5 and MACHINE_START_STOP == 1:
             COUNTER_NR = COUNTER_NR + 1
             # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
-            OPTIONS_CHANGED = 1
             COUNTER_CHANGED = 1
-            LOGGING.log_info(channel)
+            # LOGGING.log_info(channel)
 
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, OPTIONS_CHANGED, COUNTER_CHANGED
+    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON
 
     if MACHINE_START_STOP == 0:
         sleep(0.25)
@@ -361,8 +360,6 @@ def event_reset(channel):
                 LCD.refresh_lcd(what='reset', state=None)
                 JSON_FUNCS.change_json(what='reset')
                 JSON_FUNCS.change_json(what='counter', state=[0, 1])
-                OPTIONS_CHANGED = 1
-                COUNTER_CHANGED = 1
                 LOGGING.log_info('Counter reset')
                 LOGGING.log_info(channel)
 

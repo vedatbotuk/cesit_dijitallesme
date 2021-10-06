@@ -3,10 +3,9 @@
 """ Description """
 
 import json
-from os import path as path_exists
 from .time import Time
 from .log_info import LogInfo
-from tinydb import TinyDB
+import pymongo
 
 
 def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
@@ -33,15 +32,32 @@ class JsonFuncs:
         self.path_database = self.setup_json['main']['path_database']
 
         #################
-        # tinydb database
-        if path_exists.isfile(self.path_database):
-            self.db = TinyDB(self.path_database)
-            self.logging.log_info('Tiny-Database exists')
-            self.logging.log_info('Tiny-Database loaded from ' + self.path_database)
+        # mongodb database
+        database_name = 'cesit_mensucat'
+        collection_name = 'cesit_dijitallesme'
+
+        self.myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.mydb = self.myclient.database_names()
+        if database_name in self.mydb:
+            self.mydb = self.myclient[database_name]
+            self.logging.log_info("The database exists.")
+            collist = self.mydb.collection_names()
+            if collection_name in collist:
+                self.mycol = self.mydb[collection_name]
+                self.logging.log_info("The collection exists.")
+            else:
+                self.mycol = self.mydb[collection_name]
+                self.logging.log_info("Creating collection.")
+
         else:
-            self.db = TinyDB(self.path_database)
-            self.db.insert({
-                "id": self.device_name,
+            self.mydb = self.myclient[database_name]
+            self.mycol = self.mydb[collection_name]
+            self.logging.log_info("Creating database.")
+            self.logging.log_info("Creating collection.")
+
+        if not self.mycol.find({"_id": self.device_name}).count() > 0:
+            data_js = {
+                "_id": self.device_name,
                 "Makine Durumu": "Kapalı",
                 "Counter": 0,
                 "Son Reset Tarihi": "",
@@ -50,16 +66,18 @@ class JsonFuncs:
                 "Çalışma süresi": "",
                 "Çalışma hızı": "",
                 "Tahmini kalan süre": ""
-            })
-            self.logging.log_info('Tiny-Database creating')
+            }
+
+            self.mycol.insert_one(data_js)
+            self.logging.log_info("Data does not exists, inserting default data.")
         # ###############
 
-        self.counter_nr = int(self.db.all()[0]['Counter'])
+        self.counter_nr = self.mycol.find_one()['Counter']
         self.speed = None
-        self.total_counter = int(self.db.all()[0]['Toplam düğüm sayısı'])
+        self.total_counter = self.mycol.find_one()['Toplam düğüm sayısı']
 
         try:
-            self.run_time = float(self.db.all()[0]['Çalışma süresi'].split(' ', 1)[0]) * 3600
+            self.run_time = float(self.mycol.find_one()['Toplam düğüm sayısı'].split(' ', 1)[0]) * 3600
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)
@@ -85,22 +103,23 @@ class JsonFuncs:
         """change_json"""
 
         if what == 'kapali':
-            self.db.update({'Makine Durumu': 'Kapalı'}, doc_ids=[1])
+            # self.db.update({'Makine Durumu': 'Kapalı'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Kapalı'}})
 
         elif what == 'start':
-            self.db.update({'Makine Durumu': 'Çalışıyor'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
 
         elif what == 'stop':
-            self.db.update({'Makine Durumu': 'Duruyor'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor'}})
 
         elif what == 'counter':
-            self.db.update({'Counter': state[0]}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Counter': state[0]}})
 
             remainder_counter = self.total_counter - state[0]
             if remainder_counter >= 0:
-                self.db.update({'Kalan düğüm sayısı': remainder_counter}, doc_ids=[1])
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': remainder_counter}})
             else:
-                self.db.update({'Kalan düğüm sayısı': 0}, doc_ids=[1])
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
 
             try:
                 self.speed = round(state[0] / state[1] * 60, 1)
@@ -109,36 +128,37 @@ class JsonFuncs:
                 self.logging.log_info(e)
 
             self.run_time = round(state[1] / 3600, 2)
-            self.db.update({'Çalışma süresi': str(self.run_time) + ' Saat'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma süresi': str(self.run_time) + ' Saat'}})
 
             if 0 < self.speed < 40:
-                self.db.update({'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}, doc_ids=[1])
+                self.mycol.update_one({"_id": self.device_name},
+                                      {"$set": {'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}})
 
                 self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
-                self.db.update({'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}, doc_ids=[1])
+                self.mycol.update_one({"_id": self.device_name},
+                                      {"$set": {'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}})
             else:
-                self.db.update({'Çalışma hızı': 'hesaplanıyor...'}, doc_ids=[1])
-                self.db.update({'Tahmini kalan süre': 'hesaplanıyor...'}, doc_ids=[1])
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
-            self.db.update({'Son Reset Tarihi': self.system_time}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.system_time}})
 
         elif what == 'bobin':
-            self.db.update({'Makine Durumu': 'Duruyor - Bobin değişimi'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})
 
         elif what == 'cozgu':
-            self.db.update({'Makine Durumu': 'Duruyor - Çözgü'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Çözgü'}})
 
         elif what == 'ariza':
-            self.db.update({'Makine Durumu': 'Duruyor - Arıza'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Arıza'}})
 
         elif what == 'ayar':
-            self.db.update({'Makine Durumu': 'Duruyor - Ayar'}, doc_ids=[1])
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
 
         elif what == 'Given_Counter':
             self.total_counter = state
 
-            self.db.update({'Kalan düğüm sayısı': state}, doc_ids=[1])
-            self.db.update({'Toplam düğüm sayısı': state}, doc_ids=[1])
-
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': state}})
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})

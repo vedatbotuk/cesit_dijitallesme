@@ -17,7 +17,7 @@ LOGGING = classes.LogInfo(CONFIG_JSON['main']['log'],
 
 LOGGING.log_info('--- System starting ---')
 
-MACHINE_START_STOP = 0
+MACHINE_START = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 COUNTER_CHANGED = 1
@@ -34,8 +34,8 @@ RUN_TIME = classes.StartStopWatch(saved_run_time=SAVED_RUN_TIME)
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
 BTN_KAPALI.add_switches()
-BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
-BTN_START_STOP.add_switches()
+BTN_START = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
+BTN_START.add_switches()
 BTN_COZGU = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_cozgu'])
 BTN_COZGU.add_switches()
 BTN_ARIZA = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ariza'])
@@ -80,16 +80,16 @@ def check_kapali():
 
 
 def check_start_stop():
-    global MACHINE_START_STOP, COUNTER_NR, OPTIONS_CHANGED
+    global MACHINE_START, COUNTER_NR, OPTIONS_CHANGED
 
     # START/STOP SWITCH ##############
     # ################################
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
-    btn_start_stop_checked = BTN_START_STOP.check_switch()
+    btn_start_stop_checked = BTN_START.check_switch()
     if btn_start_stop_checked is True:
         STOP_OPTIONS_ARRAY.append('start')
-        MACHINE_START_STOP = 1
+        MACHINE_START = 1
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device started')
         LCD.refresh_lcd('start', COUNTER_NR)
@@ -97,7 +97,7 @@ def check_start_stop():
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
     elif btn_start_stop_checked is False:
         STOP_OPTIONS_ARRAY.append('stop')
-        MACHINE_START_STOP = 0
+        MACHINE_START = 0
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device stopped')
         LCD.refresh_lcd('stop', COUNTER_NR)
@@ -184,12 +184,13 @@ def check_ayar():
 
 def gpio_check_start():
     """ Description """
-    global MACHINE_START_STOP, STOP_OPTIONS_ARRAY
+    global MACHINE_START, STOP_OPTIONS_ARRAY
 
+    JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME.get_run_time()])
     check_kapali()
     if SYSTEM_ON == 1:
         check_start_stop()
-        if SYSTEM_ON == 1 and MACHINE_START_STOP == 0:
+        if SYSTEM_ON == 1 and MACHINE_START == 0:
             check_bobin()
             check_cozgu()
             check_ariza()
@@ -273,7 +274,7 @@ def gpio_check():
     # if SYSTEM_ON == 1:
     #     check_start_stop()
 
-    if MACHINE_START_STOP == 0 and SYSTEM_ON == 1:
+    if MACHINE_START == 0 and SYSTEM_ON == 1:
         check_keypad()
 
         check_bobin()
@@ -300,30 +301,30 @@ def gpio_check():
         RESETED = 0
 
 
-def event_start_stop(channel):
+def event_start(channel):
     """ Description """
-    global MACHINE_START_STOP, OPTIONS_CHANGED
+    global MACHINE_START, OPTIONS_CHANGED
     # START/STOP SWITCH ##############
     # ################################
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
     if SYSTEM_ON == 1:
-        btn_start_stop_checked = BTN_START_STOP.check_switch_once()
-        if btn_start_stop_checked is True and MACHINE_START_STOP == 0:
+        btn_start_stop_checked = BTN_START.check_switch_once()
+        if btn_start_stop_checked is True and MACHINE_START == 0:
             if 'stop' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('stop')
             STOP_OPTIONS_ARRAY.append('start')
-            MACHINE_START_STOP = 1
+            MACHINE_START = 1
             OPTIONS_CHANGED = 1
             RUN_TIME.start()
             LOGGING.log_info('Device started')
         # maschiene gestopt
         # zusatzlich kann signalisiert werden, warum die maschine gestopt
-        elif btn_start_stop_checked is False and MACHINE_START_STOP == 1:
+        elif btn_start_stop_checked is False and MACHINE_START == 1:
             if 'start' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('start')
             STOP_OPTIONS_ARRAY.append('stop')
-            MACHINE_START_STOP = 0
+            MACHINE_START = 0
             OPTIONS_CHANGED = 1
             RUN_TIME.stop()
             LOGGING.log_info('Device stopped')
@@ -335,31 +336,34 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, TOTAL_COUNTER, COUNTER_CHANGED, OPTIONS_CHANGED
+    global COUNTER_NR, MACHINE_START, TOTAL_COUNTER, COUNTER_CHANGED, OPTIONS_CHANGED
 
-    if SYSTEM_ON == 1 and MACHINE_START_STOP == 1:
-        # sleep(0.1)
-        cnt = 0
-        for x in range(0, 5):
-            btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
-            if btn_start_stop_checked_cnt is True:
-                cnt = cnt + 1
+    sleep(0.1)
+    btn_start_checked_cnt = BTN_START.check_switch_once()
+    if btn_start_checked_cnt is True:
+        if SYSTEM_ON == 1 and MACHINE_START == 1:
+            # sleep(0.1)
+            cnt = 0
+            for x in range(0, 5):
+                btn_start_checked_cnt = BTN_START.check_switch_once()
+                if btn_start_checked_cnt is True:
+                    cnt = cnt + 1
 
-        if cnt == 5 and MACHINE_START_STOP == 1:
-            COUNTER_NR = COUNTER_NR + 1
-            # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
-            COUNTER_CHANGED = 1  # for refresh JSON
-            OPTIONS_CHANGED = 1  # for refresh LCD
-            # LOGGING.log_info(channel)
+            if cnt == 5 and MACHINE_START == 1:
+                COUNTER_NR = COUNTER_NR + 1
+                # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
+                COUNTER_CHANGED = 1  # for refresh JSON
+                OPTIONS_CHANGED = 1  # for refresh LCD
+                # LOGGING.log_info(channel)
 
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START_STOP, SYSTEM_ON, RESETED
+    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESETED
 
-    if MACHINE_START_STOP == 0:
+    if MACHINE_START == 0:
         sleep(0.25)
-        btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
+        btn_start_stop_checked_rst = BTN_START.check_switch_once()
         if btn_start_stop_checked_rst is False:
             sleep(0.25)
             btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
@@ -386,7 +390,7 @@ def loop():
 def add_events():
     """ Description """
 
-    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    BTN_START.add_callback(mode='both', callback=event_start)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 

@@ -35,8 +35,10 @@ RUN_TIME = TIME_WATCH.get_run_time()
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
 BTN_KAPALI.add_switches()
-BTN_START = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
-BTN_START.add_switches()
+BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
+BTN_START_STOP.add_switches()
+BTN_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
+BTN_STOP.add_switches()
 BTN_COZGU = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_cozgu'])
 BTN_COZGU.add_switches()
 BTN_ARIZA = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_ariza'])
@@ -87,7 +89,7 @@ def check_start_stop():
     # ################################
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
-    btn_start_stop_checked = BTN_START.check_switch()
+    btn_start_stop_checked = BTN_START_STOP.check_switch()
     if btn_start_stop_checked is True:
         STOP_OPTIONS_ARRAY.append('start')
         MACHINE_START = 1
@@ -183,7 +185,7 @@ def check_ayar():
     # ---------------------------
 
 
-def gpio_check_start():
+def gpio_check_start_stop():
     """ Description """
     global MACHINE_START, STOP_OPTIONS_ARRAY
 
@@ -303,7 +305,7 @@ def gpio_check():
         RESETED = 0
 
 
-def event_start(channel):
+def event_start_stop(channel):
     """ Description """
     global MACHINE_START, OPTIONS_CHANGED
     # START/STOP SWITCH ##############
@@ -311,7 +313,7 @@ def event_start(channel):
     # start stop und nebenarbeiten an der maschine
     # wenn start switch on, zeigt nur start bzw. calisiyor
     if SYSTEM_ON == 1:
-        btn_start_stop_checked = BTN_START.check_switch_once()
+        btn_start_stop_checked = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked is True and MACHINE_START == 0:
             if 'stop' in STOP_OPTIONS_ARRAY:
                 STOP_OPTIONS_ARRAY.remove('stop')
@@ -340,15 +342,13 @@ def event_counter(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START, TOTAL_COUNTER, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME
 
-    sleep(0.1)
-    btn_start_checked_cnt = BTN_START.check_switch_once()
-    if btn_start_checked_cnt is True:
+    btn_stop_checked_cnt = BTN_STOP.check_switch_once()
+    if btn_stop_checked_cnt is True:
         if SYSTEM_ON == 1 and MACHINE_START == 1:
-            # sleep(0.1)
             cnt = 0
             for x in range(0, 5):
-                btn_start_checked_cnt = BTN_START.check_switch_once()
-                if btn_start_checked_cnt is True:
+                btn_start_stop_checked_cnt = BTN_START_STOP.check_switch_once()
+                if btn_start_stop_checked_cnt is True:
                     cnt = cnt + 1
 
             if cnt == 5 and MACHINE_START == 1:
@@ -366,7 +366,7 @@ def event_reset(channel):
 
     if MACHINE_START == 0:
         sleep(0.25)
-        btn_start_stop_checked_rst = BTN_START.check_switch_once()
+        btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
         if btn_start_stop_checked_rst is False:
             sleep(0.25)
             btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
@@ -393,7 +393,7 @@ def loop():
 def add_events():
     """ Description """
 
-    BTN_START.add_callback(mode='both', callback=event_start)
+    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
@@ -403,7 +403,7 @@ if __name__ == '__main__':
     LOGGING.log_info('System loaded.')
     try:
         add_events()
-        gpio_check_start()
+        gpio_check_start_stop()
         loop()
 
     except (KeyboardInterrupt, SystemExit):

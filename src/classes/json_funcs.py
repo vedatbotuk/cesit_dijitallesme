@@ -152,8 +152,6 @@ class JsonFuncs:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
 
-            self.__export_json()
-
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.system_time}})
@@ -175,3 +173,6 @@ class JsonFuncs:
 
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': state}})
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})
+
+        # Export as Jsonfile for Monitor
+        self.__export_json()

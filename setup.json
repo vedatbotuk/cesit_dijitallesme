@@ -23,8 +23,7 @@
   "buttons": {
     "btn_counter": 17,
     "btn_reset": 27,
-    "btn_start_stop": 22,
-    "btn_stop": 10
+    "btn_start_stop": 22
   },
   "switches": {
     "btn_kapali": 4,

@@ -314,14 +314,18 @@ def event_counter(channel):
     global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME
 
     if SYSTEM_ON == 1:
-        if BTN_START_STOP.check_switch_once() is True:
-            sleep(0.1)
+        checked = 0
+        for cnt in range(0,6):
             if BTN_START_STOP.check_switch_once() is True:
-                COUNTER_NR = COUNTER_NR + 1
-                RUN_TIME = TIME_WATCH.get_run_time()
-                COUNTER_CHANGED = 1  # for refresh JSON
-                OPTIONS_CHANGED = 1  # for refresh LCD
-                # LOGGING.log_info(channel)
+                checked = checked + 1
+                sleep(0.05)
+        # checked in 300ms, if start-stop active
+        if BTN_START_STOP.check_switch_once() is True and checked == 6:
+            COUNTER_NR = COUNTER_NR + 1
+            RUN_TIME = TIME_WATCH.get_run_time()
+            COUNTER_CHANGED = 1  # for refresh JSON
+            OPTIONS_CHANGED = 1  # for refresh LCD
+            # LOGGING.log_info(channel)
 
 
 def event_reset(channel):

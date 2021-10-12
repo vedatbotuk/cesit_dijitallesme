@@ -315,12 +315,13 @@ def event_counter(channel):
 
     if SYSTEM_ON == 1:
         if BTN_START_STOP.check_switch_once() is True:
-            COUNTER_NR = COUNTER_NR + 1
-            RUN_TIME = TIME_WATCH.get_run_time()
-            # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, None])
-            COUNTER_CHANGED = 1  # for refresh JSON
-            OPTIONS_CHANGED = 1  # for refresh LCD
-            # LOGGING.log_info(channel)
+            sleep(0.1)
+            if BTN_START_STOP.check_switch_once() is True:
+                COUNTER_NR = COUNTER_NR + 1
+                RUN_TIME = TIME_WATCH.get_run_time()
+                COUNTER_CHANGED = 1  # for refresh JSON
+                OPTIONS_CHANGED = 1  # for refresh LCD
+                # LOGGING.log_info(channel)
 
 
 def event_reset(channel):

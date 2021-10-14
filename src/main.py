@@ -119,12 +119,12 @@ def check_bobin():
     # ###########################
     # ab hier testet alle nebenarbeiten an der maschine
     btn_bobin_checked = BTN_BOBIN.check_switch()
-    if btn_bobin_checked is True:
+    if btn_bobin_checked is False:
         if 'bobin' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('bobin')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited bobin-status')
-    elif btn_bobin_checked is False:
+    elif btn_bobin_checked is True:
         STOP_OPTIONS_ARRAY.append('bobin')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device at bobin-status')
@@ -138,12 +138,12 @@ def check_cozgu():
     # COZGU SWITCH ##############
     # ###########################
     btn_cozgu_checked = BTN_COZGU.check_switch()
-    if btn_cozgu_checked is True:
+    if btn_cozgu_checked is False:
         if 'cozgu' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('cozgu')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited cozgu-status')
-    elif btn_cozgu_checked is False:
+    elif btn_cozgu_checked is True:
         STOP_OPTIONS_ARRAY.append('cozgu')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited cozgu-status')
@@ -157,12 +157,12 @@ def check_ariza():
     # ARIZA SWITCH ##############
     # ###########################
     btn_ariza_checked = BTN_ARIZA.check_switch()
-    if btn_ariza_checked is True:
+    if btn_ariza_checked is False:
         if 'ariza' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('ariza')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited azriza-status')
-    elif btn_ariza_checked is False:
+    elif btn_ariza_checked is True:
         STOP_OPTIONS_ARRAY.append('ariza')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited ariza-status')
@@ -176,12 +176,12 @@ def check_ayar():
     # AYAR SWITCH ###############
     # ###########################
     btn_ayar_checked = BTN_AYAR.check_switch()
-    if btn_ayar_checked is True:
+    if btn_ayar_checked is False:
         if 'ayar' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('ayar')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited ayar-status')
-    elif btn_ayar_checked is False:
+    elif btn_ayar_checked is True:
         STOP_OPTIONS_ARRAY.append('ayar')
         OPTIONS_CHANGED = 1
         LOGGING.log_info('Device exited ayar-status')
@@ -315,7 +315,7 @@ def event_counter(channel):
 
     if SYSTEM_ON == 1:
         checked = 0
-        for cnt in range(0,6):
+        for cnt in range(0,5):
             if BTN_START_STOP.check_switch_once() is True:
                 checked = checked + 1
                 sleep(0.05)

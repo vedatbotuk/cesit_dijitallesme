@@ -320,7 +320,7 @@ def event_counter(channel):
                 checked = checked + 1
                 sleep(0.05)
         # checked in 300ms, if start-stop active
-        if BTN_START_STOP.check_switch_once() is True and checked == 6:
+        if BTN_START_STOP.check_switch_once() is True and checked == 5:
             COUNTER_NR = COUNTER_NR + 1
             RUN_TIME = TIME_WATCH.get_run_time()
             COUNTER_CHANGED = 1  # for refresh JSON

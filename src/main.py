@@ -315,7 +315,7 @@ def event_counter(channel):
 
     if SYSTEM_ON == 1:
         checked = 0
-        for cnt in range(0,6):
+        for cnt in range(0,5):
             if BTN_START_STOP.check_switch_once() is True:
                 checked = checked + 1
                 sleep(0.05)

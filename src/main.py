@@ -325,7 +325,7 @@ def event_counter(channel):
             RUN_TIME = TIME_WATCH.get_run_time()
             COUNTER_CHANGED = 1  # for refresh JSON
             OPTIONS_CHANGED = 1  # for refresh LCD
-            # LOGGING.log_info(channel)
+    LOGGING.log_info(channel)
 
 
 def event_reset(channel):

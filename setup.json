@@ -28,6 +28,7 @@
   "switches": {
     "btn_kapali": 4,
     "btn_start_stop": 22,
+    "btn_stop": 10,
     "btn_cozgu": 6,
     "btn_ariza": 13,
     "btn_ayar": 19,

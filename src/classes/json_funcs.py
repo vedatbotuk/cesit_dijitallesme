@@ -143,11 +143,14 @@ class JsonFuncs:
                 self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
                 self.mycol.update_one({"_id": self.device_name},
                                       {"$set": {'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}})
+
+            elif self.speed <= 0:
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': '...'}})
+                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': '...'}})
+
             else:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
-
-            self.__export_json()
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()
@@ -170,3 +173,6 @@ class JsonFuncs:
 
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': state}})
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})
+
+        # Export as Jsonfile for Monitor
+        self.__export_json()

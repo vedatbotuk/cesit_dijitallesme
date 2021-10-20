@@ -21,6 +21,7 @@ MACHINE_START = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 COUNTER_CHANGED = 1
+COUNTER_PUSHED = 0
 RESET = 0
 STOP_OPTIONS_ARRAY = []
 
@@ -311,20 +312,26 @@ def gpio_check():
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME
+    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, COUNTER_PUSHED
 
-    if SYSTEM_ON == 1:
-        checked = 0
-        for cnt in range(0,5):
-            if BTN_START_STOP.check_switch_once() is True:
-                checked = checked + 1
-                sleep(0.05)
-        # checked in 300ms, if start-stop active
-        if BTN_START_STOP.check_switch_once() is True and checked == 5:
-            COUNTER_NR = COUNTER_NR + 1
-            RUN_TIME = TIME_WATCH.get_run_time()
-            COUNTER_CHANGED = 1  # for refresh JSON
-            OPTIONS_CHANGED = 1  # for refresh LCD
+    btn_cnt = BTN_COUNTER.check_switch_once()
+    if btn_cnt is True:
+        COUNTER_PUSHED = 1
+
+    elif btn_cnt is False:
+        if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
+            checked = 0
+            for cnt in range(0,5):
+                if BTN_START_STOP.check_switch_once() is True:
+                    checked = checked + 1
+                    sleep(0.05)
+            # checked in 300ms, if start-stop active
+            if BTN_START_STOP.check_switch_once() is True and checked == 5:
+                COUNTER_NR = COUNTER_NR + 1
+                RUN_TIME = TIME_WATCH.get_run_time()
+                COUNTER_CHANGED = 1  # for refresh JSON
+                OPTIONS_CHANGED = 1  # for refresh LCD
+                COUNTER_PUSHED = 0
     LOGGING.log_info(channel)
 
 
@@ -357,7 +364,7 @@ def loop():
 
 def add_events():
     """ Description """
-    BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
+    BTN_COUNTER.add_callback(mode='both', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
 

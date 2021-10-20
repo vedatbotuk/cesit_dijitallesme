@@ -17,12 +17,27 @@ LOGGING = classes.LogInfo(CONFIG_JSON['main']['log'],
 
 LOGGING.log_info('--- System starting ---')
 
+kapali = 1
+stop = 2
+start = 3
+counter = 4
+ariza = 5
+ayar = 6
+bobin = 7
+cozgu = 8
+reset = 9
+g = classes.Graph()
+# test = g.print_all_paths(kapali, stop)
+
+
 MACHINE_START = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 COUNTER_CHANGED = 1
+COUNTER_PUSHED = 0
 RESET = 0
 STOP_OPTIONS_ARRAY = []
+STATUS_ARRAY = []
 
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
@@ -62,7 +77,7 @@ if KEYPAD_INSTALL is True:
 
 def check_kapali():
     """ Description """
-    global SYSTEM_ON, OPTIONS_CHANGED
+    global SYSTEM_ON, OPTIONS_CHANGED, STATUS_ARRAY
     # AC/KAPA SWITCH
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
@@ -70,6 +85,7 @@ def check_kapali():
         STOP_OPTIONS_ARRAY.append('kapali')
         SYSTEM_ON = 0
         OPTIONS_CHANGED = 1
+        STATUS_ARRAY = ['kapali']
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is False:
         if 'kapali' in STOP_OPTIONS_ARRAY:
@@ -83,7 +99,7 @@ def check_kapali():
 
 
 def check_start_stop():
-    global MACHINE_START, COUNTER_NR, OPTIONS_CHANGED
+    global MACHINE_START, COUNTER_NR, OPTIONS_CHANGED, STATUS_ARRAY
 
     # START/STOP SWITCH ##############
     # ################################
@@ -94,6 +110,7 @@ def check_start_stop():
         if 'stop' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('stop')
         STOP_OPTIONS_ARRAY.append('start')
+        STATUS_ARRAY = ['start']
         MACHINE_START = 1
         OPTIONS_CHANGED = 1
         TIME_WATCH.start()
@@ -104,6 +121,7 @@ def check_start_stop():
         if 'start' in STOP_OPTIONS_ARRAY:
             STOP_OPTIONS_ARRAY.remove('start')
         STOP_OPTIONS_ARRAY.append('stop')
+        STATUS_ARRAY = ['stop']
         MACHINE_START = 0
         OPTIONS_CHANGED = 1
         TIME_WATCH.stop()
@@ -112,81 +130,85 @@ def check_start_stop():
     # ---------------------------
 
 
-def check_bobin():
-    """ Description """
-    global OPTIONS_CHANGED
-    # BOBIN SWITCH ##############
-    # ###########################
-    # ab hier testet alle nebenarbeiten an der maschine
-    btn_bobin_checked = BTN_BOBIN.check_switch()
-    if btn_bobin_checked is True:
-        if 'bobin' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('bobin')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited bobin-status')
-    elif btn_bobin_checked is False:
-        STOP_OPTIONS_ARRAY.append('bobin')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device at bobin-status')
-    # BOBIN SWITCH --------------
-    # ---------------------------
-
-
-def check_cozgu():
-    """ Description """
-    global OPTIONS_CHANGED
-    # COZGU SWITCH ##############
-    # ###########################
-    btn_cozgu_checked = BTN_COZGU.check_switch()
-    if btn_cozgu_checked is True:
-        if 'cozgu' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('cozgu')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited cozgu-status')
-    elif btn_cozgu_checked is False:
-        STOP_OPTIONS_ARRAY.append('cozgu')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited cozgu-status')
-    # COZGU SWITCH --------------
-    # ---------------------------
-
-
-def check_ariza():
-    """ Description """
-    global OPTIONS_CHANGED
-    # ARIZA SWITCH ##############
-    # ###########################
-    btn_ariza_checked = BTN_ARIZA.check_switch()
-    if btn_ariza_checked is True:
-        if 'ariza' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('ariza')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited azriza-status')
-    elif btn_ariza_checked is False:
-        STOP_OPTIONS_ARRAY.append('ariza')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited ariza-status')
-    # ARIZA SWITCH --------------
-    # ---------------------------
-
-
-def check_ayar():
-    """ Description """
-    global OPTIONS_CHANGED
-    # AYAR SWITCH ###############
-    # ###########################
-    btn_ayar_checked = BTN_AYAR.check_switch()
-    if btn_ayar_checked is True:
-        if 'ayar' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('ayar')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited ayar-status')
-    elif btn_ayar_checked is False:
-        STOP_OPTIONS_ARRAY.append('ayar')
-        OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited ayar-status')
-    # AYAR SWITCH ---------------
-    # ---------------------------
+# def check_bobin():
+#     """ Description """
+#     global OPTIONS_CHANGED, STATUS_ARRAY
+#     # BOBIN SWITCH ##############
+#     # ###########################
+#     # ab hier testet alle nebenarbeiten an der maschine
+#     btn_bobin_checked = BTN_BOBIN.check_switch()
+#     if btn_bobin_checked is True:
+#         if 'bobin' in STOP_OPTIONS_ARRAY:
+#             STOP_OPTIONS_ARRAY.remove('bobin')
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited bobin-status')
+#     elif btn_bobin_checked is False:
+#         STOP_OPTIONS_ARRAY.append('bobin')
+#         STATUS_ARRAY = ['bobin']
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device at bobin-status')
+#     # BOBIN SWITCH --------------
+#     # ---------------------------
+#
+#
+# def check_cozgu():
+#     """ Description """
+#     global OPTIONS_CHANGED, STATUS_ARRAY
+#     # COZGU SWITCH ##############
+#     # ###########################
+#     btn_cozgu_checked = BTN_COZGU.check_switch()
+#     if btn_cozgu_checked is True:
+#         if 'cozgu' in STOP_OPTIONS_ARRAY:
+#             STOP_OPTIONS_ARRAY.remove('cozgu')
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited cozgu-status')
+#     elif btn_cozgu_checked is False:
+#         STOP_OPTIONS_ARRAY.append('cozgu')
+#         STATUS_ARRAY = ['cozgu']
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited cozgu-status')
+#     # COZGU SWITCH --------------
+#     # ---------------------------
+#
+#
+# def check_ariza():
+#     """ Description """
+#     global OPTIONS_CHANGED, STATUS_ARRAY
+#     # ARIZA SWITCH ##############
+#     # ###########################
+#     btn_ariza_checked = BTN_ARIZA.check_switch()
+#     if btn_ariza_checked is True:
+#         if 'ariza' in STOP_OPTIONS_ARRAY:
+#             STOP_OPTIONS_ARRAY.remove('ariza')
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited azriza-status')
+#     elif btn_ariza_checked is False:
+#         STOP_OPTIONS_ARRAY.append('ariza')
+#         STATUS_ARRAY = ['ariza']
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited ariza-status')
+#     # ARIZA SWITCH --------------
+#     # ---------------------------
+#
+#
+# def check_ayar():
+#     """ Description """
+#     global OPTIONS_CHANGED, STATUS_ARRAY
+#     # AYAR SWITCH ###############
+#     # ###########################
+#     btn_ayar_checked = BTN_AYAR.check_switch()
+#     if btn_ayar_checked is True:
+#         if 'ayar' in STOP_OPTIONS_ARRAY:
+#             STOP_OPTIONS_ARRAY.remove('ayar')
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited ayar-status')
+#     elif btn_ayar_checked is False:
+#         STOP_OPTIONS_ARRAY.append('ayar')
+#         STATUS_ARRAY = ['ayar']
+#         OPTIONS_CHANGED = 1
+#         LOGGING.log_info('Device exited ayar-status')
+#     # AYAR SWITCH ---------------
+#     # ---------------------------
 
 
 def gpio_check_start_stop():
@@ -198,11 +220,11 @@ def gpio_check_start_stop():
 
     if SYSTEM_ON == 1:
         check_start_stop()
-        if SYSTEM_ON == 1 and MACHINE_START == 0:
-            check_bobin()
-            check_cozgu()
-            check_ariza()
-            check_ayar()
+        # if SYSTEM_ON == 1 and MACHINE_START == 0:
+            # check_bobin()
+            # check_cozgu()
+            # check_ariza()
+            # check_ayar()
 
 
 def check_keypad():
@@ -279,16 +301,16 @@ def gpio_check():
     show_remainder_counter()
     total_total_counter()
 
-    if SYSTEM_ON == 1:
-        check_start_stop()
+    # if SYSTEM_ON == 1:
+    #     check_start_stop()
 
     if MACHINE_START == 0 and SYSTEM_ON == 1:
         check_keypad()
 
-        check_bobin()
-        check_cozgu()
-        check_ariza()
-        check_ayar()
+        # check_bobin()
+        # check_cozgu()
+        # check_ariza()
+        # check_ayar()
 
     if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
@@ -309,23 +331,67 @@ def gpio_check():
         RESET = 0
 
 
+def event_start_stop(channel):
+    """ Description """
+    global MACHINE_START, OPTIONS_CHANGED, STATUS_ARRAY
+    # START/STOP SWITCH ##############
+    # ################################
+    # start stop und nebenarbeiten an der maschine
+    # wenn start switch on, zeigt nur start bzw. calisiyor
+    if SYSTEM_ON == 1:
+        btn_start_stop_checked = BTN_START_STOP.check_switch_once()
+        if btn_start_stop_checked is True and MACHINE_START == 0:
+            if STATUS_ARRAY + ['start'] in g.print_all_paths(stop, start):
+                if STATUS_ARRAY[len(STATUS_ARRAY) - 1] is 'stop':
+                    STATUS_ARRAY.pop()
+                if 'stop' in STOP_OPTIONS_ARRAY:
+                    STOP_OPTIONS_ARRAY.remove('stop')
+                STOP_OPTIONS_ARRAY.append('start')
+                MACHINE_START = 1
+                OPTIONS_CHANGED = 1
+                STATUS_ARRAY.append('start')
+                TIME_WATCH.start()
+                LOGGING.log_info('Device started')
+                print(STATUS_ARRAY)
+        # maschiene gestopt
+        # zusatzlich kann signalisiert werden, warum die maschine gestopt
+        elif btn_start_stop_checked is False and MACHINE_START == 1:
+            # if ['start'] + STATUS_ARRAY in g.print_all_paths(stop, start):
+            if STATUS_ARRAY[len(STATUS_ARRAY) - 1] is 'start':
+                STATUS_ARRAY.pop()
+            if 'start' in STOP_OPTIONS_ARRAY:
+                STOP_OPTIONS_ARRAY.remove('start')
+            STOP_OPTIONS_ARRAY.append('stop')
+            MACHINE_START = 0
+            OPTIONS_CHANGED = 1
+            STATUS_ARRAY.append('stop')
+            TIME_WATCH.stop()
+            LOGGING.log_info('Device stopped')
+            print(STATUS_ARRAY)
+
+    LOGGING.log_info(channel)
+    # START/STOP SWITCH --------
+    # ---------------------------
+
+
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME
+    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, STATUS_ARRAY, COUNTER_PUSHED
 
-    if SYSTEM_ON == 1:
-        checked = 0
-        for cnt in range(0,5):
-            if BTN_START_STOP.check_switch_once() is True:
-                checked = checked + 1
-                sleep(0.05)
-        # checked in 300ms, if start-stop active
-        if BTN_START_STOP.check_switch_once() is True and checked == 5:
-            COUNTER_NR = COUNTER_NR + 1
-            RUN_TIME = TIME_WATCH.get_run_time()
-            COUNTER_CHANGED = 1  # for refresh JSON
-            OPTIONS_CHANGED = 1  # for refresh LCD
-            # LOGGING.log_info(channel)
+    btn_cnt_check = BTN_COUNTER.check_switch_once()
+    if btn_cnt_check is True:
+        COUNTER_PUSHED = 1
+
+    elif btn_cnt_check is False:
+        if COUNTER_PUSHED == 1:
+            if STATUS_ARRAY + ['counter'] in g.print_all_paths(start, counter):
+                RUN_TIME = TIME_WATCH.get_run_time()
+                COUNTER_NR = COUNTER_NR + 1
+                OPTIONS_CHANGED = 1
+                COUNTER_PUSHED = 0
+                COUNTER_CHANGED = 1
+
+    LOGGING.log_info(channel)
 
 
 def event_reset(channel):
@@ -343,7 +409,7 @@ def event_reset(channel):
                 TIME_WATCH.reset_time()
                 RESET = 1
                 LOGGING.log_info('Counter reset')
-                LOGGING.log_info(channel)
+    LOGGING.log_info(channel)
 
 
 def loop():
@@ -357,8 +423,9 @@ def loop():
 
 def add_events():
     """ Description """
-    BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
-    BTN_RESET.add_callback(mode='rising', callback=event_reset)
+    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    BTN_COUNTER.add_callback(mode='both', callback=event_counter)
+    BTN_RESET.add_callback(mode='both', callback=event_reset)
 
 
 if __name__ == '__main__':

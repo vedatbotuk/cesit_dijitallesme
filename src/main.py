@@ -315,10 +315,10 @@ def event_counter(channel):
     global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, COUNTER_PUSHED
 
     btn_cnt = BTN_COUNTER.check_switch_once()
-    if btn_cnt is True:
+    if btn_cnt is False:
         COUNTER_PUSHED = 1
 
-    elif btn_cnt is False:
+    elif btn_cnt is True:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
             checked = 0
             # for cnt in range(0,5):

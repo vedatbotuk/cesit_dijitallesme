@@ -324,7 +324,7 @@ def event_counter(channel):
             for cnt in range(0, 5):
                 if BTN_START_STOP.check_switch_once() is True:
                     checked = checked + 1
-                    sleep(0.05)
+                    sleep(0.01)
             # checked in 300ms, if start-stop active
             if BTN_START_STOP.check_switch_once() is True and checked == 5:
                 COUNTER_NR = COUNTER_NR + 1

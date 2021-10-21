@@ -321,17 +321,17 @@ def event_counter(channel):
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
             checked = 0
-            for cnt in range(0,5):
-                if BTN_START_STOP.check_switch_once() is True:
-                    checked = checked + 1
-                    sleep(0.05)
+            # for cnt in range(0,5):
+            #     if BTN_START_STOP.check_switch_once() is True:
+            #         checked = checked + 1
+            #         sleep(0.05)
             # checked in 300ms, if start-stop active
-            if BTN_START_STOP.check_switch_once() is True and checked == 5:
-                COUNTER_NR = COUNTER_NR + 1
-                RUN_TIME = TIME_WATCH.get_run_time()
-                COUNTER_CHANGED = 1  # for refresh JSON
-                OPTIONS_CHANGED = 1  # for refresh LCD
-                COUNTER_PUSHED = 0
+            # if BTN_START_STOP.check_switch_once() is True and checked == 5:
+            COUNTER_NR = COUNTER_NR + 1
+            RUN_TIME = TIME_WATCH.get_run_time()
+            COUNTER_CHANGED = 1  # for refresh JSON
+            OPTIONS_CHANGED = 1  # for refresh LCD
+            COUNTER_PUSHED = 0
     LOGGING.log_info(channel)
 
 

@@ -162,7 +162,7 @@ class LcdModule:
                 self.lcd.write_string(self.text)
             except Exception as e:
                 self.lcd.clear()
-                self.logging.log_info(e)
+                self.logging.log_info("Error: %s.\n" % str(e))
 
     def __sync_time(self):
         """ Description """

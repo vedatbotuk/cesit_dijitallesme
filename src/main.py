@@ -348,7 +348,8 @@ def event_counter(channel):
 
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
-            if BTN_START_STOP.check_five_times(True) is True:
+            # if BTN_START_STOP.check_five_times(True) is True:
+            if BTN_COUNTER.check_switch_once() is False:
                 COUNTER_NR = COUNTER_NR + 1
                 RUN_TIME = TIME_WATCH.get_run_time()
                 COUNTER_CHANGED = 1  # for refresh JSON

@@ -291,10 +291,10 @@ def gpio_check():
         check_ariza()
         check_ayar()
 
-    if STOP_OPTIONS_ARRAY:
-        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-
     if OPTIONS_CHANGED == 1:
+        if STOP_OPTIONS_ARRAY:
+            LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
+
         JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
         OPTIONS_CHANGED = 0
 

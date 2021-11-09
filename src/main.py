@@ -317,24 +317,24 @@ def event_start_stop(channel):
     # ################################
     btn_start_stop_chk = BTN_START_STOP.check_switch_once()
     if btn_start_stop_chk is True and MACHINE_START == 0:
-        if BTN_START_STOP.check_five_times(True) is True:
-            if 'stop' in STOP_OPTIONS_ARRAY:
-                STOP_OPTIONS_ARRAY.remove('stop')
-            STOP_OPTIONS_ARRAY.append('start')
-            MACHINE_START = 1
-            OPTIONS_CHANGED = 1
-            TIME_WATCH.start()
-            LOGGING.log_info('Device started')
+        # if BTN_START_STOP.check_five_times(True) is True:
+        if 'stop' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('stop')
+        STOP_OPTIONS_ARRAY.append('start')
+        MACHINE_START = 1
+        OPTIONS_CHANGED = 1
+        TIME_WATCH.start()
+        LOGGING.log_info('Device started')
 
     elif btn_start_stop_chk is False and MACHINE_START == 1:
-        if BTN_START_STOP.check_five_times(True) is False:
-            if 'start' in STOP_OPTIONS_ARRAY:
-                STOP_OPTIONS_ARRAY.remove('start')
-            STOP_OPTIONS_ARRAY.append('stop')
-            MACHINE_START = 0
-            OPTIONS_CHANGED = 1
-            TIME_WATCH.stop()
-            LOGGING.log_info('Device stopped')
+        # if BTN_START_STOP.check_five_times(True) is False:
+        if 'start' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('start')
+        STOP_OPTIONS_ARRAY.append('stop')
+        MACHINE_START = 0
+        OPTIONS_CHANGED = 1
+        TIME_WATCH.stop()
+        LOGGING.log_info('Device stopped')
     # START/STOP SWITCH --------
 
 

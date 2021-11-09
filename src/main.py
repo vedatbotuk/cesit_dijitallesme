@@ -364,16 +364,16 @@ def event_reset(channel):
 
     if MACHINE_START == 0:
         sleep(0.25)
-        btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
-        if btn_start_stop_checked_rst is False:
-            sleep(0.25)
-            btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
-            if btn_start_stop_checked_rst is True:
-                COUNTER_NR = 0
-                TIME_WATCH.reset_time()
-                RESET = 1
-                LOGGING.log_info('Counter reset')
-                LOGGING.log_info(channel)
+        # btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
+        # if btn_start_stop_checked_rst is False:
+        #     sleep(0.25)
+        btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
+        if btn_start_stop_checked_rst is True:
+            COUNTER_NR = 0
+            TIME_WATCH.reset_time()
+            RESET = 1
+            LOGGING.log_info('Counter reset')
+            LOGGING.log_info(channel)
 
 
 def loop():

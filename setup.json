@@ -2,7 +2,7 @@
   "main": {
     "path_json": "/var/www/html/data.json",
     "path_json_default": "default_data.json",
-    "device_name": "7",
+    "device_name": "pilot",
     "log": "on",
     "log_level": "info",
     "log_path": "/var/www/html/cesit_dijitallesme.log"

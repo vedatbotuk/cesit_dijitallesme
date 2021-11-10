@@ -211,7 +211,7 @@ def check_keypad():
 
     if KEYPAD_INSTALL is True:
         button_to_give_counter = KEY_PAD.check_button()
-        if button_to_give_counter is '#':
+        if button_to_give_counter == '#':
 
             given_number = ''
             LCD.refresh_lcd('Given_Counter', given_number)
@@ -252,7 +252,7 @@ def total_total_counter():
 
     if KEYPAD_INSTALL is True:
         button_to_give_total = KEY_PAD.check_button()
-        if button_to_give_total is 'A':
+        if button_to_give_total == 'A':
             LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
             sleep(3)
         else:
@@ -264,7 +264,7 @@ def show_remainder_counter():
 
     if KEYPAD_INSTALL is True:
         button_to_give_remainder = KEY_PAD.check_button()
-        if button_to_give_remainder is 'B':
+        if button_to_give_remainder == 'B':
             LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER - COUNTER_NR)
             sleep(3)
         else:
@@ -280,62 +280,33 @@ def gpio_check():
     show_remainder_counter()
     total_total_counter()
 
-    # if SYSTEM_ON == 1:
-    #     check_start_stop()
+    if SYSTEM_ON == 1:
+        check_start_stop()
 
-    if MACHINE_START == 0 and SYSTEM_ON == 1:
-        check_keypad()
+        if MACHINE_START == 0:
+            check_keypad()
 
-        check_bobin()
-        check_cozgu()
-        check_ariza()
-        check_ayar()
+            check_bobin()
+            check_cozgu()
+            check_ariza()
+            check_ayar()
 
-    if OPTIONS_CHANGED == 1:
         if STOP_OPTIONS_ARRAY:
             LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
-        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-        OPTIONS_CHANGED = 0
+        if OPTIONS_CHANGED == 1:
+            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+            OPTIONS_CHANGED = 0
 
-    if COUNTER_CHANGED == 1:
-        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
-        # JSON_FUNCS.create_backup(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-        COUNTER_CHANGED = 0
+        if COUNTER_CHANGED == 1:
+            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
+            COUNTER_CHANGED = 0
 
-    if RESET == 1:
-        LCD.refresh_lcd(what='reset', state=None)
-        JSON_FUNCS.change_json(what='reset')
-        JSON_FUNCS.change_json(what='counter', state=[0, 1])
-        RESET = 0
-
-
-def event_start_stop(channel):
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, MACHINE_START
-
-    # START/STOP SWITCH ##############
-    # ################################
-    btn_start_stop_chk = BTN_START_STOP.check_switch_once()
-    if btn_start_stop_chk is True and MACHINE_START == 0:
-        # if BTN_START_STOP.check_five_times(True) is True:
-        if 'stop' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('stop')
-        STOP_OPTIONS_ARRAY.append('start')
-        MACHINE_START = 1
-        OPTIONS_CHANGED = 1
-        TIME_WATCH.start()
-        LOGGING.log_info('Device started')
-
-    elif btn_start_stop_chk is False and MACHINE_START == 1:
-        # if BTN_START_STOP.check_five_times(True) is False:
-        if 'start' in STOP_OPTIONS_ARRAY:
-            STOP_OPTIONS_ARRAY.remove('start')
-        STOP_OPTIONS_ARRAY.append('stop')
-        MACHINE_START = 0
-        OPTIONS_CHANGED = 1
-        TIME_WATCH.stop()
-        LOGGING.log_info('Device stopped')
-    # START/STOP SWITCH --------
+        if RESET == 1:
+            LCD.refresh_lcd(what='reset', state=None)
+            JSON_FUNCS.change_json(what='reset')
+            JSON_FUNCS.change_json(what='counter', state=[0, 1])
+            RESET = 0
 
 
 def event_counter(channel):
@@ -348,7 +319,6 @@ def event_counter(channel):
 
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
-            # if BTN_START_STOP.check_five_times(True) is True:
             if BTN_COUNTER.check_switch_once() is False:
                 COUNTER_NR = COUNTER_NR + 1
                 RUN_TIME = TIME_WATCH.get_run_time()
@@ -364,9 +334,6 @@ def event_reset(channel):
 
     if MACHINE_START == 0:
         sleep(0.25)
-        # btn_start_stop_checked_rst = BTN_START_STOP.check_switch_once()
-        # if btn_start_stop_checked_rst is False:
-        #     sleep(0.25)
         btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
         if btn_start_stop_checked_rst is True:
             COUNTER_NR = 0
@@ -388,7 +355,6 @@ def loop():
 def add_events():
     """ Description """
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
 

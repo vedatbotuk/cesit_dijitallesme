@@ -6,7 +6,6 @@
 from RPi import GPIO
 from .log_info import LogInfo
 from .json_funcs import get_setup
-from time import sleep
 
 
 def gpio_cleanup():
@@ -80,18 +79,6 @@ class ButtonSwitch:
         self.btn_state = GPIO.input(self.gpio_no)
 
         if self.btn_state:
-            return True
-        else:
-            return False
-
-    def check_five_times(self, true_false):
-        checked = 0
-        for cnt in range(0, 5):
-            self.btn_state = GPIO.input(self.gpio_no)
-            if self.btn_state == true_false:
-                checked = checked + 1
-                sleep(0.01)
-        if checked == 5:
             return True
         else:
             return False

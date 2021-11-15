@@ -6,6 +6,7 @@
 # Imports
 from time import sleep
 import classes
+from classes import os_commands
 
 # #####
 # Setup
@@ -147,7 +148,7 @@ def check_cozgu():
     elif btn_cozgu_checked is True:
         STOP_OPTIONS_ARRAY.append('cozgu')
         OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited cozgu-status')
+        LOGGING.log_info('Device at cozgu-status')
     # COZGU SWITCH --------------
     # ---------------------------
 
@@ -166,7 +167,7 @@ def check_ariza():
     elif btn_ariza_checked is True:
         STOP_OPTIONS_ARRAY.append('ariza')
         OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited ariza-status')
+        LOGGING.log_info('Device at ariza-status')
     # ARIZA SWITCH --------------
     # ---------------------------
 
@@ -185,7 +186,7 @@ def check_ayar():
     elif btn_ayar_checked is True:
         STOP_OPTIONS_ARRAY.append('ayar')
         OPTIONS_CHANGED = 1
-        LOGGING.log_info('Device exited ayar-status')
+        LOGGING.log_info('Device at ayar-status')
     # AYAR SWITCH ---------------
     # ---------------------------
 
@@ -206,13 +207,20 @@ def gpio_check_start_stop():
             check_ayar()
 
 
-def check_keypad():
+def keypad_give_counter():
+    """ Description """
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        button_to_give_counter = KEY_PAD.check_button()
-        if button_to_give_counter == '#':
+        wait = 3
+        checked = 0
+        for cnt in range(0, wait):
+            button_to_give_counter = KEY_PAD.check_button()
+            if button_to_give_counter == "#":
+                checked = checked + 1
+                sleep(1)
 
+        if checked == wait:
             given_number = ''
             LCD.refresh_lcd('Given_Counter', given_number)
 
@@ -228,15 +236,17 @@ def check_keypad():
                 elif get_button == '*':
                     try:
                         TOTAL_COUNTER = int(given_number)
-                    except Exception as e:
-                        LOGGING.log_info(e)
+
+                        JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
+                        LCD.refresh_lcd('successfully', given_number)
+                        sleep(2)
                         break
 
-                    JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
-                    LCD.refresh_lcd('successfully', given_number)
-                    sleep(2)
-
-                    break
+                    except Exception as e:
+                        LCD.refresh_lcd('Counter_not_allowed')
+                        sleep(2)
+                        LCD.refresh_lcd('Given_Counter', given_number)
+                        LOGGING.log_info(e)
 
                 elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                     given_number = given_number + get_button
@@ -247,7 +257,64 @@ def check_keypad():
             pass
 
 
-def total_total_counter():
+def keypad_give_os_cmd():
+    """ Description """
+
+    if KEYPAD_INSTALL is True:
+        wait = 3
+        checked = 0
+        for cnt in range(0, wait):
+            button_to_give_total = KEY_PAD.check_button()
+            if button_to_give_total == "D":
+                checked = checked + 1
+                sleep(1)
+
+        if checked == wait:
+            given_code = ''
+            LCD.refresh_lcd('Given_Code', given_code)
+
+            while True:
+                get_button = str(KEY_PAD.check_button())
+                if get_button == 'C':
+                    break
+
+                elif get_button == 'D':
+                    given_code = given_code[:-1]
+                    LCD.refresh_lcd('Given_Code', given_code)
+
+                elif get_button == '*':
+
+                    if given_code == '100':
+                        os_commands.shutdown_system()
+                        break
+
+                    elif given_code == '101':
+                        os_commands.reboot_system()
+                        break
+
+                    elif given_code == '102':
+                        os_commands.restart_program()
+                        break
+
+                    elif given_code == '103':
+                        os_commands.update_code()
+                        break
+
+                    else:
+                        LCD.refresh_lcd('Code_not_exists')
+                        sleep(2)
+                        given_code = ''
+                        LCD.refresh_lcd('Given_Code', given_code)
+
+                elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    given_code = given_code + get_button
+                    LCD.refresh_lcd('Given_Code', given_code)
+
+                sleep(0.2)
+
+
+def show_total_counter():
+    """ Description """
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
@@ -255,11 +322,15 @@ def total_total_counter():
         if button_to_give_total == 'A':
             LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
             sleep(3)
+            # button_to_give_code = KEY_PAD.check_button()
+            # if button_to_give_code == '#':
+            #     give_system_code()
         else:
             pass
 
 
 def show_remainder_counter():
+    """ Description """
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
@@ -278,13 +349,14 @@ def gpio_check():
     check_kapali()
 
     show_remainder_counter()
-    total_total_counter()
+    show_total_counter()
 
     if SYSTEM_ON == 1:
         check_start_stop()
 
         if MACHINE_START == 0:
-            check_keypad()
+            keypad_give_counter()
+            keypad_give_os_cmd()
 
             check_bobin()
             check_cozgu()

@@ -101,7 +101,7 @@ class LcdModule:
         self.lcd.create_char(4, character_s)
         self.lcd.create_char(5, character_u)
 
-    def refresh_lcd(self, what, state):
+    def refresh_lcd(self, what, state=None):
         """ Description """
 
         if what == 'kapali':
@@ -143,16 +143,37 @@ class LcdModule:
         elif what == 'Given_Counter':
             self.line2 = u'-> ' + str(state)
 
+        elif what == 'Given_Code':
+            self.line2 = u'## ' + str(state)
+
+        elif what == 'Code_not_exists':
+            self.line2 = u'## Ge\x00ersiz Code'
+
         elif what == 'successfully':
             self.line2 = u'-> Ba\x04ar\x02l\x02'
 
+        elif what == 'Counter_not_allowed':
+            self.line2 = u'-> Say\x02 girin'
+
+        elif what == 'code_shutdown':
+            self.line2 = u'## Raspi off...'
+
+        elif what == 'code_reboot':
+            self.line2 = u'## Raspi restart...'
+
+        elif what == 'code_restart_program':
+            self.line2 = u'## Restart...'
+
+        elif what == 'code_update':
+            self.line2 = u'## G\x05ncelleniyor'
+
         elif what == 'show_remainder':
             self.line1 = ''
-            self.line2 = u'Kalan= ' + str(state)
+            self.line2 = u'Kalan=' + str(state)
 
         elif what == 'show_total':
             self.line1 = ''
-            self.line2 = u'Toplam= ' + str(state)
+            self.line2 = u'Toplam=' + str(state)
 
         text_old = self.text
         self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))

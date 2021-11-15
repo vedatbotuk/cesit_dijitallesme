@@ -85,7 +85,7 @@ class LcdModule:
         self.lcd = CharLCD(i2c_expander=model,
                            address=address,
                            port=1,
-                           cols=16,
+                           cols=17,
                            rows=2,
                            dotsize=8,
                            charmap='A02',
@@ -158,7 +158,7 @@ class LcdModule:
         self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
         if text_old != self.text:
             try:
-                # self.lcd.cursor_pos = (0, 0)
+                self.lcd.cursor_pos = (0, 0)
                 self.lcd.write_string(self.text)
             except Exception as e:
                 self.lcd.clear()

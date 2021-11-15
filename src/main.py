@@ -212,13 +212,15 @@ def keypad_give_counter():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        wait = 3
+        wait = 15
         checked = 0
         for cnt in range(0, wait):
             button_to_give_counter = KEY_PAD.check_button()
             if button_to_give_counter == "#":
                 checked = checked + 1
-                sleep(1)
+            else:
+                break
+            sleep(0.2)
 
         if checked == wait:
             given_number = ''
@@ -261,13 +263,15 @@ def keypad_give_os_cmd():
     """ Description """
 
     if KEYPAD_INSTALL is True:
-        wait = 3
+        wait = 15
         checked = 0
         for cnt in range(0, wait):
             button_to_give_total = KEY_PAD.check_button()
             if button_to_give_total == "D":
                 checked = checked + 1
-                sleep(1)
+            else:
+                break
+            sleep(0.2)
 
         if checked == wait:
             given_code = ''
@@ -318,15 +322,13 @@ def show_total_counter():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        button_to_give_total = KEY_PAD.check_button()
-        if button_to_give_total == 'A':
-            LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
-            sleep(3)
-            # button_to_give_code = KEY_PAD.check_button()
-            # if button_to_give_code == '#':
-            #     give_system_code()
-        else:
-            pass
+        while True:
+            button_to_give_total = KEY_PAD.check_button()
+            if button_to_give_total == 'A':
+                LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
+            else:
+                break
+            sleep(0.5)
 
 
 def show_remainder_counter():
@@ -334,12 +336,13 @@ def show_remainder_counter():
     global TOTAL_COUNTER, COUNTER_NR
 
     if KEYPAD_INSTALL is True:
-        button_to_give_remainder = KEY_PAD.check_button()
-        if button_to_give_remainder == 'B':
-            LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER - COUNTER_NR)
-            sleep(3)
-        else:
-            pass
+        while True:
+            button_to_give_remainder = KEY_PAD.check_button()
+            if button_to_give_remainder == 'B':
+                LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER - COUNTER_NR)
+            else:
+                break
+            sleep(0.5)
 
 
 def gpio_check():

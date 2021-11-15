@@ -85,7 +85,7 @@ class LcdModule:
         self.lcd = CharLCD(i2c_expander=model,
                            address=address,
                            port=1,
-                           cols=17,
+                           cols=16,
                            rows=2,
                            dotsize=8,
                            charmap='A02',

@@ -11,6 +11,7 @@ def shutdown_system():
     sleep(2)
     LCD.lcd_close()
     system("sudo shutdown now")
+    exit()
 
 
 def reboot_system():
@@ -19,6 +20,7 @@ def reboot_system():
     sleep(2)
     LCD.lcd_close()
     system("sudo reboot")
+    exit()
 
 
 def restart_program():
@@ -27,6 +29,7 @@ def restart_program():
     sleep(2)
     LCD.lcd_close()
     system("sudo systemctl restart cesit_dijitallesme.service")
+    exit()
 
 
 def update_code():
@@ -34,3 +37,4 @@ def update_code():
     system("cd /home/pi/cesit_dijitallesme/ && git pull")
     LCD.lcd_close()
     system("sudo systemctl restart cesit_dijitallesme.service")
+    exit()

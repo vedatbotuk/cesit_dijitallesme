@@ -388,9 +388,6 @@ def gpio_check():
             check_ariza()
             check_ayar()
 
-        if STOP_OPTIONS_ARRAY:
-            LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
-
         if OPTIONS_CHANGED == 1:
             JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
             OPTIONS_CHANGED = 0
@@ -404,6 +401,9 @@ def gpio_check():
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=[0, 1])
             RESET = 0
+
+    if STOP_OPTIONS_ARRAY:
+        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
 
 def event_counter(channel):

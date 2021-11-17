@@ -140,7 +140,7 @@ class JsonFuncs:
                 self.mycol.update_one({"_id": self.device_name},
                                       {"$set": {'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}})
 
-                self.remainder_time = round((self.total_counter / self.speed) / 60, 2)
+                self.remainder_time = round((self.total_counter / self.speed) / 60, 2) - self.run_time
                 self.mycol.update_one({"_id": self.device_name},
                                       {"$set": {'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}})
 

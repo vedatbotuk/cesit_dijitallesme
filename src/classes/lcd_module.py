@@ -73,7 +73,9 @@ class LcdModule:
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
 
-        self.text = ''
+        self.text_line1 = ''
+        self.text_line2 = ''
+
         self.line1 = ''
         self.line2 = ''
 
@@ -85,11 +87,11 @@ class LcdModule:
         self.lcd = CharLCD(i2c_expander=model,
                            address=address,
                            port=1,
-                           cols=17,
+                           cols=16,
                            rows=2,
                            dotsize=8,
                            charmap='A02',
-                           auto_linebreaks=False,
+                           auto_linebreaks=True,
                            backlight_enabled=True)
 
         self.logging.log_info('Module: ' + model + ' loaded')
@@ -175,12 +177,26 @@ class LcdModule:
             self.line1 = ''
             self.line2 = u'Toplam=' + str(state)
 
-        text_old = self.text
-        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
-        if text_old != self.text:
+        elif what == 'after_clear':
+            self.line1 = ''
+            self.line2 = ''
+
+        text_old_line1 = self.text_line1
+        self.text_line1 = str(self.__sync_time()) + self.line1
+        if text_old_line1 != self.text_line1:
             try:
                 self.lcd.cursor_pos = (0, 0)
-                self.lcd.write_string(self.text)
+                self.lcd.write_string(self.text_line1[:16])
+            except Exception as e:
+                self.lcd.clear()
+                self.logging.log_info(e)
+
+        text_old_line2 = self.text_line2
+        self.text_line2 = self.line2 + ' ' * (16 - len(self.line2))
+        if text_old_line2 != self.text_line2:
+            try:
+                self.lcd.cursor_pos = (1, 0)
+                self.lcd.write_string(self.text_line2[:16])
             except Exception as e:
                 self.lcd.clear()
                 self.logging.log_info(e)
@@ -193,3 +209,7 @@ class LcdModule:
     def lcd_close(self):
         """ Description """
         self.lcd.close(clear=True)
+
+    def lcd_clear(self):
+        """ Description """
+        self.lcd.clear()

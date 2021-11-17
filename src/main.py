@@ -218,7 +218,9 @@ def keypad_give_counter():
             button_to_give_counter = KEY_PAD.check_button()
             if button_to_give_counter == "#":
                 checked = checked + 1
-                sleep(0.2)
+            else:
+                break
+            sleep(0.2)
 
         if checked == wait:
             given_number = ''
@@ -267,7 +269,9 @@ def keypad_give_os_cmd():
             button_to_give_total = KEY_PAD.check_button()
             if button_to_give_total == "D":
                 checked = checked + 1
-                sleep(0.2)
+            else:
+                break
+            sleep(0.2)
 
         if checked == wait:
             given_code = ''
@@ -341,6 +345,27 @@ def show_remainder_counter():
             sleep(0.5)
 
 
+def clear_lcd():
+    """ Description """
+
+    if KEYPAD_INSTALL is True:
+        wait = 15
+        checked = 0
+        for cnt in range(0, wait):
+            button_to_give_total = KEY_PAD.check_button()
+            if button_to_give_total == "C":
+                checked = checked + 1
+            else:
+                break
+            sleep(0.2)
+
+        if checked == wait:
+            LCD.lcd_clear()
+            sleep(0.25)
+            LCD.refresh_lcd(what='after_clear')
+            sleep(0.25)
+
+
 def gpio_check():
     """ Description """
     global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET
@@ -349,6 +374,7 @@ def gpio_check():
 
     show_remainder_counter()
     show_total_counter()
+    clear_lcd()
 
     if SYSTEM_ON == 1:
         check_start_stop()

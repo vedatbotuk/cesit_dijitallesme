@@ -169,6 +169,12 @@ class LcdModule:
         elif what == 'code_update':
             self.line2 = u'## G\x05ncelleniyor'
 
+        elif what == 'no_internet':
+            self.line2 = u'## No Internet'
+
+        elif what == 'not_successfully':
+            self.line2 = u'## Ba\x04ar\x02s\x02z'
+
         elif what == 'show_remainder':
             self.line1 = ''
             self.line2 = u'Kalan=' + str(state)

@@ -416,12 +416,11 @@ def event_counter(channel):
 
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
-            if BTN_COUNTER.check_switch_once() is False:
-                COUNTER_NR = COUNTER_NR + 1
-                RUN_TIME = TIME_WATCH.get_run_time()
-                COUNTER_CHANGED = 1  # for refresh JSON
-                OPTIONS_CHANGED = 1  # for refresh LCD
-                COUNTER_PUSHED = 0
+            COUNTER_NR = COUNTER_NR + 1
+            RUN_TIME = TIME_WATCH.get_run_time()
+            COUNTER_CHANGED = 1  # for refresh JSON
+            OPTIONS_CHANGED = 1  # for refresh LCD
+            COUNTER_PUSHED = 0
     LOGGING.log_info(channel)
 
 

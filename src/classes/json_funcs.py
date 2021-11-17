@@ -15,6 +15,10 @@ def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
         return config_json
 
 
+def time_to_hhmm_format(float_time):
+    return '{0:02.0f}:{1:02.0f}'.format(*divmod(float_time * 60, 60))
+
+
 class JsonFuncs:
     """ Description """
 
@@ -134,7 +138,8 @@ class JsonFuncs:
                 self.logging.log_info(e)
 
             self.run_time = round(state[1] / 3600, 2)
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma süresi': str(self.run_time) + ' Saat'}})
+            self.mycol.update_one({"_id": self.device_name},
+                                  {"$set": {'Çalışma süresi': time_to_hhmm_format(self.run_time)}})
 
             if 0 < self.speed < 40:
                 self.mycol.update_one({"_id": self.device_name},
@@ -142,7 +147,8 @@ class JsonFuncs:
 
                 self.remainder_time = round(((self.total_counter / self.speed) / 60) - self.run_time, 2)
                 self.mycol.update_one({"_id": self.device_name},
-                                      {"$set": {'Tahmini kalan süre': str(self.remainder_time) + ' Saat'}})
+                                      {"$set": {
+                                          'Tahmini kalan süre': time_to_hhmm_format(self.remainder_time)}})
 
             elif self.speed <= 0:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': '...'}})

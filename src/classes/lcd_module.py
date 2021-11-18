@@ -73,8 +73,7 @@ class LcdModule:
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
 
-        self.text_line1 = ''
-        self.text_line2 = ''
+        self.text = ''
 
         self.line1 = ''
         self.line2 = ''
@@ -187,22 +186,12 @@ class LcdModule:
             self.line1 = ''
             self.line2 = ''
 
-        text_old_line1 = self.text_line1
-        self.text_line1 = str(self.__sync_time()) + self.line1
-        if text_old_line1 != self.text_line1:
+        text_old = self.text
+        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
+        if text_old != self.text:
             try:
                 self.lcd.cursor_pos = (0, 0)
-                self.lcd.write_string(self.text_line1[:16])
-            except Exception as e:
-                self.lcd.clear()
-                self.logging.log_info(e)
-
-        text_old_line2 = self.text_line2
-        self.text_line2 = self.line2 + ' ' * (16 - len(self.line2))
-        if text_old_line2 != self.text_line2:
-            try:
-                self.lcd.cursor_pos = (1, 0)
-                self.lcd.write_string(self.text_line2[:16])
+                self.lcd.write_string(self.text)
             except Exception as e:
                 self.lcd.clear()
                 self.logging.log_info(e)

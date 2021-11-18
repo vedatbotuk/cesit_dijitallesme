@@ -290,18 +290,25 @@ def keypad_give_os_cmd():
 
                     if given_code == '100':
                         os_commands.shutdown_system()
+                        LCD.lcd_close()
+                        exit()
                         break
 
                     elif given_code == '101':
                         os_commands.reboot_system()
+                        LCD.lcd_close()
+                        exit()
                         break
 
                     elif given_code == '102':
                         os_commands.restart_program()
+                        LCD.lcd_close()
+                        exit()
                         break
 
                     elif given_code == '103':
                         os_commands.update_code()
+                        LCD.lcd_close()
                         break
 
                     else:
@@ -376,21 +383,24 @@ def gpio_check():
     show_total_counter()
     clear_lcd()
 
+    if MACHINE_START == 0:
+        keypad_give_counter()
+        keypad_give_os_cmd()
+
+        check_bobin()
+        check_cozgu()
+        check_ariza()
+        check_ayar()
+
+    if STOP_OPTIONS_ARRAY:
+        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
+
+    if OPTIONS_CHANGED == 1:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        OPTIONS_CHANGED = 0
+
     if SYSTEM_ON == 1:
         check_start_stop()
-
-        if MACHINE_START == 0:
-            keypad_give_counter()
-            keypad_give_os_cmd()
-
-            check_bobin()
-            check_cozgu()
-            check_ariza()
-            check_ayar()
-
-        if OPTIONS_CHANGED == 1:
-            JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
-            OPTIONS_CHANGED = 0
 
         if COUNTER_CHANGED == 1:
             JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
@@ -401,9 +411,6 @@ def gpio_check():
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=[0, 1])
             RESET = 0
-
-    if STOP_OPTIONS_ARRAY:
-        LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
 
 def event_counter(channel):

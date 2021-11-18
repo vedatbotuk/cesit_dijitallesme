@@ -171,6 +171,9 @@ class LcdModule:
         elif what == 'no_internet':
             self.line2 = u'## No Internet'
 
+        elif what == 'update_successfully':
+            self.line2 = u'## Ba\x04ar\x02l\x02'
+
         elif what == 'not_successfully':
             self.line2 = u'## Ba\x04ar\x02s\x02z'
 

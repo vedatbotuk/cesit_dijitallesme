@@ -48,7 +48,7 @@ def update_code():
         LCD.refresh_lcd('code_update')
         if subprocess.call("cd /home/pi/cesit_dijitallesme && git pull", shell=True) == 0:
             sleep(1)
-            LCD.refresh_lcd('successfully')
+            LCD.refresh_lcd('update_successfully')
             system("sudo systemctl restart cesit_dijitallesme.service")
         else:
             logging.log_info('Update not successfully, git fails: ')

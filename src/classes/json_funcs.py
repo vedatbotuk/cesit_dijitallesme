@@ -3,7 +3,7 @@
 """ Description """
 
 import json
-from .time import Time
+from .time import get_date_time
 from .log_info import LogInfo
 import pymongo
 
@@ -85,7 +85,6 @@ class JsonFuncs:
 
         self.remainder_time = None
 
-        self.time_obj = Time()
         try:
             self.reset_time = self.mycol.find_one({"_id": self.device_name})['Son Reset Tarihi']
             self.reset_time = float(self.reset_time)
@@ -143,7 +142,6 @@ class JsonFuncs:
             self.mycol.update_one({"_id": self.device_name},
                                   {"$set": {'Çalışma süresi': self.run_time}})
 
-            # if 0 < self.speed < 40:
             self.mycol.update_one({"_id": self.device_name},
                                   {"$set": {'Çalışma hızı': self.speed}})
 
@@ -159,16 +157,8 @@ class JsonFuncs:
                                   {"$set": {
                                       'Tahmini kalan süre': self.remainder_time}})
 
-            # elif self.speed <= 0:
-            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': '...'}})
-            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': '...'}})
-
-            # else:
-            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
-            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
-
         elif what == 'reset':
-            self.reset_time = self.time_obj.get_date_time()
+            self.reset_time = get_date_time()
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.reset_time}})
 
         elif what == 'bobin':

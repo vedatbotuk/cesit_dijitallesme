@@ -133,7 +133,7 @@ class JsonFuncs:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
 
             try:
-                self.speed = round(state[0] / state[1], 1)
+                self.speed = round(state[0] / state[1], 2)
             except ZeroDivisionError as e:
                 self.speed = 0
                 self.logging.log_info('speed: ' + str(e))

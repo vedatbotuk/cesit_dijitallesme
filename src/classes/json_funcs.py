@@ -76,6 +76,7 @@ class JsonFuncs:
 
         try:
             self.run_time = self.mycol.find_one({"_id": self.device_name})['Çalışma süresi']
+            self.run_time = float(self.run_time)
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)

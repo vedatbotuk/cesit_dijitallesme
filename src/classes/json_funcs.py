@@ -88,7 +88,7 @@ class JsonFuncs:
         self.time_obj = Time()
         try:
             self.reset_time = self.mycol.find_one({"_id": self.device_name})['Son Reset Tarihi']
-            self.reset_time = float(self.run_time)
+            self.reset_time = float(self.reset_time)
         except Exception as e:
             self.reset_time = 0
             self.logging.log_info(e)

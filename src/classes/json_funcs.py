@@ -15,10 +15,6 @@ def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
         return config_json
 
 
-def time_to_hhmm_format(float_time):
-    return '{0:02.0f}:{1:02.0f}'.format(*divmod(float_time * 60, 60))
-
-
 class JsonFuncs:
     """ Description """
 
@@ -40,9 +36,9 @@ class JsonFuncs:
             "Son Reset Tarihi": "",
             "Toplam düğüm sayısı": 0,
             "Kalan düğüm sayısı": 0,
-            "Çalışma süresi": "",
-            "Çalışma hızı": "",
-            "Tahmini kalan süre": ""
+            "Çalışma süresi": 0,
+            "Çalışma hızı": 0,
+            "Tahmini kalan süre": 0
         }
 
         #################
@@ -79,8 +75,7 @@ class JsonFuncs:
         self.total_counter = self.mycol.find_one({"_id": self.device_name})['Toplam düğüm sayısı']
 
         try:
-            self.run_time = float(
-                self.mycol.find_one({"_id": self.device_name})['Çalışma süresi'].split(' ', 1)[0]) * 3600
+            self.run_time = self.mycol.find_one({"_id": self.device_name})['Çalışma süresi']
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)
@@ -132,31 +127,38 @@ class JsonFuncs:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
 
             try:
-                self.speed = round(state[0] / state[1] * 60, 1)
+                self.speed = round(state[0] / state[1], 1)
             except ZeroDivisionError as e:
                 self.speed = 0
-                self.logging.log_info(e)
+                self.logging.log_info('speed: ' + str(e))
 
-            self.run_time = round(state[1] / 3600, 2)
+            self.run_time = state[1]
             self.mycol.update_one({"_id": self.device_name},
-                                  {"$set": {'Çalışma süresi': time_to_hhmm_format(self.run_time)}})
+                                  {"$set": {'Çalışma süresi': self.run_time}})
 
-            if 0 < self.speed < 40:
-                self.mycol.update_one({"_id": self.device_name},
-                                      {"$set": {'Çalışma hızı': str(self.speed) + ' düğüm/dakkika'}})
+            # if 0 < self.speed < 40:
+            self.mycol.update_one({"_id": self.device_name},
+                                  {"$set": {'Çalışma hızı': self.speed}})
 
-                self.remainder_time = round(((self.total_counter / self.speed) / 60) - self.run_time, 2)
-                self.mycol.update_one({"_id": self.device_name},
-                                      {"$set": {
-                                          'Tahmini kalan süre': time_to_hhmm_format(self.remainder_time)}})
+            try:
+                self.remainder_time = round((self.total_counter / self.speed) - self.run_time, 2)
+                if self.remainder_time < 0:
+                    self.remainder_time = 0
+            except ZeroDivisionError as e:
+                self.remainder_time = 0
+                self.logging.log_info('remainder_time: ' + str(e))
 
-            elif self.speed <= 0:
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': '...'}})
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': '...'}})
+            self.mycol.update_one({"_id": self.device_name},
+                                  {"$set": {
+                                      'Tahmini kalan süre': self.remainder_time}})
 
-            else:
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
+            # elif self.speed <= 0:
+            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': '...'}})
+            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': '...'}})
+
+            # else:
+            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Çalışma hızı': 'hesaplanıyor...'}})
+            #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
 
         elif what == 'reset':
             self.system_time = self.time_obj.get_date_time()

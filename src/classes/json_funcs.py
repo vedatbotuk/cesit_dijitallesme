@@ -33,7 +33,7 @@ class JsonFuncs:
             "_id": self.device_name,
             "Makine Durumu": "Kapalı",
             "Counter": 0,
-            "Son Reset Tarihi": "",
+            "Son Reset Tarihi": 0,
             "Toplam düğüm sayısı": 0,
             "Kalan düğüm sayısı": 0,
             "Çalışma süresi": 0,
@@ -80,12 +80,18 @@ class JsonFuncs:
         except Exception as e:
             self.run_time = 0
             self.logging.log_info(e)
+
             self.logging.log_info('decelerated run_time = 0')
 
         self.remainder_time = None
 
         self.time_obj = Time()
-        self.system_time = self.time_obj.get_date_time()
+        try:
+            self.reset_time = self.mycol.find_one({"_id": self.device_name})['Son Reset Tarihi']
+            self.reset_time = float(self.run_time)
+        except Exception as e:
+            self.reset_time = 0
+            self.logging.log_info(e)
 
     def get_counter(self):
         """ Description """
@@ -162,8 +168,8 @@ class JsonFuncs:
             #     self.mycol.update_one({"_id": self.device_name}, {"$set": {'Tahmini kalan süre': 'hesaplanıyor...'}})
 
         elif what == 'reset':
-            self.system_time = self.time_obj.get_date_time()
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.system_time}})
+            self.reset_time = self.time_obj.get_date_time()
+            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.reset_time}})
 
         elif what == 'bobin':
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})

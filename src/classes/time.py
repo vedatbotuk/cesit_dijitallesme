@@ -27,7 +27,7 @@ class Time:
         """ Description """
         self.date_time_obj = datetime.now()
 
-        return self.date_time_obj.strftime("%d-%b-%Y (%H:%M:%S)")
+        return datetime.timestamp(self.date_time_obj)
 
 
 class StartStopWatch:

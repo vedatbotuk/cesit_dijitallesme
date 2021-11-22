@@ -6,6 +6,12 @@
 from datetime import datetime
 
 
+def get_date_time():
+    """ Description """
+    # self.date_time_obj = datetime.now()
+    return datetime.timestamp(datetime.now())
+
+
 class Time:
     """ Description """
     def __init__(self):
@@ -22,12 +28,6 @@ class Time:
             self.system_time = self.date_time_obj.strftime("%H:%M")
 
         return self.system_time
-
-    def get_date_time(self):
-        """ Description """
-        self.date_time_obj = datetime.now()
-
-        return datetime.timestamp(self.date_time_obj)
 
 
 class StartStopWatch:

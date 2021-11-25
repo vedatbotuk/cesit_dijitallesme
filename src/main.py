@@ -367,7 +367,7 @@ def clear_lcd():
             sleep(0.2)
 
         if checked == wait:
-            LCD.lcd_clear()
+            LCD.lcd_close()
             sleep(0.25)
             LCD.refresh_lcd(what='after_clear')
             sleep(0.25)
@@ -399,9 +399,6 @@ def gpio_check():
         JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
         OPTIONS_CHANGED = 0
 
-    if SYSTEM_ON == 1:
-        check_start_stop()
-
         if COUNTER_CHANGED == 1:
             JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
             COUNTER_CHANGED = 0
@@ -411,6 +408,36 @@ def gpio_check():
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=[0, 1])
             RESET = 0
+
+
+def event_start_stop(channel):
+    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, MACHINE_START
+
+    # START/STOP SWITCH ##############
+    # ################################
+    btn_start_stop_chk = BTN_START_STOP.check_switch_once()
+    if btn_start_stop_chk is True and MACHINE_START == 0:
+        # if BTN_START_STOP.check_five_times(True) is True:
+        if 'stop' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('stop')
+        STOP_OPTIONS_ARRAY.append('start')
+        MACHINE_START = 1
+        OPTIONS_CHANGED = 1
+        TIME_WATCH.start()
+        LOGGING.log_info('')
+        LOGGING.log_info(str(channel) + ' Device started')
+
+    elif btn_start_stop_chk is False and MACHINE_START == 1:
+        # if BTN_START_STOP.check_five_times(True) is False:
+        if 'start' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('start')
+        STOP_OPTIONS_ARRAY.append('stop')
+        MACHINE_START = 0
+        OPTIONS_CHANGED = 1
+        TIME_WATCH.stop()
+        LOGGING.log_info(str(channel) + ' Device stopped')
+        LOGGING.log_info('')
+    # START/STOP SWITCH --------
 
 
 def event_counter(channel):
@@ -461,6 +488,7 @@ def loop():
 
 def add_events():
     """ Description """
+    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 

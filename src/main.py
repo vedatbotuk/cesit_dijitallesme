@@ -420,6 +420,8 @@ def event_counter(channel):
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:
         COUNTER_PUSHED = 1
+        LOGGING.log_info('')
+        LOGGING.log_info(str(channel) + ' high')
 
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
@@ -428,7 +430,9 @@ def event_counter(channel):
             COUNTER_CHANGED = 1  # for refresh JSON
             OPTIONS_CHANGED = 1  # for refresh LCD
             COUNTER_PUSHED = 0
-    LOGGING.log_info(channel)
+            LOGGING.log_info('   ' + str(COUNTER_NR))
+        LOGGING.log_info(str(channel) + ' low')
+        LOGGING.log_info('')
 
 
 def event_reset(channel):

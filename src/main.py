@@ -261,6 +261,7 @@ def keypad_give_counter():
 
 def keypad_give_os_cmd():
     """ Description """
+    global COUNTER_NR
 
     if KEYPAD_INSTALL is True:
         wait = 15
@@ -309,6 +310,41 @@ def keypad_give_os_cmd():
                     elif given_code == '103':
                         os_commands.update_code()
                         LCD.lcd_close()
+                        break
+
+                    elif given_code == '104':
+                        given_number = ''
+                        LCD.refresh_lcd('Given_Counter', given_number)
+
+                        while True:
+                            get_button = str(KEY_PAD.check_button())
+                            if get_button == 'C':
+                                break
+
+                            elif get_button == 'D':
+                                given_number = given_number[:-1]
+                                LCD.refresh_lcd('Given_Counter', given_number)
+
+                            elif get_button == '*':
+                                try:
+                                    COUNTER_NR = int(given_number)
+
+                                    JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
+                                    LCD.refresh_lcd('successfully', given_number)
+                                    sleep(2)
+                                    break
+
+                                except Exception as e:
+                                    LCD.refresh_lcd('Counter_not_allowed')
+                                    sleep(2)
+                                    LCD.refresh_lcd('Given_Counter', given_number)
+                                    LOGGING.log_info(e)
+
+                            elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                                given_number = given_number + get_button
+                                LCD.refresh_lcd('Given_Counter', given_number)
+
+                            sleep(0.2)
                         break
 
                     else:
@@ -447,8 +483,8 @@ def event_counter(channel):
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:
         COUNTER_PUSHED = 1
-        LOGGING.log_info('')
-        LOGGING.log_info(str(channel) + ' high')
+        # LOGGING.log_info('')
+        # LOGGING.log_info(str(channel) + ' high')
 
     elif btn_cnt is False:
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
@@ -458,8 +494,8 @@ def event_counter(channel):
             OPTIONS_CHANGED = 1  # for refresh LCD
             COUNTER_PUSHED = 0
             LOGGING.log_info('   ' + str(COUNTER_NR))
-        LOGGING.log_info(str(channel) + ' low')
-        LOGGING.log_info('')
+        # LOGGING.log_info(str(channel) + ' low')
+        # LOGGING.log_info('')
 
 
 def event_reset(channel):
@@ -467,7 +503,7 @@ def event_reset(channel):
     global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET
 
     if MACHINE_START == 0:
-        sleep(0.25)
+        # sleep(0.25)
         btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
         if btn_start_stop_checked_rst is True:
             COUNTER_NR = 0

@@ -23,7 +23,8 @@ SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
 COUNTER_CHANGED = 1
 COUNTER_PUSHED = 0
-RESET = 0
+RESET_PUSHED = 0
+RESET_CHANGED = 0
 STOP_OPTIONS_ARRAY = []
 
 JSON_FUNCS = classes.JsonFuncs()
@@ -207,7 +208,48 @@ def gpio_check_start_stop():
             check_ayar()
 
 
-def keypad_give_counter():
+def given_counter():
+    """ Description """
+    return_number = None
+    given_number = ''
+
+    LCD.refresh_lcd('Given_Counter', given_number)
+
+    while True:
+        get_button = str(KEY_PAD.check_button())
+        if get_button == 'C':
+            break
+
+        elif get_button == 'D':
+            given_number = given_number[:-1]
+            LCD.refresh_lcd('Given_Counter', given_number)
+
+        elif get_button == '*':
+            try:
+                return_number = int(given_number)
+
+                JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
+                LCD.refresh_lcd('successfully', given_number)
+                sleep(2)
+                break
+
+            except Exception as e:
+                LCD.refresh_lcd('Counter_not_allowed')
+                sleep(2)
+                LCD.refresh_lcd('Given_Counter', given_number)
+                return_number = None
+                LOGGING.log_info(e)
+
+        elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            given_number = given_number + get_button
+            LCD.refresh_lcd('Given_Counter', given_number)
+
+        sleep(0.2)
+
+    return return_number
+
+
+def keypad_give_total_counter():
     """ Description """
     global TOTAL_COUNTER, COUNTER_NR
 
@@ -223,38 +265,9 @@ def keypad_give_counter():
             sleep(0.2)
 
         if checked == wait:
-            given_number = ''
-            LCD.refresh_lcd('Given_Counter', given_number)
-
-            while True:
-                get_button = str(KEY_PAD.check_button())
-                if get_button == 'C':
-                    break
-
-                elif get_button == 'D':
-                    given_number = given_number[:-1]
-                    LCD.refresh_lcd('Given_Counter', given_number)
-
-                elif get_button == '*':
-                    try:
-                        TOTAL_COUNTER = int(given_number)
-
-                        JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
-                        LCD.refresh_lcd('successfully', given_number)
-                        sleep(2)
-                        break
-
-                    except Exception as e:
-                        LCD.refresh_lcd('Counter_not_allowed')
-                        sleep(2)
-                        LCD.refresh_lcd('Given_Counter', given_number)
-                        LOGGING.log_info(e)
-
-                elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    given_number = given_number + get_button
-                    LCD.refresh_lcd('Given_Counter', given_number)
-
-                sleep(0.2)
+            total_counter = given_counter()
+            if total_counter is not None:
+                TOTAL_COUNTER = total_counter
         else:
             pass
 
@@ -313,38 +326,9 @@ def keypad_give_os_cmd():
                         break
 
                     elif given_code == '104':
-                        given_number = ''
-                        LCD.refresh_lcd('Given_Counter', given_number)
-
-                        while True:
-                            get_button = str(KEY_PAD.check_button())
-                            if get_button == 'C':
-                                break
-
-                            elif get_button == 'D':
-                                given_number = given_number[:-1]
-                                LCD.refresh_lcd('Given_Counter', given_number)
-
-                            elif get_button == '*':
-                                try:
-                                    COUNTER_NR = int(given_number)
-
-                                    JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
-                                    LCD.refresh_lcd('successfully', given_number)
-                                    sleep(2)
-                                    break
-
-                                except Exception as e:
-                                    LCD.refresh_lcd('Counter_not_allowed')
-                                    sleep(2)
-                                    LCD.refresh_lcd('Given_Counter', given_number)
-                                    LOGGING.log_info(e)
-
-                            elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                                given_number = given_number + get_button
-                                LCD.refresh_lcd('Given_Counter', given_number)
-
-                            sleep(0.2)
+                        change_counter = given_counter()
+                        if change_counter is not None:
+                            COUNTER_NR = change_counter
                         break
 
                     else:
@@ -411,7 +395,7 @@ def clear_lcd():
 
 def gpio_check():
     """ Description """
-    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET
+    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED
 
     check_kapali()
 
@@ -420,7 +404,7 @@ def gpio_check():
     clear_lcd()
 
     if MACHINE_START == 0:
-        keypad_give_counter()
+        keypad_give_total_counter()
         keypad_give_os_cmd()
 
         check_bobin()
@@ -439,11 +423,11 @@ def gpio_check():
             JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
             COUNTER_CHANGED = 0
 
-        if RESET == 1:
+        if RESET_CHANGED == 1:
             LCD.refresh_lcd(what='reset', state=None)
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=[0, 1])
-            RESET = 0
+            RESET_CHANGED = 0
 
 
 def event_start_stop(channel):
@@ -493,24 +477,31 @@ def event_counter(channel):
             COUNTER_CHANGED = 1  # for refresh JSON
             OPTIONS_CHANGED = 1  # for refresh LCD
             COUNTER_PUSHED = 0
-            LOGGING.log_info('   ' + str(COUNTER_NR))
+            # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
         # LOGGING.log_info('')
+        else:
+            LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
 
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET
+    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, RESET_PUSHED
 
-    if MACHINE_START == 0:
-        # sleep(0.25)
-        btn_start_stop_checked_rst = BTN_RESET.check_switch_once()
-        if btn_start_stop_checked_rst is True:
+    btn_rest = BTN_RESET.check_switch_once()
+    if btn_rest is True:
+        RESET_PUSHED = 1
+
+    elif btn_rest is False:
+        if MACHINE_START == 0 and RESET_PUSHED == 1:
             COUNTER_NR = 0
             TIME_WATCH.reset_time()
-            RESET = 1
+            RESET_CHANGED = 1
+            RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
-            LOGGING.log_info(channel)
+            # LOGGING.log_info(channel)
+        else:
+            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():

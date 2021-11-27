@@ -267,7 +267,7 @@ def keypad_give_total_counter():
         if checked == wait:
             total_counter = given_counter()
             if total_counter is not None:
-                COUNTER_NR = total_counter
+                TOTAL_COUNTER = total_counter
         else:
             pass
 

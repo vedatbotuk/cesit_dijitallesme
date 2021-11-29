@@ -39,6 +39,7 @@ class StartStopWatch:
         self.stop_time = self.__get_unix_time()
         self.run_time = saved_run_time
         self.tmp_time = self.run_time
+        self.counter_time_first = 0
 
     def __get_unix_time(self):
         """ Description """
@@ -62,3 +63,10 @@ class StartStopWatch:
     def reset_time(self):
         self.run_time = 0
         self.tmp_time = 0
+
+    def get_counter_time(self):
+        counter_time_second = self.__get_unix_time()
+        counter_time_diff = counter_time_second - self.counter_time_first
+        self.counter_time_first = counter_time_second
+
+        return counter_time_diff

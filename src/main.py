@@ -34,6 +34,7 @@ SAVED_RUN_TIME = JSON_FUNCS.get_saved_run_time()
 
 TIME_WATCH = classes.StartStopWatch(saved_run_time=SAVED_RUN_TIME)
 RUN_TIME = TIME_WATCH.get_run_time()
+TIME_BTW_COUNTER = 0
 
 LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
@@ -197,7 +198,7 @@ def gpio_check_start_stop():
     global MACHINE_START, STOP_OPTIONS_ARRAY
 
     check_kapali()
-    JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
+    JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME, TIME_BTW_COUNTER])
 
     if SYSTEM_ON == 1:
         check_start_stop()
@@ -420,13 +421,13 @@ def gpio_check():
         OPTIONS_CHANGED = 0
 
         if COUNTER_CHANGED == 1:
-            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME])
+            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME, TIME_BTW_COUNTER])
             COUNTER_CHANGED = 0
 
         if RESET_CHANGED == 1:
             LCD.refresh_lcd(what='reset', state=None)
             JSON_FUNCS.change_json(what='reset')
-            JSON_FUNCS.change_json(what='counter', state=[0, 1])
+            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
             RESET_CHANGED = 0
 
 
@@ -462,7 +463,7 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, COUNTER_PUSHED
+    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:
@@ -474,6 +475,7 @@ def event_counter(channel):
         if SYSTEM_ON == 1 and COUNTER_PUSHED == 1:
             COUNTER_NR = COUNTER_NR + 1
             RUN_TIME = TIME_WATCH.get_run_time()
+            TIME_BTW_COUNTER = TIME_WATCH.get_counter_time()
             COUNTER_CHANGED = 1  # for refresh JSON
             OPTIONS_CHANGED = 1  # for refresh LCD
             COUNTER_PUSHED = 0

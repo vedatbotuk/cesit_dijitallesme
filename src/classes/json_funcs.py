@@ -71,7 +71,7 @@ class JsonFuncs:
         # ###############
 
         self.counter_nr = self.mycol.find_one({"_id": self.device_name})['Counter']
-        self.speed = None
+        self.time_btw_counter = None
         self.total_counter = self.mycol.find_one({"_id": self.device_name})['Toplam düğüm sayısı']
 
         try:
@@ -133,9 +133,9 @@ class JsonFuncs:
                 self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
             try:
                 # Speed: counter time between counters
-                self.speed = round(state[2], 3)
+                self.time_btw_counter = round(state[2], 3)
             except ZeroDivisionError as e:
-                self.speed = 0
+                self.time_btw_counter = 0
                 self.logging.log_info('speed: ' + str(e))
 
             self.run_time = state[1]
@@ -143,10 +143,10 @@ class JsonFuncs:
                                   {"$set": {'Çalışma süresi': self.run_time}})
 
             self.mycol.update_one({"_id": self.device_name},
-                                  {"$set": {'Çalışma hızı': self.speed}})
+                                  {"$set": {'Çalışma hızı': self.time_btw_counter}})
 
             try:
-                self.remainder_time = round((self.total_counter / self.speed) - self.run_time, 2)
+                self.remainder_time = round((self.total_counter * self.time_btw_counter) - self.run_time, 2)
                 if self.remainder_time < 0:
                     self.remainder_time = 0
             except ZeroDivisionError as e:

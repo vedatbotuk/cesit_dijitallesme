@@ -480,7 +480,7 @@ def event_counter(channel):
             COUNTER_CHANGED = 1  # for refresh JSON
             OPTIONS_CHANGED = 1  # for refresh LCD
             COUNTER_PUSHED = 0
-            LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
+            # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
         # LOGGING.log_info('')
         else:

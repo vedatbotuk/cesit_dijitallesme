@@ -498,7 +498,7 @@ def event_reset(channel):
 
     elif btn_rest is False:
         LOGGING.log_info('Reset released')
-        if MACHINE_START == 0 and RESET_PUSHED == 1:
+        if RESET_PUSHED == 1:
             COUNTER_NR = 0
             TIME_WATCH.reset_time()
             RESET_CHANGED = 1

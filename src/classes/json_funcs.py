@@ -173,11 +173,9 @@ class JsonFuncs:
         elif what == 'ayar':
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
 
-        elif what == 'Given_Counter':
+        elif what == 'Given_Total_Counter':
             self.total_counter = state
-
             self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': state}})
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})
 
         # Export as Jsonfile for Monitor
         self.__export_json()

@@ -229,7 +229,6 @@ def given_counter():
             try:
                 return_number = int(given_number)
 
-                JSON_FUNCS.change_json(what='Given_Counter', state=TOTAL_COUNTER)
                 LCD.refresh_lcd('successfully', given_number)
                 sleep(2)
                 break
@@ -267,6 +266,7 @@ def keypad_give_total_counter():
 
         if checked == wait:
             total_counter = given_counter()
+            JSON_FUNCS.change_json(what='Given_Total_Counter', state=total_counter)
             if total_counter is not None:
                 TOTAL_COUNTER = total_counter
         else:
@@ -427,7 +427,7 @@ def gpio_check():
         if RESET_CHANGED == 1:
             LCD.refresh_lcd(what='reset', state=None)
             JSON_FUNCS.change_json(what='reset')
-            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
+            JSON_FUNCS.change_json(what='counter', state=[0, 1, 0])
             RESET_CHANGED = 0
 
 
@@ -482,8 +482,8 @@ def event_counter(channel):
             # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
         # LOGGING.log_info('')
-        else:
-            LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
 
 
 def event_reset(channel):
@@ -502,8 +502,8 @@ def event_reset(channel):
             RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
             # LOGGING.log_info(channel)
-        else:
-            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():

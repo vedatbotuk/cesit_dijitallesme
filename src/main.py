@@ -491,22 +491,13 @@ def event_reset(channel):
     """ Description """
     global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, RESET_PUSHED
 
-    btn_rest = BTN_RESET.check_switch_once()
-    if btn_rest is True:
-        RESET_PUSHED = 1
-        LOGGING.log_info('Reset pushed')
-
-    elif btn_rest is False:
-        LOGGING.log_info('Reset released')
-        if RESET_PUSHED == 1:
+    if BTN_RESET.check_switch_once() is True:
+        sleep(2)
+        if BTN_RESET.check_switch_once() is True:
             COUNTER_NR = 0
             TIME_WATCH.reset_time()
             RESET_CHANGED = 1
-            RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
-            # LOGGING.log_info(channel)
-        else:
-            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():
@@ -522,7 +513,7 @@ def add_events():
     """ Description """
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    BTN_RESET.add_callback(mode='both', callback=event_reset)
+    BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
 
 if __name__ == '__main__':

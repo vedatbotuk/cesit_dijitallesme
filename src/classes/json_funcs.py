@@ -146,7 +146,7 @@ class JsonFuncs:
                                   {"$set": {'Çalışma hızı': self.time_btw_counter}})
 
             try:
-                self.remainder_time = round((self.total_counter * self.time_btw_counter) - self.run_time, 2)
+                self.remainder_time = round(remainder_counter * self.time_btw_counter, 2)
                 if self.remainder_time < 0:
                     self.remainder_time = 0
             except ZeroDivisionError as e:

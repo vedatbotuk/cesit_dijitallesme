@@ -266,9 +266,9 @@ def keypad_give_total_counter():
 
         if checked == wait:
             total_counter = given_counter()
-            JSON_FUNCS.change_json(what='Given_Total_Counter', state=total_counter)
             if total_counter is not None:
                 TOTAL_COUNTER = total_counter
+                JSON_FUNCS.change_json(what='Given_Total_Counter', state=TOTAL_COUNTER)
         else:
             pass
 
@@ -330,6 +330,7 @@ def keypad_give_os_cmd():
                         change_counter = given_counter()
                         if change_counter is not None:
                             COUNTER_NR = change_counter
+                            JSON_FUNCS.change_json(what='Given_Counter', state=COUNTER_NR)
                         break
 
                     else:
@@ -388,7 +389,7 @@ def clear_lcd():
             sleep(0.2)
 
         if checked == wait:
-            LCD.lcd_close()
+            LCD.lcd_clear()
             sleep(0.25)
             LCD.refresh_lcd(what='after_clear')
             sleep(0.25)
@@ -425,9 +426,9 @@ def gpio_check():
             COUNTER_CHANGED = 0
 
         if RESET_CHANGED == 1:
-            LCD.refresh_lcd(what='reset', state=None)
+            LCD.refresh_lcd(what='reset')
             JSON_FUNCS.change_json(what='reset')
-            JSON_FUNCS.change_json(what='counter', state=[0, 1, 0])
+            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
             RESET_CHANGED = 0
 
 

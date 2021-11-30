@@ -138,7 +138,7 @@ class LcdModule:
             self.line2 = u'...'
 
         elif what == 'reset':
-            self.line1 = ''
+            # self.line1 = ''
             self.line2 = u'Counter=' + '0'
 
         elif what == 'Given_Counter':
@@ -190,8 +190,10 @@ class LcdModule:
             self.line2 = ''
 
         text_old = self.text
-        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
+        self.text = str(self.__sync_time()) + self.line1[:16] + '\n\r' + self.line2[:16] + ' ' * (16 - len(self.line2))
         if text_old != self.text:
+            print(self.text)
+            print(self.text)
             try:
                 self.lcd.cursor_pos = (0, 0)
                 self.lcd.write_string(self.text)

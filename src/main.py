@@ -496,15 +496,15 @@ def event_reset(channel):
         RESET_PUSHED = 1
 
     elif btn_rest is False:
-        if MACHINE_START == 0 and RESET_PUSHED == 1:
+        if RESET_PUSHED == 1:
             COUNTER_NR = 0
             TIME_WATCH.reset_time()
             RESET_CHANGED = 1
             RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
             # LOGGING.log_info(channel)
-        # else:
-        #     LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+        else:
+            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():

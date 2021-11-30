@@ -21,6 +21,8 @@ LOGGING.log_info('--- System starting ---')
 MACHINE_START = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
+START_STATUS_CHANGED = 1
+STOP_STATUS_CHANGED = 1
 COUNTER_CHANGED = 1
 COUNTER_PUSHED = 0
 RESET_PUSHED = 0
@@ -397,7 +399,8 @@ def clear_lcd():
 
 def gpio_check():
     """ Description """
-    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED
+    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
+        START_STATUS_CHANGED, STOP_STATUS_CHANGED
 
     check_kapali()
 
@@ -417,6 +420,14 @@ def gpio_check():
     if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
+    if START_STATUS_CHANGED == 1:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        START_STATUS_CHANGED = 0
+
+    if STOP_STATUS_CHANGED == 1:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        STOP_STATUS_CHANGED = 0
+
     if OPTIONS_CHANGED == 1:
         JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
         OPTIONS_CHANGED = 0
@@ -433,7 +444,7 @@ def gpio_check():
 
 
 def event_start_stop(channel):
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, MACHINE_START
+    global COUNTER_NR, COUNTER_CHANGED, RUN_TIME, MACHINE_START, START_STATUS_CHANGED, STOP_STATUS_CHANGED
 
     # START/STOP SWITCH ##############
     # ################################
@@ -444,7 +455,7 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.remove('stop')
         STOP_OPTIONS_ARRAY.append('start')
         MACHINE_START = 1
-        OPTIONS_CHANGED = 1
+        START_STATUS_CHANGED = 1
         TIME_WATCH.start()
         LOGGING.log_info('')
         LOGGING.log_info(str(channel) + ' Device started')
@@ -455,7 +466,7 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.remove('start')
         STOP_OPTIONS_ARRAY.append('stop')
         MACHINE_START = 0
-        OPTIONS_CHANGED = 1
+        STOP_STATUS_CHANGED = 1
         TIME_WATCH.stop()
         LOGGING.log_info(str(channel) + ' Device stopped')
         LOGGING.log_info('')
@@ -483,8 +494,8 @@ def event_counter(channel):
             # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
         # LOGGING.log_info('')
-        else:
-            LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
 
 
 def event_reset(channel):
@@ -503,8 +514,8 @@ def event_reset(channel):
             RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
             # LOGGING.log_info(channel)
-        else:
-            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():

@@ -21,6 +21,8 @@ LOGGING.log_info('--- System starting ---')
 MACHINE_START = 0
 SYSTEM_ON = 0
 OPTIONS_CHANGED = 1
+START_STATUS_CHANGED = 1
+STOP_STATUS_CHANGED = 1
 COUNTER_CHANGED = 1
 COUNTER_PUSHED = 0
 RESET_PUSHED = 0
@@ -397,7 +399,8 @@ def clear_lcd():
 
 def gpio_check():
     """ Description """
-    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED
+    global OPTIONS_CHANGED, STOP_OPTIONS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
+        START_STATUS_CHANGED, STOP_STATUS_CHANGED
 
     check_kapali()
 
@@ -417,23 +420,32 @@ def gpio_check():
     if STOP_OPTIONS_ARRAY:
         LCD.refresh_lcd(STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1], COUNTER_NR)
 
+    if START_STATUS_CHANGED == 1:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        START_STATUS_CHANGED = 0
+
+    if STOP_STATUS_CHANGED == 1:
+        JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
+        STOP_STATUS_CHANGED = 0
+
     if OPTIONS_CHANGED == 1:
         JSON_FUNCS.change_json(what=STOP_OPTIONS_ARRAY[len(STOP_OPTIONS_ARRAY) - 1])
         OPTIONS_CHANGED = 0
 
-        if COUNTER_CHANGED == 1:
-            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME, TIME_BTW_COUNTER])
-            COUNTER_CHANGED = 0
+    if COUNTER_CHANGED == 1:
+        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, RUN_TIME, TIME_BTW_COUNTER])
+        COUNTER_CHANGED = 0
 
-        if RESET_CHANGED == 1:
-            LCD.refresh_lcd(what='reset')
-            JSON_FUNCS.change_json(what='reset')
-            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
-            RESET_CHANGED = 0
+    if RESET_CHANGED == 1:
+        LCD.refresh_lcd(what='reset')
+        JSON_FUNCS.change_json(what='reset')
+        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
+        RESET_CHANGED = 0
 
 
 def event_start_stop(channel):
-    global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, MACHINE_START
+    global COUNTER_NR, COUNTER_CHANGED, RUN_TIME, MACHINE_START, START_STATUS_CHANGED, STOP_STATUS_CHANGED,\
+        OPTIONS_CHANGED
 
     # START/STOP SWITCH ##############
     # ################################
@@ -444,7 +456,8 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.remove('stop')
         STOP_OPTIONS_ARRAY.append('start')
         MACHINE_START = 1
-        OPTIONS_CHANGED = 1
+        OPTIONS_CHANGED = 1 # for refresh LCD
+        START_STATUS_CHANGED = 1
         TIME_WATCH.start()
         LOGGING.log_info('')
         LOGGING.log_info(str(channel) + ' Device started')
@@ -455,7 +468,8 @@ def event_start_stop(channel):
             STOP_OPTIONS_ARRAY.remove('start')
         STOP_OPTIONS_ARRAY.append('stop')
         MACHINE_START = 0
-        OPTIONS_CHANGED = 1
+        OPTIONS_CHANGED = 1 # for refresh LCD
+        STOP_STATUS_CHANGED = 1
         TIME_WATCH.stop()
         LOGGING.log_info(str(channel) + ' Device stopped')
         LOGGING.log_info('')
@@ -478,7 +492,7 @@ def event_counter(channel):
             RUN_TIME = TIME_WATCH.get_run_time()
             TIME_BTW_COUNTER = TIME_WATCH.get_counter_time()
             COUNTER_CHANGED = 1  # for refresh JSON
-            OPTIONS_CHANGED = 1  # for refresh LCD
+            OPTIONS_CHANGED = 1
             COUNTER_PUSHED = 0
             # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
@@ -489,7 +503,7 @@ def event_counter(channel):
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, RESET_PUSHED
+    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, RESET_PUSHED, OPTIONS_CHANGED
 
     btn_rest = BTN_RESET.check_switch_once()
     if btn_rest is True:
@@ -500,6 +514,7 @@ def event_reset(channel):
             COUNTER_NR = 0
             TIME_WATCH.reset_time()
             RESET_CHANGED = 1
+            OPTIONS_CHANGED = 1 # for refresh LCD
             RESET_PUSHED = 0
             LOGGING.log_info('Counter reset')
             # LOGGING.log_info(channel)
@@ -520,7 +535,7 @@ def add_events():
     """ Description """
     BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    BTN_RESET.add_callback(mode='rising', callback=event_reset)
+    BTN_RESET.add_callback(mode='both', callback=event_reset)
 
 
 if __name__ == '__main__':

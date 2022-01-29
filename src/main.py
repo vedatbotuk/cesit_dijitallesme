@@ -130,85 +130,85 @@ def check_start_stop():
     # ---------------------------
 
 
-# def check_bobin():
-#     """ Description """
-#     global OPTIONS_CHANGED, STATUS_ARRAY
-#     # BOBIN SWITCH ##############
-#     # ###########################
-#     # ab hier testet alle nebenarbeiten an der maschine
-#     btn_bobin_checked = BTN_BOBIN.check_switch()
-#     if btn_bobin_checked is True:
-#         if 'bobin' in STOP_OPTIONS_ARRAY:
-#             STOP_OPTIONS_ARRAY.remove('bobin')
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited bobin-status')
-#     elif btn_bobin_checked is False:
-#         STOP_OPTIONS_ARRAY.append('bobin')
-#         STATUS_ARRAY = ['bobin']
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device at bobin-status')
-#     # BOBIN SWITCH --------------
-#     # ---------------------------
-#
-#
-# def check_cozgu():
-#     """ Description """
-#     global OPTIONS_CHANGED, STATUS_ARRAY
-#     # COZGU SWITCH ##############
-#     # ###########################
-#     btn_cozgu_checked = BTN_COZGU.check_switch()
-#     if btn_cozgu_checked is True:
-#         if 'cozgu' in STOP_OPTIONS_ARRAY:
-#             STOP_OPTIONS_ARRAY.remove('cozgu')
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited cozgu-status')
-#     elif btn_cozgu_checked is False:
-#         STOP_OPTIONS_ARRAY.append('cozgu')
-#         STATUS_ARRAY = ['cozgu']
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited cozgu-status')
-#     # COZGU SWITCH --------------
-#     # ---------------------------
-#
-#
-# def check_ariza():
-#     """ Description """
-#     global OPTIONS_CHANGED, STATUS_ARRAY
-#     # ARIZA SWITCH ##############
-#     # ###########################
-#     btn_ariza_checked = BTN_ARIZA.check_switch()
-#     if btn_ariza_checked is True:
-#         if 'ariza' in STOP_OPTIONS_ARRAY:
-#             STOP_OPTIONS_ARRAY.remove('ariza')
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited azriza-status')
-#     elif btn_ariza_checked is False:
-#         STOP_OPTIONS_ARRAY.append('ariza')
-#         STATUS_ARRAY = ['ariza']
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited ariza-status')
-#     # ARIZA SWITCH --------------
-#     # ---------------------------
-#
-#
-# def check_ayar():
-#     """ Description """
-#     global OPTIONS_CHANGED, STATUS_ARRAY
-#     # AYAR SWITCH ###############
-#     # ###########################
-#     btn_ayar_checked = BTN_AYAR.check_switch()
-#     if btn_ayar_checked is True:
-#         if 'ayar' in STOP_OPTIONS_ARRAY:
-#             STOP_OPTIONS_ARRAY.remove('ayar')
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited ayar-status')
-#     elif btn_ayar_checked is False:
-#         STOP_OPTIONS_ARRAY.append('ayar')
-#         STATUS_ARRAY = ['ayar']
-#         OPTIONS_CHANGED = 1
-#         LOGGING.log_info('Device exited ayar-status')
-#     # AYAR SWITCH ---------------
-#     # ---------------------------
+def check_bobin():
+    """ Description """
+    global OPTIONS_CHANGED, STATUS_ARRAY
+    # BOBIN SWITCH ##############
+    # ###########################
+    # ab hier testet alle nebenarbeiten an der maschine
+    btn_bobin_checked = BTN_BOBIN.check_switch()
+    if btn_bobin_checked is True:
+        if 'bobin' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('bobin')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited bobin-status')
+    elif btn_bobin_checked is False:
+        STOP_OPTIONS_ARRAY.append('bobin')
+        STATUS_ARRAY = ['bobin']
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device at bobin-status')
+    # BOBIN SWITCH --------------
+    # ---------------------------
+
+
+def check_cozgu():
+    """ Description """
+    global OPTIONS_CHANGED, STATUS_ARRAY
+    # COZGU SWITCH ##############
+    # ###########################
+    btn_cozgu_checked = BTN_COZGU.check_switch()
+    if btn_cozgu_checked is True:
+        if 'cozgu' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('cozgu')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited cozgu-status')
+    elif btn_cozgu_checked is False:
+        STOP_OPTIONS_ARRAY.append('cozgu')
+        STATUS_ARRAY = ['cozgu']
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited cozgu-status')
+    # COZGU SWITCH --------------
+    # ---------------------------
+
+
+def check_ariza():
+    """ Description """
+    global OPTIONS_CHANGED, STATUS_ARRAY
+    # ARIZA SWITCH ##############
+    # ###########################
+    btn_ariza_checked = BTN_ARIZA.check_switch()
+    if btn_ariza_checked is True:
+        if 'ariza' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('ariza')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited azriza-status')
+    elif btn_ariza_checked is False:
+        STOP_OPTIONS_ARRAY.append('ariza')
+        STATUS_ARRAY = ['ariza']
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ariza-status')
+    # ARIZA SWITCH --------------
+    # ---------------------------
+
+
+def check_ayar():
+    """ Description """
+    global OPTIONS_CHANGED, STATUS_ARRAY
+    # AYAR SWITCH ###############
+    # ###########################
+    btn_ayar_checked = BTN_AYAR.check_switch()
+    if btn_ayar_checked is True:
+        if 'ayar' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('ayar')
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ayar-status')
+    elif btn_ayar_checked is False:
+        STOP_OPTIONS_ARRAY.append('ayar')
+        STATUS_ARRAY = ['ayar']
+        OPTIONS_CHANGED = 1
+        LOGGING.log_info('Device exited ayar-status')
+    # AYAR SWITCH ---------------
+    # ---------------------------
 
 
 def gpio_check_start_stop():

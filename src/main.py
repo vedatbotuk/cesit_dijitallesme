@@ -25,6 +25,7 @@ START_STATUS_CHANGED = 1
 STOP_STATUS_CHANGED = 1
 COUNTER_CHANGED = 1
 COUNTER_PUSHED = 0
+RESET_PUSHED = 0
 RESET_CHANGED = 0
 STOP_OPTIONS_ARRAY = []
 
@@ -402,7 +403,6 @@ def gpio_check():
         START_STATUS_CHANGED, STOP_STATUS_CHANGED
 
     check_kapali()
-    check_start_stop()
 
     show_remainder_counter()
     show_total_counter()
@@ -443,6 +443,39 @@ def gpio_check():
         RESET_CHANGED = 0
 
 
+def event_start_stop(channel):
+    global COUNTER_NR, COUNTER_CHANGED, RUN_TIME, MACHINE_START, START_STATUS_CHANGED, STOP_STATUS_CHANGED,\
+        OPTIONS_CHANGED
+
+    # START/STOP SWITCH ##############
+    # ################################
+    btn_start_stop_chk = BTN_START_STOP.check_switch_once()
+    if btn_start_stop_chk is True and MACHINE_START == 0:
+        # if BTN_START_STOP.check_five_times(True) is True:
+        if 'stop' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('stop')
+        STOP_OPTIONS_ARRAY.append('start')
+        MACHINE_START = 1
+        OPTIONS_CHANGED = 1 # for refresh LCD
+        START_STATUS_CHANGED = 1
+        TIME_WATCH.start()
+        LOGGING.log_info('')
+        LOGGING.log_info(str(channel) + ' Device started')
+
+    elif btn_start_stop_chk is False and MACHINE_START == 1:
+        # if BTN_START_STOP.check_five_times(True) is False:
+        if 'start' in STOP_OPTIONS_ARRAY:
+            STOP_OPTIONS_ARRAY.remove('start')
+        STOP_OPTIONS_ARRAY.append('stop')
+        MACHINE_START = 0
+        OPTIONS_CHANGED = 1 # for refresh LCD
+        STOP_STATUS_CHANGED = 1
+        TIME_WATCH.stop()
+        LOGGING.log_info(str(channel) + ' Device stopped')
+        LOGGING.log_info('')
+    # START/STOP SWITCH --------
+
+
 def event_counter(channel):
     """ Description """
     global COUNTER_NR, COUNTER_CHANGED, OPTIONS_CHANGED, RUN_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
@@ -470,20 +503,23 @@ def event_counter(channel):
 
 def event_reset(channel):
     """ Description """
-    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, OPTIONS_CHANGED
+    global COUNTER_NR, MACHINE_START, SYSTEM_ON, RESET_CHANGED, RESET_PUSHED, OPTIONS_CHANGED
 
-    if MACHINE_START == 0:
-        sleep(0.25)
-        btn_rest = BTN_RESET.check_switch_once()
-        # if btn_rest is True:
-        COUNTER_NR = 0
-        TIME_WATCH.reset_time()
-        RESET_CHANGED = 1
-        OPTIONS_CHANGED = 1  # for refresh LCD
-        LOGGING.log_info('Counter reset')
-        # LOGGING.log_info(channel)
-        # else:
-        #     LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+    btn_rest = BTN_RESET.check_switch_once()
+    if btn_rest is True:
+        RESET_PUSHED = 1
+
+    elif btn_rest is False:
+        if MACHINE_START == 0 and RESET_PUSHED == 1:
+            COUNTER_NR = 0
+            TIME_WATCH.reset_time()
+            RESET_CHANGED = 1
+            OPTIONS_CHANGED = 1 # for refresh LCD
+            RESET_PUSHED = 0
+            LOGGING.log_info('Counter reset')
+            # LOGGING.log_info(channel)
+        else:
+            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():
@@ -497,9 +533,9 @@ def loop():
 
 def add_events():
     """ Description """
-    # BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    BTN_RESET.add_callback(mode='rising', callback=event_reset)
+    BTN_RESET.add_callback(mode='both', callback=event_reset)
 
 
 if __name__ == '__main__':

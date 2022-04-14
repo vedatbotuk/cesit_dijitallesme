@@ -475,15 +475,15 @@ def event_reset(channel):
     if MACHINE_START == 0:
         sleep(0.25)
         btn_rest = BTN_RESET.check_switch_once()
-        if btn_rest is True:
-            COUNTER_NR = 0
-            TIME_WATCH.reset_time()
-            RESET_CHANGED = 1
-            OPTIONS_CHANGED = 1  # for refresh LCD
-            LOGGING.log_info('Counter reset')
-            # LOGGING.log_info(channel)
-        else:
-            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+        # if btn_rest is True:
+        COUNTER_NR = 0
+        TIME_WATCH.reset_time()
+        RESET_CHANGED = 1
+        OPTIONS_CHANGED = 1  # for refresh LCD
+        LOGGING.log_info('Counter reset')
+        # LOGGING.log_info(channel)
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
 
 
 def loop():

@@ -32,9 +32,9 @@ class JsonFuncs:
         data_js = {
             "device_name": self.device_name,
             "_id": self.device_name + "_current",
-            "MAC-Address": self.mac_address,
+            "MAC-Adresi": self.mac_address,
             "Son Reset Tarihi": 0,
-            "cycles_nr": 0,
+            "Döngü": 0,
             "Makine Durumu": "Kapalı",
             "Counter": 0,
             "Toplam düğüm sayısı": 0,
@@ -85,7 +85,7 @@ class JsonFuncs:
         try:
             # all device_name = current + cycles, that's why -1
             # TODO: get last cycle
-            self.cycle = self.mycol.find({"device_name": self.device_name}).count() - 1
+            self.cycle = self.mycol.find_one({"_id": self.device_name + "_current"})['Döngü']
         except Exception as e:
             self.cycle = 0
             self.logging.log_info(e)
@@ -269,6 +269,8 @@ class JsonFuncs:
                                self.ayar_time)
             self.__write_cycle()
             self.cycle = self.cycle + 1
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Döngü': self.cycle}})
 
         elif what == 'bobin':
             self.mycol.update_one({"_id": self.device_name + "_current"},

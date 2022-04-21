@@ -234,10 +234,10 @@ def check_ayar():
 
 def gpio_check_start_stop():
     """ Description """
-    global MACHINE_START, STATUS_ARRAY
+    global MACHINE_START, STATUS_ARRAY, TOTAL_TIME
 
     check_kapali()
-    JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER])
+    JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
 
     # TODO: Beim Start 0,7 Sekunde Verzögerung bei der Status angezeigt.
     if SYSTEM_ON == 1:

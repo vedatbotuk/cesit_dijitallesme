@@ -456,7 +456,7 @@ def update_cycle():
 def gpio_check():
     """ Description """
     global STATUS_CHANGED, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
-        PRODUCTIVE_RUN_TIME
+        PRODUCTIVE_RUN_TIME, TOTAL_TIME
     check_kapali()
 
     show_remainder_counter()

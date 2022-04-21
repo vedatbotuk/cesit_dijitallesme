@@ -488,7 +488,7 @@ def gpio_check():
         update_cycle()
         LCD.refresh_lcd(what='reset')
         JSON_FUNCS.change_json(what='reset')
-        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0])
+        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
         RESET_CHANGED = 0
 
 

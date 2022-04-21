@@ -45,7 +45,8 @@ class JsonFuncs:
             "Arıza süresi": 0,
             "Çözgü süresi": 0,
             "Ayar süresi": 0, "Çalışma hızı": 0,
-            "Tahmini kalan süre": 0
+            "Tahmini kalan süre": 0,
+            "Verim": 0
         }
 
         #################
@@ -148,6 +149,15 @@ class JsonFuncs:
             self.logging.log_info('decelerated total_time = 0')
 
         try:
+            self.productivity = self.mycol.find_one({"_id": self.device_name + "_current"})['Verim']
+            self.productivity = float(self.productivity)
+        except Exception as e:
+            self.productivity = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated total_time = 0')
+
+        try:
             self.reset_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Son Reset Tarihi']
             self.reset_time = float(self.reset_time)
         except Exception as e:
@@ -198,7 +208,8 @@ class JsonFuncs:
             "Arıza süresi": self.ariza_time,
             "Çözgü süresi": self.cozgu_time,
             "Ayar süresi": self.ayar_time,
-            "Çalışma hızı": self.time_btw_counter
+            "Çalışma hızı": self.time_btw_counter,
+            "Verim": self.productivity
         }
         self.mycol.insert_one(write_id)
 
@@ -290,6 +301,7 @@ class JsonFuncs:
             self.ayar_time = state[4]
             self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
                                self.ayar_time)
+            self.productivity = self.productive_run_time / self.total_time
 
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {"Aktiv çalışma süresi": self.productive_run_time}})
@@ -299,6 +311,7 @@ class JsonFuncs:
             self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Ayar süresi": self.ayar_time}})
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {"Toplam çalışma süresi": self.total_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Verim": self.productivity}})
 
         # Export as Jsonfile for Monitor
         self.__export_json()

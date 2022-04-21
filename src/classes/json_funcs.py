@@ -258,8 +258,10 @@ class JsonFuncs:
                 self.logging.log_info('remainder_time: ' + str(e))
 
             self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {
-                                      'Tahmini kalan süre': self.remainder_time}})
+                                  {"$set": {'Tahmini kalan süre': self.remainder_time}})
+
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {"Toplam çalışma süresi": state[3]}})
 
         elif what == 'reset':
             self.reset_time = get_date_time()

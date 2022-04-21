@@ -56,6 +56,7 @@ BOBIN_TIME = 0
 ARIZA_TIME = 0
 COZGU_TIME = 0
 AYAR_TIME = 0
+TOTAL_TIME = 0
 
 TIME_BTW_COUNTER = 0
 
@@ -480,7 +481,7 @@ def gpio_check():
         STATUS_CHANGED = 0
 
     if COUNTER_CHANGED == 1:
-        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER])
+        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
         COUNTER_CHANGED = 0
 
     if RESET_CHANGED == 1:
@@ -524,7 +525,8 @@ def event_start_stop(channel):
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
+    global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME,\
+        TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:
@@ -536,6 +538,7 @@ def event_counter(channel):
         if COUNTER_PUSHED == 1:
             COUNTER_NR = COUNTER_NR + 1
             PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
+            TOTAL_TIME = PRODUCTIVE_RUN_TIME + BOBIN_TIME + AYAR_TIME + COZGU_TIME + AYAR_TIME
             TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
             COUNTER_CHANGED = 1  # for refresh JSON
             COUNTER_PUSHED = 0

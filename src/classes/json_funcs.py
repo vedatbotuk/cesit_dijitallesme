@@ -303,7 +303,12 @@ class JsonFuncs:
             self.ayar_time = state[4]
             self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
                                self.ayar_time)
-            self.productivity = self.productive_run_time / self.total_time
+
+            try:
+                self.productivity = round(self.productive_run_time / self.total_time, 2)
+            except ZeroDivisionError as e:
+                self.productivity = 0
+                self.logging.log_info('productivity: ' + str(e))
 
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {"Aktiv çalışma süresi": self.productive_run_time}})

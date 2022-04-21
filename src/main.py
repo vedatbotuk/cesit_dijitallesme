@@ -126,7 +126,8 @@ def check_start_stop():
         STATUS_ARRAY.append('start')
         MACHINE_START = 1
         STATUS_CHANGED = 1
-        PRODUCTIVE_RUN_TIME_WATCH.start()
+        PRODUCTIVE_RUN_TIME_WATCH.stop()
+        PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device started')
     # maschiene gestopt
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
@@ -136,8 +137,7 @@ def check_start_stop():
         STATUS_ARRAY.append('stop')
         MACHINE_START = 0
         STATUS_CHANGED = 1
-        PRODUCTIVE_RUN_TIME_WATCH.stop()
-        PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
+        PRODUCTIVE_RUN_TIME_WATCH.start()
         LOGGING.log_info('Device stopped')
     # START/STOP SWITCH --------
     # ---------------------------
@@ -151,11 +151,11 @@ def check_bobin():
     # ab hier testet alle nebenarbeiten an der maschine
     btn_bobin_checked = BTN_BOBIN.check_switch()
     if btn_bobin_checked is False:
-        if 'bobin' in STATUS_ARRAY:
+        if 'bobin' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
             STATUS_ARRAY.remove('bobin')
+            BOBIN_TIME_WATCH.stop()
+            BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
         STATUS_CHANGED = 1
-        BOBIN_TIME_WATCH.stop()
-        BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device exited bobin-status')
     elif btn_bobin_checked is True:
         STATUS_ARRAY.append('bobin')
@@ -173,11 +173,11 @@ def check_cozgu():
     # ###########################
     btn_cozgu_checked = BTN_COZGU.check_switch()
     if btn_cozgu_checked is False:
-        if 'cozgu' in STATUS_ARRAY:
+        if 'cozgu' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
             STATUS_ARRAY.remove('cozgu')
+            COZGU_TIME_WATCH.stop()
+            COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
         STATUS_CHANGED = 1
-        COZGU_TIME_WATCH.stop()
-        COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device exited cozgu-status')
     elif btn_cozgu_checked is True:
         STATUS_ARRAY.append('cozgu')
@@ -195,11 +195,11 @@ def check_ariza():
     # ###########################
     btn_ariza_checked = BTN_ARIZA.check_switch()
     if btn_ariza_checked is False:
-        if 'ariza' in STATUS_ARRAY:
+        if 'ariza' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
             STATUS_ARRAY.remove('ariza')
+            ARIZA_TIME_WATCH.stop()
+            ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
         STATUS_CHANGED = 1
-        ARIZA_TIME_WATCH.stop()
-        ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device exited azriza-status')
     elif btn_ariza_checked is True:
         STATUS_ARRAY.append('ariza')
@@ -217,11 +217,11 @@ def check_ayar():
     # ###########################
     btn_ayar_checked = BTN_AYAR.check_switch()
     if btn_ayar_checked is False:
-        if 'ayar' in STATUS_ARRAY:
+        if 'ayar' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
             STATUS_ARRAY.remove('ayar')
+            AYAR_TIME_WATCH.stop()
+            AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()
         STATUS_CHANGED = 1
-        AYAR_TIME_WATCH.stop()
-        AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device exited ayar-status')
     elif btn_ayar_checked is True:
         STATUS_ARRAY.append('ayar')
@@ -439,16 +439,6 @@ def clear_lcd():
 def update_cycle():
     global PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME
 
-    # PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
-    # print("PRODUCTIVE_RUN_TIME: " + str(PRODUCTIVE_RUN_TIME))
-    # BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
-    # print("BOBIN_TIME: " + str(BOBIN_TIME))
-    # ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
-    # print("ARIZA_TIME: " + str(ARIZA_TIME))
-    # COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
-    # print("COZGU_TIME: " + str(COZGU_TIME))
-    # AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()
-    # print("AYAR_TIME: " + str(AYAR_TIME))
     JSON_FUNCS.change_json(what='write_status_times',
                            state=[PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME])
 
@@ -457,11 +447,16 @@ def gpio_check():
     """ Description """
     global STATUS_CHANGED, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
         PRODUCTIVE_RUN_TIME, TOTAL_TIME
+
     check_kapali()
+    check_start_stop()
 
     show_remainder_counter()
     show_total_counter()
     clear_lcd()
+
+    # if STATUS_ARRAY:
+    LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
     if MACHINE_START == 0:
         keypad_give_total_counter()
@@ -472,8 +467,7 @@ def gpio_check():
         check_ariza()
         check_ayar()
 
-    # if STATUS_ARRAY:
-    LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        reset_check()
 
     if STATUS_CHANGED == 1:
         JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
@@ -492,35 +486,35 @@ def gpio_check():
         RESET_CHANGED = 0
 
 
-def event_start_stop(channel):
-    """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, MACHINE_START, STATUS_CHANGED
-
-    # START/STOP SWITCH ##############
-    # ################################
-    btn_start_stop_chk = BTN_START_STOP.check_switch_once()
-    if btn_start_stop_chk is True and MACHINE_START == 0:
-        # if BTN_START_STOP.check_five_times(True) is True:
-        # if 'stop' in STATUS_ARRAY:
-        #     STATUS_ARRAY.remove('stop')
-        STATUS_ARRAY.append('start')
-        MACHINE_START = 1
-        STATUS_CHANGED = 1  # for refresh LCD
-        PRODUCTIVE_RUN_TIME_WATCH.start()
-        LOGGING.log_info('')
-        LOGGING.log_info(str(channel) + ' Device started')
-
-    elif btn_start_stop_chk is False and MACHINE_START == 1:
-        # if BTN_START_STOP.check_five_times(True) is False:
-        # if 'start' in STATUS_ARRAY:
-        #     STATUS_ARRAY.remove('start')
-        STATUS_ARRAY.append('stop')
-        MACHINE_START = 0
-        STATUS_CHANGED = 1  # for refresh LCD
-        PRODUCTIVE_RUN_TIME_WATCH.stop()
-        LOGGING.log_info(str(channel) + ' Device stopped')
-        LOGGING.log_info('')
-    # START/STOP SWITCH --------
+# def event_start_stop(channel):
+#     """ Description """
+#     global COUNTER_NR, COUNTER_CHANGED, MACHINE_START, STATUS_CHANGED
+#
+#     # START/STOP SWITCH ##############
+#     # ################################
+#     btn_start_stop_chk = BTN_START_STOP.check_switch_once()
+#     if btn_start_stop_chk is True and MACHINE_START == 0:
+#         # if BTN_START_STOP.check_five_times(True) is True:
+#         # if 'stop' in STATUS_ARRAY:
+#         #     STATUS_ARRAY.remove('stop')
+#         STATUS_ARRAY.append('start')
+#         MACHINE_START = 1
+#         STATUS_CHANGED = 1  # for refresh LCD
+#         PRODUCTIVE_RUN_TIME_WATCH.start()
+#         LOGGING.log_info('')
+#         LOGGING.log_info(str(channel) + ' Device started')
+#
+#     elif btn_start_stop_chk is False and MACHINE_START == 1:
+#         # if BTN_START_STOP.check_five_times(True) is False:
+#         # if 'start' in STATUS_ARRAY:
+#         #     STATUS_ARRAY.remove('start')
+#         STATUS_ARRAY.append('stop')
+#         MACHINE_START = 0
+#         STATUS_CHANGED = 1  # for refresh LCD
+#         PRODUCTIVE_RUN_TIME_WATCH.stop()
+#         LOGGING.log_info(str(channel) + ' Device stopped')
+#         LOGGING.log_info('')
+#     # START/STOP SWITCH --------
 
 
 def event_counter(channel):
@@ -549,30 +543,66 @@ def event_counter(channel):
             LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
 
 
-def event_reset(channel):
+# def event_reset(channel):
+#     """ Description """
+#     global COUNTER_NR, MACHINE_START, RESET_CHANGED, RESET_PUSHED
+#
+#     btn_rest = BTN_RESET.check_switch_once()
+#     if btn_rest is True:
+#         RESET_PUSHED = 1
+#
+#     elif btn_rest is False:
+#         if MACHINE_START == 0 and RESET_PUSHED == 1:
+#             COUNTER_NR = 0
+#
+#             PRODUCTIVE_RUN_TIME_WATCH.reset_time()
+#             BOBIN_TIME_WATCH.reset_time()
+#             ARIZA_TIME_WATCH.reset_time()
+#             COZGU_TIME_WATCH.reset_time()
+#             ARIZA_TIME_WATCH.reset_time()
+#
+#             RESET_CHANGED = 1
+#             RESET_PUSHED = 0
+#             LOGGING.log_info('Counter reset')
+#             # LOGGING.log_info(channel)
+#         else:
+#             LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+
+
+def reset_check():
     """ Description """
-    global COUNTER_NR, MACHINE_START, RESET_CHANGED, RESET_PUSHED
+    global COUNTER_NR, RESET_CHANGED, RESET_PUSHED, PRODUCTIVE_RUN_TIME, BOBIN_TIME,\
+        ARIZA_TIME, COZGU_TIME, AYAR_TIME, TOTAL_TIME
 
     btn_rest = BTN_RESET.check_switch_once()
     if btn_rest is True:
-        RESET_PUSHED = 1
+        sleep(0.1)
+        btn_rest = BTN_RESET.check_switch_once()
+        if btn_rest is True:
+            sleep(0.4)
+            btn_rest = BTN_RESET.check_switch_once()
+            if btn_rest is True:
+                RESET_PUSHED = 1
 
-    elif btn_rest is False:
-        if MACHINE_START == 0 and RESET_PUSHED == 1:
-            COUNTER_NR = 0
+    if RESET_PUSHED == 1:
+        COUNTER_NR = 0
 
-            PRODUCTIVE_RUN_TIME_WATCH.reset_time()
-            BOBIN_TIME_WATCH.reset_time()
-            ARIZA_TIME_WATCH.reset_time()
-            COZGU_TIME_WATCH.reset_time()
-            ARIZA_TIME_WATCH.reset_time()
+        PRODUCTIVE_RUN_TIME_WATCH.reset_time()
+        BOBIN_TIME_WATCH.reset_time()
+        ARIZA_TIME_WATCH.reset_time()
+        COZGU_TIME_WATCH.reset_time()
+        AYAR_TIME_WATCH.reset_time()
 
-            RESET_CHANGED = 1
-            RESET_PUSHED = 0
-            LOGGING.log_info('Counter reset')
-            # LOGGING.log_info(channel)
-        else:
-            LOGGING.log_info('Wrong signal -> Reset was not pushed ' + str(channel))
+        PRODUCTIVE_RUN_TIME = 0
+        BOBIN_TIME = 0
+        ARIZA_TIME = 0
+        COZGU_TIME = 0
+        AYAR_TIME = 0
+        TOTAL_TIME = 0
+
+        RESET_CHANGED = 1
+        RESET_PUSHED = 0
+        LOGGING.log_info('Counter reset')
 
 
 def loop():
@@ -586,9 +616,9 @@ def loop():
 
 def add_events():
     """ Description """
-    BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    # BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    BTN_RESET.add_callback(mode='both', callback=event_reset)
+    # BTN_RESET.add_callback(mode='both', callback=event_reset)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """ Description """
 
@@ -28,16 +27,24 @@ class JsonFuncs:
 
         setup_json = get_setup(setup_path)
         self.device_name = setup_json['main']['device_name']
+        self.mac_address = setup_json['main']['mac_address']
         self.path_json = setup_json['main']['path_json']
         data_js = {
-            "_id": self.device_name,
+            "device_name": self.device_name,
+            "_id": self.device_name + "_current",
+            "MAC-Address": self.mac_address,
+            "Son Reset Tarihi": 0,
+            "cycles_nr": 0,
             "Makine Durumu": "Kapalı",
             "Counter": 0,
-            "Son Reset Tarihi": 0,
             "Toplam düğüm sayısı": 0,
             "Kalan düğüm sayısı": 0,
-            "Çalışma süresi": 0,
-            "Çalışma hızı": 0,
+            "Toplam çalışma süresi": 0,
+            "Aktiv çalışma süresi": 0,
+            "Bobin süresi": 0,
+            "Arıza süresi": 0,
+            "Çözgü süresi": 0,
+            "Ayar süresi": 0, "Çalışma hızı": 0,
             "Tahmini kalan süre": 0
         }
 
@@ -65,28 +72,83 @@ class JsonFuncs:
             self.logging.log_info("Creating database.")
             self.logging.log_info("Creating collection.")
 
-        if not self.mycol.find({"_id": self.device_name}).count() > 0:
+        if not self.mycol.find({"_id": self.device_name + "_current"}).count() > 0:
             self.mycol.insert_one(data_js)
             self.logging.log_info("Data does not exists, inserting default data.")
         # ###############
 
-        self.counter_nr = self.mycol.find_one({"_id": self.device_name})['Counter']
+        self.counter_nr = self.mycol.find_one({"_id": self.device_name + "_current"})['Counter']
         self.time_btw_counter = None
-        self.total_counter = self.mycol.find_one({"_id": self.device_name})['Toplam düğüm sayısı']
+        self.total_counter = self.mycol.find_one({"_id": self.device_name + "_current"})['Toplam düğüm sayısı']
 
         try:
-            self.run_time = self.mycol.find_one({"_id": self.device_name})['Çalışma süresi']
-            self.run_time = float(self.run_time)
+            # all device_name = current + cycles, that's why -1
+            # TODO: get last cycle
+            self.cycle = self.mycol.find({"device_name": self.device_name}).count() - 1
         except Exception as e:
-            self.run_time = 0
+            self.cycle = 0
+            self.logging.log_info(e)
+            self.logging.log_info('No Cycle exits. Creating new _id=0')
+
+        try:
+            self.productive_run_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
+                'Aktiv çalışma süresi']
+            self.productive_run_time = float(self.productive_run_time)
+        except Exception as e:
+            self.productive_run_time = 0
             self.logging.log_info(e)
 
-            self.logging.log_info('decelerated run_time = 0')
+            self.logging.log_info('decelerated productive run_time = 0')
 
         self.remainder_time = None
 
         try:
-            self.reset_time = self.mycol.find_one({"_id": self.device_name})['Son Reset Tarihi']
+            self.bobin_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Bobin süresi']
+            self.bobin_time = float(self.bobin_time)
+        except Exception as e:
+            self.bobin_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated bobin_time = 0')
+
+        try:
+            self.ariza_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Arıza süresi']
+            self.ariza_time = float(self.ariza_time)
+        except Exception as e:
+            self.ariza_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated ariza_time = 0')
+
+        try:
+            self.cozgu_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Çözgü süresi']
+            self.cozgu_time = float(self.cozgu_time)
+        except Exception as e:
+            self.cozgu_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated cozgu_time = 0')
+
+        try:
+            self.ayar_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Ayar süresi']
+            self.ayar_time = float(self.ayar_time)
+        except Exception as e:
+            self.ayar_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated ayar_time = 0')
+
+        try:
+            self.total_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Toplam çalışma süresi']
+            self.total_time = float(self.total_time)
+        except Exception as e:
+            self.total_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated total_time = 0')
+
+        try:
+            self.reset_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Son Reset Tarihi']
             self.reset_time = float(self.reset_time)
         except Exception as e:
             self.reset_time = 0
@@ -100,37 +162,68 @@ class JsonFuncs:
         """ Description """
         return self.total_counter
 
-    def get_saved_run_time(self):
-        return self.run_time
+    def get_saved_productive_run_time(self):
+        return self.productive_run_time
+
+    def get_saved_bobin_time(self):
+        return self.bobin_time
+
+    def get_saved_ariza_time(self):
+        return self.ariza_time
+
+    def get_saved_cozgu_time(self):
+        return self.cozgu_time
+
+    def get_saved_ayar_time(self):
+        return self.ayar_time
 
     def __export_json(self):
-        cursor = self.mycol.find({"_id": self.device_name})
+        cursor = self.mycol.find({"_id": self.device_name + "_current"})
         data_js = list(cursor)
 
         with open(self.path_json, 'w') as json_file:
             json.dump(data_js, json_file)
 
+    def __write_cycle(self):
+        write_id = {
+            "device_name": self.device_name,
+            "_id": self.device_name + "_cycle_" + str(self.cycle),
+            "Reset Tarihi": self.reset_time,
+            "Tamamlanan Counter": self.counter_nr,
+            "Toplam düğüm sayısı": self.total_counter,
+            "Kalan düğüm sayısı": self.total_counter - self.counter_nr,
+            "Toplam çalışma süresi": self.total_time,
+            "Aktiv çalışma süresi": self.productive_run_time,
+            "Bobin süresi": self.bobin_time,
+            "Arıza süresi": self.ariza_time,
+            "Çözgü süresi": self.cozgu_time,
+            "Ayar süresi": self.ayar_time,
+            "Çalışma hızı": self.time_btw_counter
+        }
+        self.mycol.insert_one(write_id)
+
     def change_json(self, what, state=None):
         """change_json"""
 
         if what == 'kapali':
-            # self.db.update({'Makine Durumu': 'Kapalı'}, doc_ids=[1])
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Kapalı'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Kapalı'}})
 
         elif what == 'start':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
 
         elif what == 'stop':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Duruyor'}})
 
         elif what == 'counter':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Counter': state[0]}})
+            self.counter_nr = state[0]
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Counter': state[0]}})
 
             remainder_counter = self.total_counter - state[0]
             if remainder_counter >= 0:
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': remainder_counter}})
+                self.mycol.update_one({"_id": self.device_name + "_current"},
+                                      {"$set": {'Kalan düğüm sayısı': remainder_counter}})
             else:
-                self.mycol.update_one({"_id": self.device_name}, {"$set": {'Kalan düğüm sayısı': 0}})
+                self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Kalan düğüm sayısı': 0}})
             try:
                 # Speed: counter time between counters
                 self.time_btw_counter = round(state[2], 3)
@@ -138,11 +231,11 @@ class JsonFuncs:
                 self.time_btw_counter = 0
                 self.logging.log_info('speed: ' + str(e))
 
-            self.run_time = state[1]
-            self.mycol.update_one({"_id": self.device_name},
-                                  {"$set": {'Çalışma süresi': self.run_time}})
+            self.productive_run_time = state[1]
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Aktiv çalışma süresi': self.productive_run_time}})
 
-            self.mycol.update_one({"_id": self.device_name},
+            self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {'Çalışma hızı': self.time_btw_counter}})
 
             try:
@@ -153,33 +246,59 @@ class JsonFuncs:
                 self.remainder_time = 0
                 self.logging.log_info('remainder_time: ' + str(e))
 
-            self.mycol.update_one({"_id": self.device_name},
+            self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {
                                       'Tahmini kalan süre': self.remainder_time}})
 
         elif what == 'reset':
             self.reset_time = get_date_time()
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Son Reset Tarihi': self.reset_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Son Reset Tarihi': self.reset_time}})
+            self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
+                               self.ayar_time)
+            self.__write_cycle()
+            self.cycle = self.cycle + 1
 
         elif what == 'bobin':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})
 
         elif what == 'cozgu':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Çözgü'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Makine Durumu': 'Duruyor - Çözgü'}})
 
         elif what == 'ariza':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Arıza'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {'Makine Durumu': 'Duruyor - Arıza'}})
 
         elif what == 'ayar':
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
 
         elif what == 'Given_Total_Counter':
             self.total_counter = state
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Toplam düğüm sayısı': state}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Toplam düğüm sayısı': state}})
 
         elif what == 'Given_Counter':
             self.counter_nr = state
-            self.mycol.update_one({"_id": self.device_name}, {"$set": {'Counter': state}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Counter': state}})
+
+        elif what == 'write_status_times':
+            self.productive_run_time = state[0]
+            self.bobin_time = state[1]
+            self.ariza_time = state[2]
+            self.cozgu_time = state[3]
+            self.ayar_time = state[4]
+            self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
+                               self.ayar_time)
+
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {"Aktiv çalışma süresi": self.productive_run_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Bobin süresi": self.bobin_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Arıza süresi": self.ariza_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Çözgü süresi": self.cozgu_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Ayar süresi": self.ayar_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {"Toplam çalışma süresi": self.total_time}})
 
         # Export as Jsonfile for Monitor
         self.__export_json()

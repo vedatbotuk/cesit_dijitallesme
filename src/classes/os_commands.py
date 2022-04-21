@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+""" Description """
+
 from os import system
 from .lcd_module import LcdModule
 from time import sleep

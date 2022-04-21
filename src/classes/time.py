@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """ Description """
 
@@ -32,7 +31,7 @@ class Time:
 
 class StartStopWatch:
     """ Description """
-    def __init__(self, saved_run_time=None):
+    def __init__(self, saved_run_time=0):
 
         self.date_time_obj = datetime.now()
         self.start_time = self.__get_unix_time()
@@ -55,7 +54,7 @@ class StartStopWatch:
         """ Description """
         self.tmp_time = self.run_time
 
-    def get_run_time(self):
+    def get_calculated_total_time(self):
         """ Description """
         self.run_time = self.tmp_time + self.__get_unix_time() - self.start_time
         return round(self.run_time, 1)

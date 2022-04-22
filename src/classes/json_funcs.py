@@ -28,7 +28,8 @@ class JsonFuncs:
         setup_json = get_setup(setup_path)
         self.device_name = setup_json['main']['device_name']
         self.mac_address = setup_json['main']['mac_address']
-        self.path_json = setup_json['main']['path_json']
+        self.path_current_json = setup_json['main']['path_current_json']
+        self.path_cycle_json = setup_json['main']['path_cycle_json']
         data_js = {
             "device_name": self.device_name,
             "_id": self.device_name + "_current",
@@ -191,7 +192,14 @@ class JsonFuncs:
         cursor = self.mycol.find({"_id": self.device_name + "_current"})
         data_js = list(cursor)
 
-        with open(self.path_json, 'w') as json_file:
+        with open(self.path_current_json, 'w') as json_file:
+            json.dump(data_js, json_file)
+
+    def __export_cycle(self):
+        cursor = self.mycol.find({"_id": self.device_name + "_cycle_"})
+        data_js = list(cursor)
+
+        with open(self.path_current_json, 'w') as json_file:
             json.dump(data_js, json_file)
 
     def __write_cycle(self):

@@ -123,11 +123,11 @@ def check_start_stop():
     if btn_start_stop_checked is True:
         if 'stop' in STATUS_ARRAY:
             STATUS_ARRAY.remove('stop')
+            PRODUCTIVE_RUN_TIME_WATCH.start()
+            PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
         STATUS_ARRAY.append('start')
         MACHINE_START = 1
         STATUS_CHANGED = 1
-        PRODUCTIVE_RUN_TIME_WATCH.stop()
-        PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device started')
     # maschiene gestopt
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
@@ -137,7 +137,7 @@ def check_start_stop():
         STATUS_ARRAY.append('stop')
         MACHINE_START = 0
         STATUS_CHANGED = 1
-        PRODUCTIVE_RUN_TIME_WATCH.start()
+        PRODUCTIVE_RUN_TIME_WATCH.stop()
         LOGGING.log_info('Device stopped')
     # START/STOP SWITCH --------
     # ---------------------------

@@ -151,7 +151,7 @@ def check_bobin():
     # ab hier testet alle nebenarbeiten an der maschine
     btn_bobin_checked = BTN_BOBIN.check_switch()
     if btn_bobin_checked is False:
-        if 'bobin' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
+        if 'bobin' in STATUS_ARRAY:
             STATUS_ARRAY.remove('bobin')
             BOBIN_TIME_WATCH.stop()
             BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
@@ -173,7 +173,7 @@ def check_cozgu():
     # ###########################
     btn_cozgu_checked = BTN_COZGU.check_switch()
     if btn_cozgu_checked is False:
-        if 'cozgu' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
+        if 'cozgu' in STATUS_ARRAY:
             STATUS_ARRAY.remove('cozgu')
             COZGU_TIME_WATCH.stop()
             COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
@@ -195,7 +195,7 @@ def check_ariza():
     # ###########################
     btn_ariza_checked = BTN_ARIZA.check_switch()
     if btn_ariza_checked is False:
-        if 'ariza' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
+        if 'ariza' in STATUS_ARRAY:
             STATUS_ARRAY.remove('ariza')
             ARIZA_TIME_WATCH.stop()
             ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
@@ -217,7 +217,7 @@ def check_ayar():
     # ###########################
     btn_ayar_checked = BTN_AYAR.check_switch()
     if btn_ayar_checked is False:
-        if 'ayar' in STATUS_ARRAY[len(STATUS_ARRAY) - 1]:
+        if 'ayar' in STATUS_ARRAY:
             STATUS_ARRAY.remove('ayar')
             AYAR_TIME_WATCH.stop()
             AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()

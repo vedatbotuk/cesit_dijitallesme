@@ -445,45 +445,47 @@ def update_cycle():
 
 def gpio_check():
     """ Description """
-    global STATUS_CHANGED, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
+    global STATUS_CHANGED,SYSTEM_ON, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
         PRODUCTIVE_RUN_TIME, TOTAL_TIME
 
     check_kapali()
-    check_start_stop()
 
-    show_remainder_counter()
-    show_total_counter()
-    clear_lcd()
+    if SYSTEM_ON == 1:
+        check_start_stop()
 
-    # if STATUS_ARRAY:
-    LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        show_remainder_counter()
+        show_total_counter()
+        clear_lcd()
 
-    if MACHINE_START == 0:
-        keypad_give_total_counter()
-        keypad_give_os_cmd()
+        # if STATUS_ARRAY:
+        LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
-        check_bobin()
-        check_cozgu()
-        check_ariza()
-        check_ayar()
+        if MACHINE_START == 0:
+            keypad_give_total_counter()
+            keypad_give_os_cmd()
 
-        reset_check()
+            check_bobin()
+            check_cozgu()
+            check_ariza()
+            check_ayar()
 
-    if STATUS_CHANGED == 1:
-        JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
-        update_cycle()
-        STATUS_CHANGED = 0
+            reset_check()
 
-    if COUNTER_CHANGED == 1:
-        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
-        COUNTER_CHANGED = 0
+        if STATUS_CHANGED == 1:
+            JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+            update_cycle()
+            STATUS_CHANGED = 0
 
-    if RESET_CHANGED == 1:
-        update_cycle()
-        LCD.refresh_lcd(what='reset')
-        JSON_FUNCS.change_json(what='reset')
-        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0, 0])
-        RESET_CHANGED = 0
+        if COUNTER_CHANGED == 1:
+            JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
+            COUNTER_CHANGED = 0
+
+        if RESET_CHANGED == 1:
+            update_cycle()
+            LCD.refresh_lcd(what='reset')
+            JSON_FUNCS.change_json(what='reset')
+            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0, 0])
+            RESET_CHANGED = 0
 
 
 # def event_start_stop(channel):

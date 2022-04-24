@@ -234,7 +234,7 @@ def check_ayar():
 
 def gpio_check_start_stop():
     """ Description """
-    global MACHINE_START, STATUS_ARRAY, TOTAL_TIME
+    global MACHINE_START, SYSTEM_ON, STATUS_ARRAY, TOTAL_TIME
 
     check_kapali()
     JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])

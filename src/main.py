@@ -594,6 +594,9 @@ def reset_check():
     if RESET_PUSHED == 1:
         COUNTER_NR = 0
 
+        TOTAL_TIME_WATCH.reset_time()
+        if SYSTEM_ON == 1:
+            TOTAL_TIME_WATCH.start()
         PRODUCTIVE_RUN_TIME_WATCH.reset_time()
         BOBIN_TIME_WATCH.reset_time()
         ARIZA_TIME_WATCH.reset_time()

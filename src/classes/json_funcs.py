@@ -283,6 +283,7 @@ class JsonFuncs:
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {'Tahmini kalan süre': self.remainder_time}})
 
+            self.total_time = state[3]
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {"Toplam çalışma süresi": state[3]}})
 

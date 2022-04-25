@@ -93,6 +93,18 @@ class JsonFuncs:
             self.logging.log_info('No Cycle exits. Creating new _id=0')
 
         try:
+            self.total_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
+                'Toplam çalışma süresi']
+            self.total_time = float(self.total_time)
+        except Exception as e:
+            self.total_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated total_time = 0')
+
+        self.remainder_time = None
+
+        try:
             self.productive_run_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
                 'Aktiv çalışma süresi']
             self.productive_run_time = float(self.productive_run_time)
@@ -172,6 +184,9 @@ class JsonFuncs:
     def get_total_counter(self):
         """ Description """
         return self.total_counter
+
+    def get_saved_total_time(self):
+        return self.total_time
 
     def get_saved_productive_run_time(self):
         return self.productive_run_time
@@ -275,8 +290,6 @@ class JsonFuncs:
             self.reset_time = get_date_time()
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {'Son Reset Tarihi': self.reset_time}})
-            self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
-                               self.ayar_time)
             self.__write_cycle()
             self.cycle = self.cycle + 1
             self.mycol.update_one({"_id": self.device_name + "_current"},
@@ -311,8 +324,7 @@ class JsonFuncs:
             self.ariza_time = state[2]
             self.cozgu_time = state[3]
             self.ayar_time = state[4]
-            self.total_time = (self.productive_run_time + self.bobin_time + self.ariza_time + self.cozgu_time +
-                               self.ayar_time)
+            self.total_time = state[5]
 
             try:
                 self.productivity = round(self.productive_run_time / self.total_time, 2)

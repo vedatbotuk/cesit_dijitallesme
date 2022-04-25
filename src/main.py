@@ -33,12 +33,14 @@ JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
 TOTAL_COUNTER = JSON_FUNCS.get_total_counter()
 
+SAVED_TOTAL_TIME = JSON_FUNCS.get_saved_total_time()
 SAVED_PRODUCTIVE_RUN_TIME = JSON_FUNCS.get_saved_productive_run_time()
 SAVED_BOBIN_TIME = JSON_FUNCS.get_saved_bobin_time()
 SAVED_ARIZA_TIME = JSON_FUNCS.get_saved_ariza_time()
 SAVED_COZGU_TIME = JSON_FUNCS.get_saved_cozgu_time()
 SAVED_AYAR_TIME = JSON_FUNCS.get_saved_ayar_time()
 
+TOTAL_TIME_WATCH = classes.StartStopWatch(saved_run_time=SAVED_TOTAL_TIME)
 PRODUCTIVE_RUN_TIME_WATCH = classes.StartStopWatch(saved_run_time=SAVED_PRODUCTIVE_RUN_TIME)
 BOBIN_TIME_WATCH = classes.StartStopWatch(saved_run_time=SAVED_BOBIN_TIME)
 ARIZA_TIME_WATCH = classes.StartStopWatch(saved_run_time=SAVED_ARIZA_TIME)
@@ -90,7 +92,7 @@ if KEYPAD_INSTALL is True:
 
 def check_kapali():
     """ Description """
-    global SYSTEM_ON, STATUS_CHANGED
+    global SYSTEM_ON, STATUS_CHANGED, TOTAL_TIME
     # AC/KAPA SWITCH
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
@@ -98,12 +100,15 @@ def check_kapali():
         STATUS_ARRAY.append('kapali')
         if 'stop' in STATUS_ARRAY:
             STATUS_ARRAY.remove('stop')
+        TOTAL_TIME_WATCH.stop()
         SYSTEM_ON = 0
         STATUS_CHANGED = 1
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is False:
         if 'kapali' in STATUS_ARRAY:
             STATUS_ARRAY.remove('kapali')
+        TOTAL_TIME_WATCH.start()
+        TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
         STATUS_ARRAY.append('stop')
         SYSTEM_ON = 1
         STATUS_CHANGED = 1
@@ -437,10 +442,10 @@ def clear_lcd():
 
 
 def update_cycle():
-    global PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME
+    global TOTAL_TIME, PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME
 
     JSON_FUNCS.change_json(what='write_status_times',
-                           state=[PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME])
+                           state=[PRODUCTIVE_RUN_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME, TOTAL_TIME])
 
 
 def gpio_check():
@@ -484,7 +489,7 @@ def gpio_check():
         update_cycle()
         LCD.refresh_lcd(what='reset')
         JSON_FUNCS.change_json(what='reset')
-        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0, 0])
+        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0, 0, 0])
         RESET_CHANGED = 0
 
 
@@ -534,7 +539,7 @@ def event_counter(channel):
         if COUNTER_PUSHED == 1:
             COUNTER_NR = COUNTER_NR + 1
             PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
-            TOTAL_TIME = PRODUCTIVE_RUN_TIME + BOBIN_TIME + AYAR_TIME + COZGU_TIME + AYAR_TIME
+            TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
             TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
             COUNTER_CHANGED = 1  # for refresh JSON
             COUNTER_PUSHED = 0

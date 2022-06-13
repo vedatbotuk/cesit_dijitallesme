@@ -11,6 +11,13 @@ def get_date_time():
     return datetime.timestamp(datetime.now())
 
 
+def get_minute():
+    """ Description """
+    now = datetime.timestamp(datetime.now())
+    unix_time = datetime.fromtimestamp(now)
+    return unix_time.strftime("%M")
+
+
 class Time:
     """ Description """
     def __init__(self):

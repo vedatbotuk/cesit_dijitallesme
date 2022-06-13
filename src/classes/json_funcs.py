@@ -117,6 +117,16 @@ class JsonFuncs:
         self.remainder_time = None
 
         try:
+            self.stop_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
+                'Aktiv çalışma süresi']
+            self.stop_time = float(self.stop_time)
+        except Exception as e:
+            self.stop_time = 0
+            self.logging.log_info(e)
+
+            self.logging.log_info('decelerated stop_time = 0')
+
+        try:
             self.bobin_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Bobin süresi']
             self.bobin_time = float(self.bobin_time)
         except Exception as e:
@@ -191,6 +201,9 @@ class JsonFuncs:
     def get_saved_productive_run_time(self):
         return self.productive_run_time
 
+    def get_saved_stop_time(self):
+        return self.stop_time
+
     def get_saved_bobin_time(self):
         return self.bobin_time
 
@@ -227,6 +240,7 @@ class JsonFuncs:
             "Kalan düğüm sayısı": self.total_counter - self.counter_nr,
             "Toplam çalışma süresi": self.total_time,
             "Aktiv çalışma süresi": self.productive_run_time,
+            "Durma süresi": self.stop_time,
             "Bobin süresi": self.bobin_time,
             "Arıza süresi": self.ariza_time,
             "Çözgü süresi": self.cozgu_time,
@@ -321,11 +335,12 @@ class JsonFuncs:
 
         elif what == 'write_status_times':
             self.productive_run_time = state[0]
-            self.bobin_time = state[1]
-            self.ariza_time = state[2]
-            self.cozgu_time = state[3]
-            self.ayar_time = state[4]
-            self.total_time = state[5]
+            self.stop_time = state[1]
+            self.bobin_time = state[2]
+            self.ariza_time = state[3]
+            self.cozgu_time = state[4]
+            self.ayar_time = state[5]
+            self.total_time = state[6]
 
             try:
                 self.productivity = round(self.productive_run_time / self.total_time, 2)
@@ -335,6 +350,8 @@ class JsonFuncs:
 
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {"Aktiv çalışma süresi": self.productive_run_time}})
+            self.mycol.update_one({"_id": self.device_name + "_current"},
+                                  {"$set": {"Durma süresi": self.stop_time}})
             self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Bobin süresi": self.bobin_time}})
             self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Arıza süresi": self.ariza_time}})
             self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Çözgü süresi": self.cozgu_time}})

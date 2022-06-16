@@ -554,8 +554,8 @@ def event_counter(channel):
             # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
         # LOGGING.log_info(str(channel) + ' low')
         # LOGGING.log_info('')
-        else:
-            LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
+        # else:
+        #     LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
 
 
 def reset_check():

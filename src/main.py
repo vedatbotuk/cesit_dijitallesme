@@ -147,11 +147,12 @@ def check_start_stop():
         STATUS_CHANGED = 1
         LOGGING.log_info('Device stopped')
 
-    now_for_check_minute = classes.get_minute()
-    if CHECK_MINUTE != now_for_check_minute:
-        CHECK_MINUTE = now_for_check_minute
-        STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
-        update_cycle()
+    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'stop':
+        now_for_check_minute = classes.get_minute()
+        if CHECK_MINUTE != now_for_check_minute:
+            CHECK_MINUTE = now_for_check_minute
+            STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
+            update_cycle()
     # START/STOP SWITCH --------
     # ---------------------------
 

@@ -118,7 +118,7 @@ class JsonFuncs:
 
         try:
             self.stop_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
-                'Aktiv çalışma süresi']
+                'Durma süresi']
             self.stop_time = float(self.stop_time)
         except Exception as e:
             self.stop_time = 0

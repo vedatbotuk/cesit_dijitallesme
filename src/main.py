@@ -177,11 +177,12 @@ def check_bobin():
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at bobin-status')
 
-    now_for_check_minute = classes.get_minute()
-    if CHECK_MINUTE != now_for_check_minute:
-        CHECK_MINUTE = now_for_check_minute
-        BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
-        update_cycle()
+    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'bobin':
+        now_for_check_minute = classes.get_minute()
+        if CHECK_MINUTE != now_for_check_minute:
+            CHECK_MINUTE = now_for_check_minute
+            BOBIN_TIME = BOBIN_TIME_WATCH.get_calculated_total_time()
+            update_cycle()
     # BOBIN SWITCH --------------
     # ---------------------------
 
@@ -206,11 +207,12 @@ def check_cozgu():
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at cozgu-status')
 
-    now_for_check_minute = classes.get_minute()
-    if CHECK_MINUTE != now_for_check_minute:
-        CHECK_MINUTE = now_for_check_minute
-        COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
-        update_cycle()
+    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'cozgu':
+        now_for_check_minute = classes.get_minute()
+        if CHECK_MINUTE != now_for_check_minute:
+            CHECK_MINUTE = now_for_check_minute
+            COZGU_TIME = COZGU_TIME_WATCH.get_calculated_total_time()
+            update_cycle()
     # COZGU SWITCH --------------
     # ---------------------------
 
@@ -235,11 +237,12 @@ def check_ariza():
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at ariza-status')
 
-    now_for_check_minute = classes.get_minute()
-    if CHECK_MINUTE != now_for_check_minute:
-        CHECK_MINUTE = now_for_check_minute
-        ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
-        update_cycle()
+    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'ariza':
+        now_for_check_minute = classes.get_minute()
+        if CHECK_MINUTE != now_for_check_minute:
+            CHECK_MINUTE = now_for_check_minute
+            ARIZA_TIME = ARIZA_TIME_WATCH.get_calculated_total_time()
+            update_cycle()
     # ARIZA SWITCH --------------
     # ---------------------------
 
@@ -264,11 +267,12 @@ def check_ayar():
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at ayar-status')
 
-    now_for_check_minute = classes.get_minute()
-    if CHECK_MINUTE != now_for_check_minute:
-        CHECK_MINUTE = now_for_check_minute
-        AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()
-        update_cycle()
+    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'ayar':
+        now_for_check_minute = classes.get_minute()
+        if CHECK_MINUTE != now_for_check_minute:
+            CHECK_MINUTE = now_for_check_minute
+            AYAR_TIME = AYAR_TIME_WATCH.get_calculated_total_time()
+            update_cycle()
     # AYAR SWITCH ---------------
     # ---------------------------
 

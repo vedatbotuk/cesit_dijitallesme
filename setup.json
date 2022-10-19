@@ -1,13 +1,13 @@
 {
   "main": {
-    "path_current_json": "/var/www/html/data.json",
-    "path_cycle_json": "/var/www/html/cycle.json",
+    "path_current_json": "/home/pi/cesit_dijitallesme/data.json",
+    "path_cycle_json": "/home/pi/cesit_dijitallesme/cycle.json",
     "path_json_default": "default_data.json",
     "device_name": "7",
     "mac_address": "b8:27:eb:55:ea:75",
     "log": "on",
     "log_level": "info",
-    "log_path": "/var/www/html/cesit_dijitallesme.log"
+    "log_path": "/home/pi/cesit_dijitallesme.log"
   },
   "device": {
     "network": "WLAN",

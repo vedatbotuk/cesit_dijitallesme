@@ -41,6 +41,12 @@ class ButtonSwitch:
         elif mode == 'rising':
             GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=50)
 
+    def wait_for_rising(self):
+        GPIO.wait_for_edge(self.gpio_no, GPIO.RISING)
+
+    def wait_for_falling(self):
+        GPIO.wait_for_edge(self.gpio_no, GPIO.FALLING)
+
     def remove_callback(self):
         """ Test """
         GPIO.remove_event_detect(self.gpio_no)

@@ -7,6 +7,9 @@
 from time import sleep
 import classes
 from classes import os_commands
+import concurrent.futures
+
+is_shutdown = False
 
 # #####
 # Setup
@@ -489,6 +492,32 @@ def update_cycle():
                            state=[PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME, TOTAL_TIME])
 
 
+def lcd_refresh(sleep_time):
+    global STATUS_ARRAY, COUNTER_NR
+
+    while not is_shutdown:
+        LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        sleep(sleep_time)
+
+
+def json_refresh(sleep_time):
+    global STATUS_ARRAY, COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME
+
+    while not is_shutdown:
+        if STATUS_CHANGED == 1:
+            JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+
+        if COUNTER_CHANGED == 1:
+            JSON_FUNCS.change_json(what='counter',
+                                   state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
+
+        if RESET_CHANGED == 1:
+            JSON_FUNCS.change_json(what='reset')
+            JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
+
+        sleep(sleep_time)
+
+
 def gpio_check():
     """ Description """
     global STATUS_CHANGED,SYSTEM_ON, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
@@ -504,7 +533,7 @@ def gpio_check():
     clear_lcd()
 
     # if STATUS_ARRAY:
-    LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+    # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
     if MACHINE_START == 0:
         keypad_give_total_counter()
@@ -518,45 +547,48 @@ def gpio_check():
         reset_check()
 
     if STATUS_CHANGED == 1:
-        JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+        # JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
         update_cycle()
         STATUS_CHANGED = 0
 
     if COUNTER_CHANGED == 1:
-        JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
+        # JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
         COUNTER_CHANGED = 0
 
     if RESET_CHANGED == 1:
         update_cycle()
         LCD.refresh_lcd(what='reset')
-        JSON_FUNCS.change_json(what='reset')
-        JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
+        # JSON_FUNCS.change_json(what='reset')
+        # JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
         RESET_CHANGED = 0
 
 
-def event_counter(channel):
+def event_counter(sleep_time):
     """ Description """
     global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
-    btn_cnt = BTN_COUNTER.check_switch_once()
-    if btn_cnt is True:
-        COUNTER_PUSHED = 1
-        # LOGGING.log_info('')
-        # LOGGING.log_info(str(channel) + ' high')
+    while not is_shutdown:
+        BTN_COUNTER.wait_for_rising()
+        btn_cnt = BTN_COUNTER.check_switch_once()
+        if btn_cnt is True:
+            COUNTER_PUSHED = 1
+            # LOGGING.log_info('')
+            # LOGGING.log_info(str(channel) + ' high')
 
-    elif btn_cnt is False:
-        if COUNTER_PUSHED == 1:
-            COUNTER_NR = COUNTER_NR + 1
-            PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
-            TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
-            TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
-            COUNTER_CHANGED = 1  # for refresh JSON
-            COUNTER_PUSHED = 0
-            # LOGGING.log_info(str(channel) + ' ' + str(COUNTER_NR))
-        # LOGGING.log_info(str(channel) + ' low')
-        # LOGGING.log_info('')
-        # else:
-        #     LOGGING.log_info('Wrong signal -> Counter was not pushed ' + str(channel))
+        elif btn_cnt is False:
+            if COUNTER_PUSHED == 1:
+                COUNTER_NR = COUNTER_NR + 1
+                PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
+                TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
+                TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
+                COUNTER_CHANGED = 1  # for refresh JSON
+                COUNTER_PUSHED = 0
+                # LOGGING.log_info(str(COUNTER_NR))
+                # LOGGING.log_info(' low')
+                # LOGGING.log_info('')
+            else:
+                LOGGING.log_info('Wrong signal -> Counter was not pushed ')
+        sleep(sleep_time)
 
 
 def reset_check():
@@ -600,31 +632,41 @@ def reset_check():
         LOGGING.log_info('Counter reset')
 
 
-def loop():
+def loop(sleep_time):
     """ Description """
 
     LOGGING.log_info('gpio_check loop begins.')
-    while True:
+    while not is_shutdown:
         gpio_check()
-        sleep(0.2)
+        sleep(sleep_time)
 
 
-def add_events():
-    """ Description """
-    # BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
-    BTN_COUNTER.add_callback(mode='both', callback=event_counter)
-    # BTN_RESET.add_callback(mode='both', callback=event_reset)
+def start_threading():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        executor.submit(event_counter, 0.01)
+        executor.submit(loop, 0.2)
+        executor.submit(lcd_refresh, 0.3)
+        executor.submit(json_refresh, 10)
+
+
+# def add_events():
+#     """ Description """
+#     # BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+#     BTN_COUNTER.add_callback(mode='both', callback=event_counter)
+#     # BTN_RESET.add_callback(mode='both', callback=event_reset)
 
 
 if __name__ == '__main__':
 
     LOGGING.log_info('System loaded.')
     try:
-        add_events()
+        # add_events()
+        start_threading()
         gpio_check_start_stop()
-        loop()
+        # loop()
 
     except (KeyboardInterrupt, SystemExit):
+        is_shutdown = True
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()

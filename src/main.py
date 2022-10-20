@@ -496,6 +496,10 @@ def lcd_refresh(sleep_time):
     global STATUS_ARRAY, COUNTER_NR
 
     while not is_shutdown:
+        show_remainder_counter()
+        show_total_counter()
+        clear_lcd()
+
         LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
         sleep(sleep_time)
 
@@ -506,6 +510,9 @@ def json_refresh(sleep_time):
     while not is_shutdown:
         if STATUS_CHANGED == 1:
             JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+            JSON_FUNCS.change_json(what='write_status_times',
+                                   state=[PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME,
+                                          TOTAL_TIME])
 
         if COUNTER_CHANGED == 1:
             JSON_FUNCS.change_json(what='counter',
@@ -514,6 +521,9 @@ def json_refresh(sleep_time):
         if RESET_CHANGED == 1:
             JSON_FUNCS.change_json(what='reset')
             JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
+            JSON_FUNCS.change_json(what='write_status_times',
+                                   state=[PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME,
+                                          TOTAL_TIME])
 
         sleep(sleep_time)
 
@@ -528,10 +538,6 @@ def gpio_check():
     if SYSTEM_ON == 1:
         check_start_stop()
 
-    show_remainder_counter()
-    show_total_counter()
-    clear_lcd()
-
     # if STATUS_ARRAY:
     # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
@@ -543,8 +549,6 @@ def gpio_check():
         check_cozgu()
         check_ariza()
         check_ayar()
-
-        reset_check()
 
     if STATUS_CHANGED == 1:
         # JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
@@ -568,68 +572,66 @@ def event_counter(sleep_time):
     global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
     while not is_shutdown:
-        BTN_COUNTER.wait_for_rising()
+        # BTN_COUNTER.wait_for_rising()
         btn_cnt = BTN_COUNTER.check_switch_once()
         if btn_cnt is True:
             COUNTER_PUSHED = 1
             # LOGGING.log_info('')
             # LOGGING.log_info(str(channel) + ' high')
 
-        elif btn_cnt is False:
-            if COUNTER_PUSHED == 1:
-                COUNTER_NR = COUNTER_NR + 1
-                PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
-                TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
-                TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
-                COUNTER_CHANGED = 1  # for refresh JSON
-                COUNTER_PUSHED = 0
-                # LOGGING.log_info(str(COUNTER_NR))
-                # LOGGING.log_info(' low')
-                # LOGGING.log_info('')
-            else:
-                LOGGING.log_info('Wrong signal -> Counter was not pushed ')
+        elif btn_cnt is False and COUNTER_PUSHED == 1:
+            COUNTER_NR = COUNTER_NR + 1
+            PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
+            TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
+            TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
+            COUNTER_CHANGED = 1  # for refresh JSON
+            COUNTER_PUSHED = 0
+            # LOGGING.log_info(str(COUNTER_NR))
+            # LOGGING.log_info(' low')
+            # LOGGING.log_info('')
         sleep(sleep_time)
 
 
-def reset_check():
+def event_reset(sleep_time):
     """ Description """
     global COUNTER_NR, RESET_CHANGED, RESET_PUSHED, PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME,\
         ARIZA_TIME, COZGU_TIME, AYAR_TIME, TOTAL_TIME
 
-    btn_rest = BTN_RESET.check_switch_once()
-    if btn_rest is True:
-        sleep(0.1)
+    while not is_shutdown:
+        # BTN_RESET.wait_for_rising()
         btn_rest = BTN_RESET.check_switch_once()
         if btn_rest is True:
-            sleep(0.4)
+            sleep(0.5)
             btn_rest = BTN_RESET.check_switch_once()
             if btn_rest is True:
                 RESET_PUSHED = 1
 
-    if RESET_PUSHED == 1:
-        COUNTER_NR = 0
+        if RESET_PUSHED == 1:
+            COUNTER_NR = 0
 
-        TOTAL_TIME_WATCH.reset_time()
-        if SYSTEM_ON == 1:
-            TOTAL_TIME_WATCH.start()
-        PRODUCTIVE_RUN_TIME_WATCH.reset_time()
-        STOP_TIME_WATCH.reset_time()
-        BOBIN_TIME_WATCH.reset_time()
-        ARIZA_TIME_WATCH.reset_time()
-        COZGU_TIME_WATCH.reset_time()
-        AYAR_TIME_WATCH.reset_time()
+            TOTAL_TIME_WATCH.reset_time()
+            if SYSTEM_ON == 1:
+                TOTAL_TIME_WATCH.start()
+            PRODUCTIVE_RUN_TIME_WATCH.reset_time()
+            STOP_TIME_WATCH.reset_time()
+            BOBIN_TIME_WATCH.reset_time()
+            ARIZA_TIME_WATCH.reset_time()
+            COZGU_TIME_WATCH.reset_time()
+            AYAR_TIME_WATCH.reset_time()
 
-        PRODUCTIVE_RUN_TIME = 0
-        STOP_TIME = 0
-        BOBIN_TIME = 0
-        ARIZA_TIME = 0
-        COZGU_TIME = 0
-        AYAR_TIME = 0
-        TOTAL_TIME = 0
+            PRODUCTIVE_RUN_TIME = 0
+            STOP_TIME = 0
+            BOBIN_TIME = 0
+            ARIZA_TIME = 0
+            COZGU_TIME = 0
+            AYAR_TIME = 0
+            TOTAL_TIME = 0
 
-        RESET_CHANGED = 1
-        RESET_PUSHED = 0
-        LOGGING.log_info('Counter reset')
+            RESET_CHANGED = 1
+            RESET_PUSHED = 0
+            LOGGING.log_info('Counter reset')
+
+        sleep(sleep_time)
 
 
 def loop(sleep_time):
@@ -643,10 +645,11 @@ def loop(sleep_time):
 
 def start_threading():
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        executor.submit(event_counter, 0.01)
+        executor.submit(event_counter, 0.05)
+        executor.submit(event_reset, 0.5)
         executor.submit(loop, 0.2)
         executor.submit(lcd_refresh, 0.3)
-        executor.submit(json_refresh, 10)
+        # executor.submit(json_refresh, 10)
 
 
 # def add_events():

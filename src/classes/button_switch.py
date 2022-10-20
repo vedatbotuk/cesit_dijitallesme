@@ -35,11 +35,11 @@ class ButtonSwitch:
         """ Test """
 
         if mode == 'falling':
-            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback, bouncetime=50)
+            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback, bouncetime=100)
         elif mode == 'both':
-            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback, bouncetime=50)
+            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback, bouncetime=100)
         elif mode == 'rising':
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=50)
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=100)
 
     def wait_for_rising(self):
         GPIO.wait_for_edge(self.gpio_no, GPIO.RISING)

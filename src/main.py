@@ -10,6 +10,7 @@ from classes import os_commands
 import concurrent.futures
 
 is_shutdown = False
+GIVE_OS_CMD = False
 
 # #####
 # Setup
@@ -364,7 +365,7 @@ def keypad_give_total_counter():
 
 def keypad_give_os_cmd():
     """ Description """
-    global COUNTER_NR
+    global COUNTER_NR, GIVE_OS_CMD
 
     if KEYPAD_INSTALL is True:
         wait = 15
@@ -378,6 +379,7 @@ def keypad_give_os_cmd():
             sleep(0.2)
 
         if checked == wait:
+            GIVE_OS_CMD = True
             given_code = ''
             LCD.refresh_lcd('Given_Code', given_code)
 
@@ -433,6 +435,7 @@ def keypad_give_os_cmd():
                     LCD.refresh_lcd('Given_Code', given_code)
 
                 sleep(0.2)
+            GIVE_OS_CMD = False
 
 
 def show_total_counter():
@@ -493,14 +496,15 @@ def update_cycle():
 
 
 def lcd_refresh(sleep_time):
-    global STATUS_ARRAY, COUNTER_NR
+    global STATUS_ARRAY, COUNTER_NR, GIVE_OS_CMD
 
     while not is_shutdown:
         show_remainder_counter()
         show_total_counter()
         clear_lcd()
 
-        LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        if not GIVE_OS_CMD:
+            LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
         sleep(sleep_time)
 
 
@@ -539,7 +543,7 @@ def gpio_check():
         check_start_stop()
 
     # if STATUS_ARRAY:
-    # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
     if MACHINE_START == 0:
         keypad_give_total_counter()

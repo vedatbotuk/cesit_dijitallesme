@@ -1,22 +1,26 @@
 # #######
 # Imports
 from time import sleep
-import classes
+from classes import keypad
+from classes import lcd_module
+from classes import os_commands
+from classes import log_info
+from classes import json_funcs
 # from classes import os_commands
 
 # #####
 # Setup
-CONFIG_JSON = classes.get_setup()
+CONFIG_JSON = json_funcs.get_setup()
 
-LOGGING = classes.LogInfo(CONFIG_JSON['main']['log'],
+LOGGING = log_info.LogInfo(CONFIG_JSON['main']['log'],
                           CONFIG_JSON['main']['log_level'],
                           CONFIG_JSON['main']['log_path'])
 
-LCD = classes.LcdModule()
+LCD = lcd_module.LcdModule()
 
 KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
-    KEY_PAD = classes.KeyPad()
+    KEY_PAD = keypad.KeyPad()
 
 def given_counter():
     """ Description """
@@ -113,25 +117,25 @@ def keypad_give_os_cmd():
                 elif get_button == '*':
 
                     if given_code == '100':
-                        classes.os_commands.shutdown_system()
+                        os_commands.shutdown_system()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '101':
-                        classes.os_commands.reboot_system()
+                        os_commands.reboot_system()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '102':
-                        classes.os_commands.restart_program()
+                        os_commands.restart_program()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '103':
-                        classes.os_commands.update_code()
+                        os_commands.update_code()
                         LCD.lcd_close()
                         break
 

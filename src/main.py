@@ -6,11 +6,11 @@
 # Imports
 from time import sleep
 import classes
-import keypad_funcs
+from classes import os_commands
 import concurrent.futures
 
-
 is_shutdown = False
+GIVE_OS_CMD = False
 
 # #####
 # Setup
@@ -66,6 +66,7 @@ TIME_BTW_COUNTER = 0
 
 CHECK_MINUTE = ''
 
+LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
 BTN_KAPALI.add_switches()
 BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
@@ -83,6 +84,11 @@ BTN_BOBIN.add_switches()
 
 BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
+
+KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
+if KEYPAD_INSTALL is True:
+    KEY_PAD = classes.KeyPad()
+
 
 # end of setup
 # ############
@@ -293,15 +299,182 @@ def gpio_check_start_stop():
             check_ayar()
 
 
+def given_counter():
+    """ Description """
+    return_number = None
+    given_number = ''
+
+    LCD.refresh_lcd('Given_Counter', given_number)
+
+    while True:
+        get_button = str(KEY_PAD.check_button())
+        if get_button == 'C':
+            break
+
+        elif get_button == 'D':
+            given_number = given_number[:-1]
+            LCD.refresh_lcd('Given_Counter', given_number)
+
+        elif get_button == '*':
+            try:
+                return_number = int(given_number)
+
+                LCD.refresh_lcd('successfully', given_number)
+                sleep(2)
+                break
+
+            except Exception as e:
+                LCD.refresh_lcd('Counter_not_allowed')
+                sleep(2)
+                LCD.refresh_lcd('Given_Counter', given_number)
+                return_number = None
+                LOGGING.log_info(e)
+
+        elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            given_number = given_number + get_button
+            LCD.refresh_lcd('Given_Counter', given_number)
+
+        sleep(0.2)
+
+    return return_number
+
+
+def keypad_give_total_counter():
+    """ Description """
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        wait = 15
+        checked = 0
+        for cnt in range(0, wait):
+            button_to_give_counter = KEY_PAD.check_button()
+            if button_to_give_counter == "#":
+                checked = checked + 1
+            else:
+                break
+            sleep(0.2)
+
+        if checked == wait:
+            total_counter = given_counter()
+            if total_counter is not None:
+                TOTAL_COUNTER = total_counter
+                JSON_FUNCS.change_json(what='Given_Total_Counter', state=TOTAL_COUNTER)
+        else:
+            pass
+
+
+def keypad_give_os_cmd():
+    """ Description """
+    global COUNTER_NR, GIVE_OS_CMD
+
+    if KEYPAD_INSTALL is True:
+        wait = 15
+        checked = 0
+        for cnt in range(0, wait):
+            button_to_give_total = KEY_PAD.check_button()
+            if button_to_give_total == "D":
+                checked = checked + 1
+            else:
+                break
+            sleep(0.2)
+
+        if checked == wait:
+            GIVE_OS_CMD = True
+            given_code = ''
+            LCD.refresh_lcd('Given_Code', given_code)
+
+            while True:
+                get_button = str(KEY_PAD.check_button())
+                if get_button == 'C':
+                    break
+
+                elif get_button == 'D':
+                    given_code = given_code[:-1]
+                    LCD.refresh_lcd('Given_Code', given_code)
+
+                elif get_button == '*':
+
+                    if given_code == '100':
+                        os_commands.shutdown_system()
+                        LCD.lcd_close()
+                        exit()
+                        break
+
+                    elif given_code == '101':
+                        os_commands.reboot_system()
+                        LCD.lcd_close()
+                        exit()
+                        break
+
+                    elif given_code == '102':
+                        os_commands.restart_program()
+                        LCD.lcd_close()
+                        exit()
+                        break
+
+                    elif given_code == '103':
+                        os_commands.update_code()
+                        LCD.lcd_close()
+                        break
+
+                    elif given_code == '104':
+                        change_counter = given_counter()
+                        if change_counter is not None:
+                            COUNTER_NR = change_counter
+                            JSON_FUNCS.change_json(what='Given_Counter', state=COUNTER_NR)
+                        break
+
+                    else:
+                        LCD.refresh_lcd('Code_not_exists')
+                        sleep(2)
+                        given_code = ''
+                        LCD.refresh_lcd('Given_Code', given_code)
+
+                elif get_button in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    given_code = given_code + get_button
+                    LCD.refresh_lcd('Given_Code', given_code)
+
+                sleep(0.2)
+            GIVE_OS_CMD = False
+
+
+def show_total_counter():
+    """ Description """
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        while True:
+            button_to_give_total = KEY_PAD.check_button()
+            if button_to_give_total == 'A':
+                LCD.refresh_lcd(what='show_total', state=TOTAL_COUNTER)
+            else:
+                break
+            sleep(0.5)
+
+
+def show_remainder_counter():
+    """ Description """
+    global TOTAL_COUNTER, COUNTER_NR
+
+    if KEYPAD_INSTALL is True:
+        while True:
+            button_to_give_remainder = KEY_PAD.check_button()
+            if button_to_give_remainder == 'B':
+                LCD.refresh_lcd(what='show_remainder', state=TOTAL_COUNTER - COUNTER_NR)
+            else:
+                break
+            sleep(0.5)
+
+
 def clear_lcd():
     """ If LCD shows not Correct, with this function could be refreshed. """
 
-    if keypad_funcs.KEYPAD_INSTALL is True:
-        if keypad_funcs.KEY_PAD.check_button() == "C":
+    if KEYPAD_INSTALL is True:
+        if KEY_PAD.check_button() == "C":
             wait = 15
             checked = 0
             for cnt in range(0, wait):
-                button_to_give_total = keypad_funcs.KEY_PAD.check_button()
+                button_to_give_total = KEY_PAD.check_button()
                 if button_to_give_total == "C":
                     checked = checked + 1
                 else:
@@ -309,9 +482,9 @@ def clear_lcd():
                 sleep(0.2)
 
             if checked == wait:
-                keypad_funcs.LCD.lcd_clear()
+                LCD.lcd_clear()
                 sleep(0.25)
-                keypad_funcs.LCD.refresh_lcd(what='after_clear')
+                LCD.refresh_lcd(what='after_clear')
                 sleep(0.25)
 
 
@@ -323,18 +496,15 @@ def update_cycle():
 
 
 def lcd_refresh(sleep_time):
-    global STATUS_ARRAY, COUNTER_NR, MACHINE_START
+    global STATUS_ARRAY, COUNTER_NR, GIVE_OS_CMD
 
     while not is_shutdown:
-        keypad_funcs.show_remainder_counter()
-        keypad_funcs.show_total_counter()
+        show_remainder_counter()
+        show_total_counter()
         clear_lcd()
 
-        if MACHINE_START == 0:
-            keypad_funcs.keypad_give_total_counter()
-            keypad_funcs.keypad_give_os_cmd()
-
-        keypad_funcs.LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        if not GIVE_OS_CMD:
+            LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
         sleep(sleep_time)
 
 
@@ -376,6 +546,9 @@ def gpio_check():
         # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
     if MACHINE_START == 0:
+        keypad_give_total_counter()
+        keypad_give_os_cmd()
+
         check_bobin()
         check_cozgu()
         check_ariza()
@@ -392,7 +565,7 @@ def gpio_check():
 
     if RESET_CHANGED == 1:
         update_cycle()
-        keypad_funcs.LCD.refresh_lcd(what='reset')
+        LCD.refresh_lcd(what='reset')
         # JSON_FUNCS.change_json(what='reset')
         # JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
         RESET_CHANGED = 0
@@ -504,6 +677,7 @@ if __name__ == '__main__':
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
-        keypad_funcs.LCD.lcd_close()
+        LCD.lcd_close()
     # end of program
     # ##############
+    

@@ -6,7 +6,7 @@
 # Imports
 from time import sleep
 import classes
-from funcs import *
+import keypad_funcs
 import concurrent.futures
 
 
@@ -297,12 +297,12 @@ def gpio_check_start_stop():
 def clear_lcd():
     """ If LCD shows not Correct, with this function could be refreshed. """
 
-    if KEYPAD_INSTALL is True:
-        if KEY_PAD.check_button() == "C":
+    if keypad_funcs.KEYPAD_INSTALL is True:
+        if keypad_funcs.KEY_PAD.check_button() == "C":
             wait = 15
             checked = 0
             for cnt in range(0, wait):
-                button_to_give_total = KEY_PAD.check_button()
+                button_to_give_total = keypad_funcs.KEY_PAD.check_button()
                 if button_to_give_total == "C":
                     checked = checked + 1
                 else:
@@ -310,9 +310,9 @@ def clear_lcd():
                 sleep(0.2)
 
             if checked == wait:
-                LCD.lcd_clear()
+                keypad_funcs.LCD.lcd_clear()
                 sleep(0.25)
-                LCD.refresh_lcd(what='after_clear')
+                keypad_funcs.LCD.refresh_lcd(what='after_clear')
                 sleep(0.25)
 
 
@@ -327,15 +327,15 @@ def lcd_refresh(sleep_time):
     global STATUS_ARRAY, COUNTER_NR, MACHINE_START
 
     while not is_shutdown:
-        show_remainder_counter()
-        show_total_counter()
+        keypad_funcs.show_remainder_counter()
+        keypad_funcs.show_total_counter()
         clear_lcd()
 
         if MACHINE_START == 0:
-            keypad_give_total_counter()
-            keypad_give_os_cmd()
+            keypad_funcs.keypad_give_total_counter()
+            keypad_funcs.keypad_give_os_cmd()
 
-        LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        keypad_funcs.LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
         sleep(sleep_time)
 
 
@@ -393,7 +393,7 @@ def gpio_check():
 
     if RESET_CHANGED == 1:
         update_cycle()
-        LCD.refresh_lcd(what='reset')
+        keypad_funcs.LCD.refresh_lcd(what='reset')
         # JSON_FUNCS.change_json(what='reset')
         # JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
         RESET_CHANGED = 0
@@ -505,6 +505,6 @@ if __name__ == '__main__':
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
-        LCD.lcd_close()
+        keypad_funcs.LCD.lcd_close()
     # end of program
     # ##############

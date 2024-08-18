@@ -66,6 +66,7 @@ TIME_BTW_COUNTER = 0
 
 CHECK_MINUTE = ''
 
+LCD = classes.LcdModule()
 BTN_KAPALI = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_kapali'])
 BTN_KAPALI.add_switches()
 BTN_START_STOP = classes.ButtonSwitch(CONFIG_JSON['switches']['btn_start_stop'])
@@ -84,6 +85,9 @@ BTN_BOBIN.add_switches()
 BTN_RESET = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_reset'])
 BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 
+KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
+if KEYPAD_INSTALL is True:
+    KEY_PAD = classes.KeyPad()
 
 # end of setup
 # ############
@@ -310,9 +314,9 @@ def clear_lcd():
                 sleep(0.2)
 
             if checked == wait:
-                keypad_funcs.LCD.lcd_clear()
+                LCD.lcd_clear()
                 sleep(0.25)
-                keypad_funcs.LCD.refresh_lcd(what='after_clear')
+                LCD.refresh_lcd(what='after_clear')
                 sleep(0.25)
 
 
@@ -335,7 +339,7 @@ def lcd_refresh(sleep_time):
             keypad_funcs.keypad_give_total_counter()
             keypad_funcs.keypad_give_os_cmd()
 
-        keypad_funcs.LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+        LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
         sleep(sleep_time)
 
 
@@ -393,7 +397,7 @@ def gpio_check():
 
     if RESET_CHANGED == 1:
         update_cycle()
-        keypad_funcs.LCD.refresh_lcd(what='reset')
+        LCD.refresh_lcd(what='reset')
         # JSON_FUNCS.change_json(what='reset')
         # JSON_FUNCS.change_json(what='counter', state=[0, 0, 0, 0])
         RESET_CHANGED = 0
@@ -505,6 +509,6 @@ if __name__ == '__main__':
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
-        keypad_funcs.LCD.lcd_close()
+        LCD.lcd_close()
     # end of program
     # ##############

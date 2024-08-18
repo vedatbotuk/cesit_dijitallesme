@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """ Description """
 
@@ -41,6 +40,12 @@ class ButtonSwitch:
             GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback, bouncetime=100)
         elif mode == 'rising':
             GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=100)
+
+    def wait_for_rising(self):
+        GPIO.wait_for_edge(self.gpio_no, GPIO.RISING)
+
+    def wait_for_falling(self):
+        GPIO.wait_for_edge(self.gpio_no, GPIO.FALLING)
 
     def remove_callback(self):
         """ Test """

@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """ Description """
 
@@ -74,6 +73,7 @@ class LcdModule:
                                config_json['main']['log_path'])
 
         self.text = ''
+
         self.line1 = ''
         self.line2 = ''
 
@@ -85,11 +85,11 @@ class LcdModule:
         self.lcd = CharLCD(i2c_expander=model,
                            address=address,
                            port=1,
-                           cols=17,
+                           cols=16,
                            rows=2,
                            dotsize=8,
                            charmap='A02',
-                           auto_linebreaks=False,
+                           auto_linebreaks=True,
                            backlight_enabled=True)
 
         self.logging.log_info('Module: ' + model + ' loaded')
@@ -101,7 +101,7 @@ class LcdModule:
         self.lcd.create_char(4, character_s)
         self.lcd.create_char(5, character_u)
 
-    def refresh_lcd(self, what, state):
+    def refresh_lcd(self, what, state=None):
         """ Description """
 
         if what == 'kapali':
@@ -137,26 +137,61 @@ class LcdModule:
             self.line2 = u'...'
 
         elif what == 'reset':
-            self.line1 = ''
+            # self.line1 = ''
             self.line2 = u'Counter=' + '0'
 
         elif what == 'Given_Counter':
             self.line2 = u'-> ' + str(state)
 
+        elif what == 'Given_Code':
+            self.line2 = u'## ' + str(state)
+
+        elif what == 'Code_not_exists':
+            self.line2 = u'## Ge\x00ersiz Code'
+
         elif what == 'successfully':
             self.line2 = u'-> Ba\x04ar\x02l\x02'
 
+        elif what == 'Counter_not_allowed':
+            self.line2 = u'-> Say\x02 girin'
+
+        elif what == 'code_shutdown':
+            self.line2 = u'## Raspi off...'
+
+        elif what == 'code_reboot':
+            self.line2 = u'## Raspi restart...'
+
+        elif what == 'code_restart_program':
+            self.line2 = u'## Restart...'
+
+        elif what == 'code_update':
+            self.line2 = u'## G\x05ncelleniyor'
+
+        elif what == 'no_internet':
+            self.line2 = u'## No Internet'
+
+        elif what == 'update_successfully':
+            self.line2 = u'## Ba\x04ar\x02l\x02'
+
+        elif what == 'not_successfully':
+            self.line2 = u'## Ba\x04ar\x02s\x02z'
+
         elif what == 'show_remainder':
             self.line1 = ''
-            self.line2 = u'Kalan= ' + str(state)
+            self.line2 = u'Kalan=' + str(state)
 
         elif what == 'show_total':
             self.line1 = ''
-            self.line2 = u'Toplam= ' + str(state)
+            self.line2 = u'Toplam=' + str(state)
+
+        elif what == 'after_clear':
+            self.line1 = ''
+            self.line2 = ''
 
         text_old = self.text
-        self.text = str(self.__sync_time()) + self.line1 + '\n\r' + self.line2 + ' ' * (16 - len(self.line2))
+        self.text = str(self.__sync_time()) + self.line1[:16] + '\n\r' + self.line2[:16] + ' ' * (16 - len(self.line2))
         if text_old != self.text:
+            # print(self.text)
             try:
                 self.lcd.cursor_pos = (0, 0)
                 self.lcd.write_string(self.text)
@@ -172,3 +207,7 @@ class LcdModule:
     def lcd_close(self):
         """ Description """
         self.lcd.close(clear=True)
+
+    def lcd_clear(self):
+        """ Description """
+        self.lcd.clear()

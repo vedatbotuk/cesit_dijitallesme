@@ -498,15 +498,14 @@ def update_cycle():
 
 
 def lcd_refresh(sleep_time):
-    global COUNTER_NR, GIVE_OS_CMD
+    global COUNTER_NR, GIVE_OS_CMD, GIVI_TOTAL_CNT
 
     while not is_shutdown:
-        if not GIVE_OS_CMD or not GIVI_TOTAL_CNT:
-            LCD.refresh_lcd(machine.get_state(), COUNTER_NR)
-        else:
+        if GIVE_OS_CMD==False ^ GIVI_TOTAL_CNT==False:
             show_remainder_counter()
             show_total_counter()
             clear_lcd()
+            LCD.refresh_lcd(machine.get_state(), COUNTER_NR)
         sleep(sleep_time)
 
 

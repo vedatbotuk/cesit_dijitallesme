@@ -85,13 +85,10 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
-broker = "127.0.0.1"
-port = 1883
-topic = "test/topic"
-mqtt_module = classes.MQTTModule(broker, port, topic)
+mqtt_module = classes.MQTTModule("device1")
 mqtt_module.connect()
 ### TEST ###
-mqtt_module.publish("Hello MQTT!")
+mqtt_module.update_counter()
 # Warte für eingehende Nachrichten (z.B. 10 Sekunden)
 import time
 time.sleep(10)

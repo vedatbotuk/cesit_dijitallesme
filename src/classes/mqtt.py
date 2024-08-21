@@ -3,7 +3,7 @@ import time
 import random
 from datetime import datetime
 
-class Device:
+class MQTTModule:
     def __init__(self, device_id, broker="127.0.0.1", port=1883):
         self.device_id = device_id
         self.broker = broker
@@ -101,35 +101,35 @@ class Device:
         self.last_update_timestamp = self.get_timestamp()
         self.publish_software_version()
 
-if __name__ == "__main__":
-    device1 = Device("device1")
-    device2 = Device("device2")
+# if __name__ == "__main__":
+#     device1 = Device("device1")
+#     device2 = Device("device2")
 
-    device1.connect()
-    device2.connect()
+#     device1.connect()
+#     device2.connect()
 
-    try:
-        for _ in range(10):  # Läuft für ca. 30 Sekunden
-            # Simuliere Hauptstatusänderungen und Unterstatus bei stop
-            main_status = random.choice(["off", "run", "stop", "reset", "software_update"])
-            substatus = random.choice(["bobin", "ayar", "cozgu", "ariza"]) if main_status == "stop" else None
+#     try:
+#         for _ in range(10):  # Läuft für ca. 30 Sekunden
+#             # Simuliere Hauptstatusänderungen und Unterstatus bei stop
+#             main_status = random.choice(["off", "run", "stop", "reset", "software_update"])
+#             substatus = random.choice(["bobin", "ayar", "cozgu", "ariza"]) if main_status == "stop" else None
 
-            device1.update_status(main_status, substatus)
-            device2.update_status(main_status, substatus)
+#             device1.update_status(main_status, substatus)
+#             device2.update_status(main_status, substatus)
 
-            # Zähler aktualisieren
-            device1.update_counter()
-            device2.update_counter()
+#             # Zähler aktualisieren
+#             device1.update_counter()
+#             device2.update_counter()
 
-            # Simuliere Software-Version Updates
-            if random.choice([True, False]):
-                new_version = f"1.{random.randint(0, 9)}.{random.randint(0, 9)}"
-                device1.update_software_version(new_version)
-                device2.update_software_version(new_version)
+#             # Simuliere Software-Version Updates
+#             if random.choice([True, False]):
+#                 new_version = f"1.{random.randint(0, 9)}.{random.randint(0, 9)}"
+#                 device1.update_software_version(new_version)
+#                 device2.update_software_version(new_version)
 
-            time.sleep(3)  # Warte 3 Sekunden
-    except KeyboardInterrupt:
-        print("Beendet durch Benutzer")
+#             time.sleep(3)  # Warte 3 Sekunden
+#     except KeyboardInterrupt:
+#         print("Beendet durch Benutzer")
 
-    device1.disconnect()
-    device2.disconnect()
+#     device1.disconnect()
+#     device2.disconnect()

@@ -85,16 +85,16 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
-mqtt_module = classes.MQTTModule("device1")
-try:
-    mqtt_module.connect()
-except KeyboardInterrupt:
-    print("MQTT Connection refused!")
+#mqtt_module = classes.MQTTModule("device1")
+#try:
+#    mqtt_module.connect()
+#except KeyboardInterrupt:
+#    print("MQTT Connection refused!")
 ### TEST ###
-mqtt_module.update_counter()
+#mqtt_module.update_counter()
 # Warte für eingehende Nachrichten (z.B. 10 Sekunden)
-import time
-time.sleep(10)
+#import time
+#time.sleep(10)
 ############
 
 machine = classes.MaschineState()
@@ -562,19 +562,13 @@ def gpio_check():
         RESET_CHANGED = 0
 
 
-def event_counter(sleep_time):
+def event_counter(channel):
     """ Description """
     global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
-    print("Counter pushed.")
-    # BTN_COUNTER.wait_for_rising()
+    sleep(0.1)
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:
-        COUNTER_PUSHED = 1
-        # LOGGING.log_info('')
-        # LOGGING.log_info(str(channel) + ' high')
-
-    elif btn_cnt is False and COUNTER_PUSHED == 1:
         COUNTER_NR = COUNTER_NR + 1
         PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
         TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
@@ -586,12 +580,11 @@ def event_counter(sleep_time):
         # LOGGING.log_info('')
 
 
-def event_reset(sleep_time):
+def event_reset(channel):
     """ Description """
     global COUNTER_NR, RESET_CHANGED, RESET_PUSHED, PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME,\
         ARIZA_TIME, COZGU_TIME, AYAR_TIME, TOTAL_TIME
 
-    # BTN_RESET.wait_for_rising()
     btn_rest = BTN_RESET.check_switch_once()
     if btn_rest is True:
         sleep(0.5)
@@ -668,4 +661,3 @@ if __name__ == '__main__':
         mqtt_module.disconnect()
     # end of program
     # ##############
-    

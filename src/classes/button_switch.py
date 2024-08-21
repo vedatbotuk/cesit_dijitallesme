@@ -29,17 +29,17 @@ class ButtonSwitch:
         self.sec_state = None
         self.btn_state = None
 
-        GPIO.setup(self.gpio_no, GPIO.IN)
+        GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
 
     def add_callback(self, mode, callback):
         """ Test """
 
         if mode == 'falling':
-            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback, bouncetime=100)
+            GPIO.add_event_detect(self.gpio_no, GPIO.FALLING, callback=callback, bouncetime=200)
         elif mode == 'both':
-            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback, bouncetime=100)
+            GPIO.add_event_detect(self.gpio_no, GPIO.BOTH, callback=callback, bouncetime=200)
         elif mode == 'rising':
-            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=100)
+            GPIO.add_event_detect(self.gpio_no, GPIO.RISING, callback=callback, bouncetime=200)
 
     def wait_for_rising(self):
         GPIO.wait_for_edge(self.gpio_no, GPIO.RISING)
@@ -57,8 +57,6 @@ class ButtonSwitch:
 
     def check_switch(self):
         """ Test """
-        self.btn_state = GPIO.input(self.gpio_no)
-
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
         if self.btn_state:

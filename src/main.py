@@ -10,6 +10,7 @@ import concurrent.futures
 
 is_shutdown = False
 GIVE_OS_CMD = False
+GIVI_TOTAL_CNT = False
 
 # #####
 # Setup
@@ -335,7 +336,7 @@ def given_counter():
 
 def keypad_give_total_counter():
     """ Description """
-    global TOTAL_COUNTER, COUNTER_NR
+    global TOTAL_COUNTER, COUNTER_NR, GIVI_TOTAL_CNT
 
     if KEYPAD_INSTALL is True:
         wait = 15
@@ -349,7 +350,9 @@ def keypad_give_total_counter():
             sleep(0.2)
 
         if checked == wait:
+            GIVI_TOTAL_CNT = True
             total_counter = given_counter()
+            GIVI_TOTAL_CNT = False
             if total_counter is not None:
                 TOTAL_COUNTER = total_counter
                 # JSON_FUNCS.change_json(what='Given_Total_Counter', state=TOTAL_COUNTER)
@@ -391,20 +394,20 @@ def keypad_give_os_cmd():
                     if given_code == '100':
                         classes.os_commands.shutdown_system()
                         LCD.lcd_close()
+                        classes.gpio_cleanup()
                         exit()
-                        break
 
                     elif given_code == '101':
                         classes.os_commands.reboot_system()
                         LCD.lcd_close()
+                        classes.gpio_cleanup()
                         exit()
-                        break
 
                     elif given_code == '102':
                         classes.os_commands.restart_program()
                         LCD.lcd_close()
+                        classes.gpio_cleanup()
                         exit()
-                        break
 
                     elif given_code == '103':
                         classes.os_commands.update_code()
@@ -417,10 +420,12 @@ def keypad_give_os_cmd():
                             COUNTER_NR = change_counter
                             JSON_FUNCS.change_json(what='Given_Counter', state=COUNTER_NR)
                         break
+
                     elif given_code == '105':
                         LCD.lcd_close()
                         classes.gpio_cleanup()
                         exit()
+
                     else:
                         LCD.refresh_lcd('Code_not_exists')
                         sleep(2)
@@ -496,12 +501,12 @@ def lcd_refresh(sleep_time):
     global COUNTER_NR, GIVE_OS_CMD
 
     while not is_shutdown:
-        show_remainder_counter()
-        show_total_counter()
-        clear_lcd()
-
-        if not GIVE_OS_CMD:
+        if not GIVE_OS_CMD or not GIVI_TOTAL_CNT:
             LCD.refresh_lcd(machine.get_state(), COUNTER_NR)
+        else:
+            show_remainder_counter()
+            show_total_counter()
+            clear_lcd()
         sleep(sleep_time)
 
 

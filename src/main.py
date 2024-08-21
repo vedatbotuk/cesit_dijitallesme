@@ -352,7 +352,7 @@ def keypad_give_total_counter():
             total_counter = given_counter()
             if total_counter is not None:
                 TOTAL_COUNTER = total_counter
-                JSON_FUNCS.change_json(what='Given_Total_Counter', state=TOTAL_COUNTER)
+                # JSON_FUNCS.change_json(what='Given_Total_Counter', state=TOTAL_COUNTER)
         else:
             pass
 
@@ -417,7 +417,10 @@ def keypad_give_os_cmd():
                             COUNTER_NR = change_counter
                             JSON_FUNCS.change_json(what='Given_Counter', state=COUNTER_NR)
                         break
-
+                    elif given_code == '105':
+                        LCD.lcd_close()
+                        classes.gpio_cleanup()
+                        exit()
                     else:
                         LCD.refresh_lcd('Code_not_exists')
                         sleep(2)
@@ -564,7 +567,7 @@ def gpio_check():
 
 def event_counter(channel):
     """ Description """
-    global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
+    global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, TIME_BTW_COUNTER
 
     sleep(0.1)
     btn_cnt = BTN_COUNTER.check_switch_once()
@@ -574,7 +577,6 @@ def event_counter(channel):
         TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
         TIME_BTW_COUNTER = PRODUCTIVE_RUN_TIME_WATCH.get_counter_time()
         COUNTER_CHANGED = 1  # for refresh JSON
-        COUNTER_PUSHED = 0
         # LOGGING.log_info(str(COUNTER_NR))
         # LOGGING.log_info(' low')
         # LOGGING.log_info('')
@@ -637,8 +639,8 @@ def start_threading():
 
 
 def add_events():
-#     """ Description """
-#     # BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
+    """ Description """
+    #  BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 
@@ -656,8 +658,8 @@ if __name__ == '__main__':
         is_shutdown = True
         print('keyboard interrupt detected')
         LOGGING.log_info('System stopped.')
-        classes.gpio_cleanup()
         LCD.lcd_close()
+        classes.gpio_cleanup()
         # mqtt_module.disconnect()
-    # end of program
-    # ##############
+# end of program
+# ##############

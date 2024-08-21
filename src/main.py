@@ -658,6 +658,6 @@ if __name__ == '__main__':
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
         LCD.lcd_close()
-        mqtt_module.disconnect()
+        # mqtt_module.disconnect()
     # end of program
     # ##############

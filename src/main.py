@@ -6,7 +6,6 @@
 # Imports
 from time import sleep
 import classes
-from classes import os_commands
 import concurrent.futures
 
 is_shutdown = False
@@ -85,6 +84,18 @@ BTN_COUNTER = classes.ButtonSwitch(CONFIG_JSON['buttons']['btn_counter'])
 KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
+
+broker = "127.0.0.1"
+port = 1883
+topic = "test/topic"
+mqtt_module = classes.MQTTModule(broker, port, topic)
+mqtt_module.connect()
+### TEST ###
+mqtt_module.publish("Hello MQTT!")
+# Warte für eingehende Nachrichten (z.B. 10 Sekunden)
+import time
+time.sleep(10)
+############
 
 machine = classes.MaschineState()
 
@@ -378,25 +389,25 @@ def keypad_give_os_cmd():
                 elif get_button == '*':
 
                     if given_code == '100':
-                        os_commands.shutdown_system()
+                        classes.os_commands.shutdown_system()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '101':
-                        os_commands.reboot_system()
+                        classes.os_commands.reboot_system()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '102':
-                        os_commands.restart_program()
+                        classes.os_commands.restart_program()
                         LCD.lcd_close()
                         exit()
                         break
 
                     elif given_code == '103':
-                        os_commands.update_code()
+                        classes.os_commands.update_code()
                         LCD.lcd_close()
                         break
 
@@ -653,6 +664,7 @@ if __name__ == '__main__':
         LOGGING.log_info('System stopped.')
         classes.gpio_cleanup()
         LCD.lcd_close()
+        mqtt_module.disconnect()
     # end of program
     # ##############
     

@@ -634,9 +634,8 @@ def loop(sleep_time):
 
 
 def start_threading():
+    """ Description """
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        # executor.submit(event_counter, 0.1)
-        # executor.submit(event_reset, 0.5)
         executor.submit(loop, 0.2)
         executor.submit(lcd_refresh, 0.3)
         # executor.submit(json_refresh, 10)
@@ -644,7 +643,6 @@ def start_threading():
 
 def add_events():
     """ Description """
-    #  BTN_START_STOP.add_callback(mode='both', callback=event_start_stop)
     BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
     BTN_RESET.add_callback(mode='rising', callback=event_reset)
 

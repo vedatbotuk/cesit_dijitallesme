@@ -30,9 +30,6 @@ COUNTER_PUSHED = 0
 RESET_PUSHED = 0
 RESET_CHANGED = 0
 
-# TODO: überlege eine bessere Lösung
-STATUS_ARRAY = []
-
 JSON_FUNCS = classes.JsonFuncs()
 COUNTER_NR = JSON_FUNCS.get_counter()
 TOTAL_COUNTER = JSON_FUNCS.get_total_counter()
@@ -89,6 +86,7 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
+machine = classes.MaschineState()
 
 # end of setup
 # ############
@@ -101,19 +99,15 @@ def check_kapali():
     # ###########################
     btn_kapali_checked = BTN_KAPALI.check_switch()
     if btn_kapali_checked is True:
-        STATUS_ARRAY.append('kapali')
-        if 'stop' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('stop')
+        machine.change_state("kapali")
         TOTAL_TIME_WATCH.stop()
         SYSTEM_ON = 0
         STATUS_CHANGED = 1
         LOGGING.log_info('Device off')
     elif btn_kapali_checked is False:
-        if 'kapali' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('kapali')
+        machine.change_state("stop")
         TOTAL_TIME_WATCH.start()
         TOTAL_TIME = TOTAL_TIME_WATCH.get_calculated_total_time()
-        STATUS_ARRAY.append('stop')
         SYSTEM_ON = 1
         STATUS_CHANGED = 1
         LOGGING.log_info('Device on')
@@ -130,28 +124,24 @@ def check_start_stop():
     # wenn start switch on, zeigt nur start bzw. calisiyor
     btn_start_stop_checked = BTN_START_STOP.check_switch()
     if btn_start_stop_checked is True:
-        if 'stop' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('stop')
+        machine.change_state("start")
         PRODUCTIVE_RUN_TIME_WATCH.start()
         PRODUCTIVE_RUN_TIME = PRODUCTIVE_RUN_TIME_WATCH.get_calculated_total_time()
         STOP_TIME_WATCH.stop()
-        STATUS_ARRAY.append('start')
         MACHINE_START = 1
         STATUS_CHANGED = 1
         LOGGING.log_info('Device started')
     # maschiene gestopt
     # zusatzlich kann signalisiert werden, warum die maschine gestopt
     elif btn_start_stop_checked is False:
-        if 'start' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('start')
+        machine.change_state("stop")
         PRODUCTIVE_RUN_TIME_WATCH.stop()
         STOP_TIME_WATCH.start()
-        STATUS_ARRAY.append('stop')
         MACHINE_START = 0
         STATUS_CHANGED = 1
         LOGGING.log_info('Device stopped')
 
-    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'stop':
+    if machine.get_state == 'stop':
         now_for_check_minute = classes.get_minute()
         if CHECK_MINUTE != now_for_check_minute:
             CHECK_MINUTE = now_for_check_minute
@@ -169,20 +159,19 @@ def check_bobin():
     # ab hier testet alle nebenarbeiten an der maschine
     btn_bobin_checked = BTN_BOBIN.check_switch()
     if btn_bobin_checked is False:
-        if 'bobin' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('bobin')
-            BOBIN_TIME_WATCH.stop()
+        machine.deactivate_state("bobin")
+        BOBIN_TIME_WATCH.stop()
         STATUS_CHANGED = 1
         LOGGING.log_info('Device exited bobin-status')
     elif btn_bobin_checked is True:
-        STATUS_ARRAY.append('bobin')
+        machine.change_state("bobin")
         STATUS_CHANGED = 1
         BOBIN_TIME_WATCH.start()
         STOP_TIME_WATCH.stop()
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at bobin-status')
 
-    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'bobin':
+    if machine.get_state() == 'bobin':
         now_for_check_minute = classes.get_minute()
         if CHECK_MINUTE != now_for_check_minute:
             CHECK_MINUTE = now_for_check_minute
@@ -199,20 +188,18 @@ def check_cozgu():
     # ###########################
     btn_cozgu_checked = BTN_COZGU.check_switch()
     if btn_cozgu_checked is False:
-        if 'cozgu' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('cozgu')
-            COZGU_TIME_WATCH.stop()
+        machine.deactivate_state("cozgu")
         STATUS_CHANGED = 1
         LOGGING.log_info('Device exited cozgu-status')
     elif btn_cozgu_checked is True:
-        STATUS_ARRAY.append('cozgu')
+        machine.change_state("cozgu")
         STATUS_CHANGED = 1
         COZGU_TIME_WATCH.start()
         STOP_TIME_WATCH.stop()
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at cozgu-status')
 
-    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'cozgu':
+    if machine.get_state() == 'cozgu':
         now_for_check_minute = classes.get_minute()
         if CHECK_MINUTE != now_for_check_minute:
             CHECK_MINUTE = now_for_check_minute
@@ -229,20 +216,18 @@ def check_ariza():
     # ###########################
     btn_ariza_checked = BTN_ARIZA.check_switch()
     if btn_ariza_checked is False:
-        if 'ariza' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('ariza')
-            ARIZA_TIME_WATCH.stop()
+        machine.deactivate_state("ariza")
         STATUS_CHANGED = 1
         LOGGING.log_info('Device exited azriza-status')
     elif btn_ariza_checked is True:
-        STATUS_ARRAY.append('ariza')
+        machine.change_state("ariza")
         STATUS_CHANGED = 1
         ARIZA_TIME_WATCH.start()
         STOP_TIME_WATCH.stop()
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at ariza-status')
 
-    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'ariza':
+    if machine.get_state() == 'ariza':
         now_for_check_minute = classes.get_minute()
         if CHECK_MINUTE != now_for_check_minute:
             CHECK_MINUTE = now_for_check_minute
@@ -259,20 +244,18 @@ def check_ayar():
     # ###########################
     btn_ayar_checked = BTN_AYAR.check_switch()
     if btn_ayar_checked is False:
-        if 'ayar' in STATUS_ARRAY:
-            STATUS_ARRAY.remove('ayar')
-            AYAR_TIME_WATCH.stop()
+        machine.deactivate_state("ayar")
         STATUS_CHANGED = 1
         LOGGING.log_info('Device exited ayar-status')
     elif btn_ayar_checked is True:
-        STATUS_ARRAY.append('ayar')
+        machine.change_state("ayar")
         STATUS_CHANGED = 1
         AYAR_TIME_WATCH.start()
         STOP_TIME_WATCH.stop()
         STOP_TIME = STOP_TIME_WATCH.get_calculated_total_time()
         LOGGING.log_info('Device at ayar-status')
 
-    if STATUS_ARRAY[len(STATUS_ARRAY) - 1] == 'ayar':
+    if machine.get_state() == 'ayar':
         now_for_check_minute = classes.get_minute()
         if CHECK_MINUTE != now_for_check_minute:
             CHECK_MINUTE = now_for_check_minute
@@ -284,7 +267,7 @@ def check_ayar():
 
 def gpio_check_start_stop():
     """ Description """
-    global MACHINE_START, SYSTEM_ON, STATUS_ARRAY, TOTAL_TIME
+    global MACHINE_START, SYSTEM_ON, TOTAL_TIME
 
     check_kapali()
     JSON_FUNCS.change_json(what='counter', state=[COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME])
@@ -496,7 +479,7 @@ def update_cycle():
 
 
 def lcd_refresh(sleep_time):
-    global STATUS_ARRAY, COUNTER_NR, GIVE_OS_CMD
+    global COUNTER_NR, GIVE_OS_CMD
 
     while not is_shutdown:
         show_remainder_counter()
@@ -504,16 +487,16 @@ def lcd_refresh(sleep_time):
         clear_lcd()
 
         if not GIVE_OS_CMD:
-            LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
+            LCD.refresh_lcd(machine.get_state(), COUNTER_NR)
         sleep(sleep_time)
 
 
 def json_refresh(sleep_time):
-    global STATUS_ARRAY, COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME
+    global COUNTER_NR, PRODUCTIVE_RUN_TIME, TIME_BTW_COUNTER, TOTAL_TIME
 
     while not is_shutdown:
         if STATUS_CHANGED == 1:
-            JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+            JSON_FUNCS.change_json(what=machine.get_state)
             JSON_FUNCS.change_json(what='write_status_times',
                                    state=[PRODUCTIVE_RUN_TIME, STOP_TIME, BOBIN_TIME, ARIZA_TIME, COZGU_TIME, AYAR_TIME,
                                           TOTAL_TIME])
@@ -534,16 +517,13 @@ def json_refresh(sleep_time):
 
 def gpio_check():
     """ Description """
-    global STATUS_CHANGED,SYSTEM_ON, STATUS_ARRAY, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
+    global STATUS_CHANGED,SYSTEM_ON, TOTAL_COUNTER, COUNTER_NR, COUNTER_CHANGED, RESET_CHANGED, \
         PRODUCTIVE_RUN_TIME, TOTAL_TIME
 
     check_kapali()
 
     if SYSTEM_ON == 1:
         check_start_stop()
-
-    # if STATUS_ARRAY:
-        # LCD.refresh_lcd(STATUS_ARRAY[len(STATUS_ARRAY) - 1], COUNTER_NR)
 
     if MACHINE_START == 0:
         keypad_give_total_counter()
@@ -555,7 +535,7 @@ def gpio_check():
         check_ayar()
 
     if STATUS_CHANGED == 1:
-        # JSON_FUNCS.change_json(what=STATUS_ARRAY[len(STATUS_ARRAY) - 1])
+        # JSON_FUNCS.change_json(what=machine.getstate())
         update_cycle()
         STATUS_CHANGED = 0
 

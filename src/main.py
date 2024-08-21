@@ -328,7 +328,7 @@ def given_counter():
             given_number = given_number + get_button
             LCD.refresh_lcd('Given_Counter', given_number)
 
-        sleep(0.2)
+        sleep(0.1)
 
     return return_number
 
@@ -431,7 +431,7 @@ def keypad_give_os_cmd():
                     given_code = given_code + get_button
                     LCD.refresh_lcd('Given_Code', given_code)
 
-                sleep(0.2)
+                sleep(0.1)
             GIVE_OS_CMD = False
 
 

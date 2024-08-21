@@ -57,8 +57,6 @@ class ButtonSwitch:
 
     def check_switch(self):
         """ Test """
-        self.btn_state = GPIO.input(self.gpio_no)
-
         # if changes the state of button return something.
         # If stay the state, will be returned nothing.
         if self.btn_state:

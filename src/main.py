@@ -86,7 +86,10 @@ if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
 mqtt_module = classes.MQTTModule("device1")
-mqtt_module.connect()
+try:
+    mqtt_module.connect()
+except KeyboardInterrupt:
+    print("MQTT Connection refused!")
 ### TEST ###
 mqtt_module.update_counter()
 # Warte für eingehende Nachrichten (z.B. 10 Sekunden)
@@ -563,6 +566,7 @@ def event_counter(sleep_time):
     """ Description """
     global COUNTER_NR, COUNTER_CHANGED, PRODUCTIVE_RUN_TIME, TOTAL_TIME, COUNTER_PUSHED, TIME_BTW_COUNTER
 
+    print("Counter pushed.")
     # BTN_COUNTER.wait_for_rising()
     btn_cnt = BTN_COUNTER.check_switch_once()
     if btn_cnt is True:

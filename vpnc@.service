@@ -1,0 +1,16 @@
+[Unit]
+Description=VPNC connection to %i
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/vpnc --pid-file=/run/vpnc@%i.pid --ifmtu=1290 /etc/vpnc/%i.conf
+PIDFile=/run/vpnc@%i.pid
+
+Restart=always
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target
+

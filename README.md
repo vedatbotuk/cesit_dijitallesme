@@ -8,6 +8,14 @@
 
 # Configure
 
+```
+bash configure_app.sh
+```
+Edit ```setup.json```
+```
+nano setup.json
+```
+
 ## App Service
 ```
 sudo cp conf/cesit_core.service /etc/systemd/system/

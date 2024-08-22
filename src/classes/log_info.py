@@ -34,3 +34,10 @@ class LogInfo:
             logging.debug(text)
         else:
             pass
+
+    def log_error(self, text):
+        """ Description """
+        if (self.log_on_off == "on") and (self.log_level == "error"):
+            logging.info(text)
+        else:
+            pass

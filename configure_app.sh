@@ -25,7 +25,7 @@ fi
 echo "Installing required Python packages from requirements.txt..."
 
 # Check if requirements.txt exists
-if [ ! -f "requirements.txt" ]; then
+if [ ! -f "conf/requirements.txt" ]; then
   echo "Error: requirements.txt file not found."
   exit 1
 fi

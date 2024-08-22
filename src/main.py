@@ -86,16 +86,16 @@ KEYPAD_INSTALL = CONFIG_JSON['module']['keypad']['install']
 if KEYPAD_INSTALL is True:
     KEY_PAD = classes.KeyPad()
 
-#mqtt_module = classes.MQTTModule("device1")
-#try:
-#    mqtt_module.connect()
-#except KeyboardInterrupt:
-#    print("MQTT Connection refused!")
-### TEST ###
-#mqtt_module.update_counter()
+mqtt_module = classes.MQTTModule("device1")
+try:
+   mqtt_module.connect()
+except KeyboardInterrupt:
+   print("MQTT Connection refused!")
+## TEST ###
+mqtt_module.update_counter()
 # Warte für eingehende Nachrichten (z.B. 10 Sekunden)
-#import time
-#time.sleep(10)
+# import time
+# time.sleep(10)
 ############
 
 machine = classes.MaschineState()
@@ -662,6 +662,6 @@ if __name__ == '__main__':
         LOGGING.log_info('System stopped.')
         LCD.lcd_close()
         classes.gpio_cleanup()
-        # mqtt_module.disconnect()
+        mqtt_module.disconnect()
 # end of program
 # ##############

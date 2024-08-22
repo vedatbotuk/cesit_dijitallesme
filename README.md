@@ -2,10 +2,17 @@
 
 # Install
 
+## Raspbian OS
+
+## Python
+
+## VPN
+
 # Requirements
 - ```pip3 install pymongo RPLCD smbus2 ```
 - ```pip3 install "paho-mqtt<2.0.0"```
 
+# Hardware
 
 # Remarks
 - An external pull-up sensor is being used.

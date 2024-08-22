@@ -13,7 +13,6 @@
 - ```pip3 install "paho-mqtt<2.0.0"```
 
 # Hardware
-![schaltung drawio](https://github.com/user-attachments/assets/34851fcb-241b-4d0a-90a4-d9f7aac53585)
 
 # Remarks
 - An external pull-up sensor is being used.

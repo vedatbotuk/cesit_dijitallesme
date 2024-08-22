@@ -16,6 +16,8 @@ class LogInfo:
         if self.log_on_off == "on":
             if self.log_level == "info":
                 self.logging_level = logging.INFO
+            elif self.log_level == "error":
+                self.logging_level = logging.ERROR
             elif self.log_level == "debug":
                 self.logging_level = logging.DEBUG
 
@@ -30,8 +32,6 @@ class LogInfo:
         """ Description """
         if (self.log_on_off == "on") and (self.log_level == "info"):
             logging.info(text)
-        elif (self.log_on_off == "on") and (self.log_level == "debug"):
-            logging.debug(text)
         else:
             pass
 
@@ -39,5 +39,12 @@ class LogInfo:
         """ Description """
         if (self.log_on_off == "on") and (self.log_level == "error"):
             logging.info(text)
+        else:
+            pass
+
+    def log_debug(self, text):
+        """ Description """
+        if (self.log_on_off == "on") and (self.log_level == "debug"):
+            logging.debug(text)
         else:
             pass

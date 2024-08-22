@@ -103,7 +103,6 @@ machine = classes.MaschineState()
 # end of setup
 # ############
 
-
 def check_kapali():
     """ Description """
     global SYSTEM_ON, STATUS_CHANGED, TOTAL_TIME

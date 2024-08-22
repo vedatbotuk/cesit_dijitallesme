@@ -1,0 +1,12 @@
+[Unit]
+Description=python cesit dijitallesme
+Requires=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/python3.7 /home/pi/cesit_dijitallesme/src/main.py
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+

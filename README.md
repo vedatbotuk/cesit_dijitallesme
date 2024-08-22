@@ -6,13 +6,37 @@
 
 ## Python
 
+# Configure
+
+## App Service
+```
+sudo cp conf/cesit_core.service /etc/systemd/system/
+sudo systemclt enable cesit_core.service
+sudo systemclt start cesit_core.service
+```
+
 ## VPN
+Copy and give vpn-login information with ```nano```.
+```
+sudo cp myconnection.conf /etc/vpnc/
+sudo nano /etc/vpnc/myconnection.conf
+
+sudo cp conf/vpnc@.service /lib/systemd/system/vpnc@.service
+sudo systemclt enable vpnc@myconnection.service
+sudo systemclt start vpnc@myconnection.service
+```
 
 # Requirements
 - ```pip3 install pymongo RPLCD smbus2 ```
 - ```pip3 install "paho-mqtt<2.0.0"```
 
 # Hardware
+
+## Pinout
+![pinout](img/raspberry_zero_pinout.png)
+imgref: indibit.de
+## Input Circuit
+![input_circuit](img/input_circuit.png)
 
 # Remarks
 - An external pull-up sensor is being used.

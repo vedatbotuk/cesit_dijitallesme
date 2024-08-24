@@ -5,6 +5,7 @@ import json
 from .time import get_date_time
 from .log_info import LogInfo
 from .mqtt import *
+from os import path
 
 def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
     """ Description """
@@ -32,49 +33,57 @@ class JsonFuncs:
         self.path_current_json = setup_json['main']['path_current_json']
         self.path_cycle_json = setup_json['main']['path_cycle_json']
 
-        with open('data.json', 'r') as file:
-            data = json.load(file)
+        data_js = {
+            "device_name": self.device_name,
+            "_id": self.device_name + "_current",
+            "MAC-Adresi": self.mac_address,
+            "Son Reset Tarihi": 0,
+            "Döngü": 0,
+            "Makine Durumu": "Kapalı",
+            "Counter": 0,
+            "Toplam düğüm sayısı": 0,
+            "Kalan düğüm sayısı": 0,
+            "Toplam çalışma süresi": 0,
+            "Aktiv çalışma süresi": 0,
+            "Bobin süresi": 0,
+            "Arıza süresi": 0,
+            "Çözgü süresi": 0,
+            "Ayar süresi": 0, "Çalışma hızı": 0,
+            "Tahmini kalan süre": 0,
+            "Verim": 0
+        }
+        expected_keys = set(data_js.keys())
 
-        # so musst einfach letzte zustand vom device, bevor ausgeschaltet ist importiert werden.
-        data_js = data
-        # data_js = {
-        #     "device_name": self.device_name,
-        #     "_id": self.device_name + "_current",
-        #     "MAC-Adresi": self.mac_address,
-        #     "Son Reset Tarihi": 0,
-        #     "Döngü": 0,
-        #     "Makine Durumu": "Kapalı",
-        #     "Counter": 0,
-        #     "Toplam düğüm sayısı": 0,
-        #     "Kalan düğüm sayısı": 0,
-        #     "Toplam çalışma süresi": 0,
-        #     "Aktiv çalışma süresi": 0,
-        #     "Bobin süresi": 0,
-        #     "Arıza süresi": 0,
-        #     "Çözgü süresi": 0,
-        #     "Ayar süresi": 0, "Çalışma hızı": 0,
-        #     "Tahmini kalan süre": 0,
-        #     "Verim": 0
-        # }
+        # Überprüfen, ob die Datei existiert
+        if path.exists('data.json'):
+            # Versuche, die Datei zu öffnen und zu lesen
+            with open('data.json', 'r') as file:
+                data = json.load(file)
+            json_keys = set(data.keys())
+            
+            # Wenn die Schlüssel nicht übereinstimmen, data_js verwenden
+            if json_keys != expected_keys:
+                data = data_js
+        else:
+            # Wenn die Datei nicht existiert, data_js verwenden
+            data = data_js
 
         # TODO: hier muss json struktur angepasst werden. Ich brauche data.json from target.
-        self.counter_nr = data['Counter']
-            
+        data_js['Counter'] = data['Counter']
         self.time_btw_counter = None
-        self.total_counter = self.mycol.find_one({"_id": self.device_name + "_current"})['Toplam düğüm sayısı']
+        self.total_counter = data['Toplam düğüm sayısı']
 
         try:
             # all device_name = current + cycles, that's why -1
             # TODO: get last cycle
-            self.cycle = self.mycol.find_one({"_id": self.device_name + "_current"})['Döngü']
+            self.cycle = data['Döngü']
         except Exception as e:
             self.cycle = 0
             self.logging.log_info(e)
             self.logging.log_info('No Cycle exits. Creating new _id=0')
 
         try:
-            self.total_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
-                'Toplam çalışma süresi']
+            self.total_time = data['Toplam çalışma süresi']
             self.total_time = float(self.total_time)
         except Exception as e:
             self.total_time = 0
@@ -85,8 +94,7 @@ class JsonFuncs:
         self.remainder_time = None
 
         try:
-            self.productive_run_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
-                'Aktiv çalışma süresi']
+            self.productive_run_time = data['Aktiv çalışma süresi']
             self.productive_run_time = float(self.productive_run_time)
         except Exception as e:
             self.productive_run_time = 0
@@ -97,8 +105,7 @@ class JsonFuncs:
         self.remainder_time = None
 
         try:
-            self.stop_time = self.mycol.find_one({"_id": self.device_name + "_current"})[
-                'Durma süresi']
+            self.stop_time = data[ 'Durma süresi']
             self.stop_time = float(self.stop_time)
         except Exception as e:
             self.stop_time = 0
@@ -107,7 +114,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated stop_time = 0')
 
         try:
-            self.bobin_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Bobin süresi']
+            self.bobin_time = data['Bobin süresi']
             self.bobin_time = float(self.bobin_time)
         except Exception as e:
             self.bobin_time = 0
@@ -116,7 +123,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated bobin_time = 0')
 
         try:
-            self.ariza_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Arıza süresi']
+            self.ariza_time = ['Arıza süresi']
             self.ariza_time = float(self.ariza_time)
         except Exception as e:
             self.ariza_time = 0
@@ -125,7 +132,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated ariza_time = 0')
 
         try:
-            self.cozgu_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Çözgü süresi']
+            self.cozgu_time = data['Çözgü süresi']
             self.cozgu_time = float(self.cozgu_time)
         except Exception as e:
             self.cozgu_time = 0
@@ -134,7 +141,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated cozgu_time = 0')
 
         try:
-            self.ayar_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Ayar süresi']
+            self.ayar_time = data['Ayar süresi']
             self.ayar_time = float(self.ayar_time)
         except Exception as e:
             self.ayar_time = 0
@@ -143,7 +150,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated ayar_time = 0')
 
         try:
-            self.total_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Toplam çalışma süresi']
+            self.total_time = data['Toplam çalışma süresi']
             self.total_time = float(self.total_time)
         except Exception as e:
             self.total_time = 0
@@ -152,7 +159,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated total_time = 0')
 
         try:
-            self.productivity = self.mycol.find_one({"_id": self.device_name + "_current"})['Verim']
+            self.productivity = data['Verim']
             self.productivity = float(self.productivity)
         except Exception as e:
             self.productivity = 0
@@ -161,7 +168,7 @@ class JsonFuncs:
             self.logging.log_info('decelerated total_time = 0')
 
         try:
-            self.reset_time = self.mycol.find_one({"_id": self.device_name + "_current"})['Son Reset Tarihi']
+            self.reset_time = data['Son Reset Tarihi']
             self.reset_time = float(self.reset_time)
         except Exception as e:
             self.reset_time = 0
@@ -196,9 +203,28 @@ class JsonFuncs:
     def get_saved_ayar_time(self):
         return self.ayar_time
 
+    # TODO: Makine Durumu": "Kapalı" vielleicht muss auch letzte State geschrieben werden.
     def __export_json(self):
-        cursor = self.mycol.find({"_id": self.device_name + "_current"})
-        data_js = list(cursor)
+        data_js = {
+            "device_name": self.device_name,
+            "_id": self.device_name + "_current",
+            "MAC-Adresi": self.mac_address,
+            "Son Reset Tarihi": self.reset_time,
+            "Döngü": self.cycle,
+            "Makine Durumu": "Kapalı",
+            "Counter": self.counter_nr,
+            "Toplam düğüm sayısı": self.total_counter,
+            "Kalan düğüm sayısı": self.total_counter - self.counter_nr,
+            "Toplam çalışma süresi": self.total_time,
+            "Aktiv çalışma süresi": self.productive_run_time,
+            "Bobin süresi": self.bobin_time,
+            "Arıza süresi": self.ariza_time,
+            "Çözgü süresi": self.cozgu_time,
+            "Ayar süresi": self.ayar_time,
+            "Çalışma hızı": self.time_btw_counter,
+            "Tahmini kalan süre": self.remainder_time,
+            "Verim": self.productivity
+        }
 
         with open(self.path_current_json, 'w') as json_file:
             json.dump(data_js, json_file)

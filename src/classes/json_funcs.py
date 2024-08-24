@@ -264,21 +264,19 @@ class JsonFuncs:
 
         elif what == 'start':
             self.data['Makine Durumu'] = 'Çalışıyor'
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
 
         elif what == 'stop':
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Duruyor'}})
+            self.data['Makine Durumu'] =  'Duruyor'
 
         elif what == 'counter':
             self.counter_nr = state[0]
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Counter': state[0]}})
+            self.data['Counter'] = state[0]
 
             remainder_counter = self.total_counter - state[0]
             if remainder_counter >= 0:
-                self.mycol.update_one({"_id": self.device_name + "_current"},
-                                      {"$set": {'Kalan düğüm sayısı': remainder_counter}})
+                self.data['Kalan düğüm sayısı'] = remainder_counter
             else:
-                self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Kalan düğüm sayısı': 0}})
+                self.data['Kalan düğüm sayısı'] = 0
             try:
                 # Speed: counter time between counters
                 self.time_btw_counter = round(state[2], 3)
@@ -287,11 +285,8 @@ class JsonFuncs:
                 self.logging.log_info('speed: ' + str(e))
 
             self.productive_run_time = state[1]
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Aktiv çalışma süresi': self.productive_run_time}})
-
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Çalışma hızı': self.time_btw_counter}})
+            self.data['Aktiv çalışma süresi'] = self.productive_run_time
+            self.data['Çalışma hızı'] = self.time_btw_counter
 
             try:
                 self.remainder_time = round(remainder_counter * self.time_btw_counter, 2)
@@ -301,44 +296,39 @@ class JsonFuncs:
                 self.remainder_time = 0
                 self.logging.log_info('remainder_time: ' + str(e))
 
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Tahmini kalan süre': self.remainder_time}})
+            self.data['Tahmini kalan süre'] = self.remainder_time
 
             self.total_time = state[3]
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {"Toplam çalışma süresi": state[3]}})
+            self.data['Toplam çalışma süresi'] = state[3]
 
         elif what == 'reset':
             self.reset_time = get_date_time()
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Son Reset Tarihi': self.reset_time}})
+            self.data['Son Reset Tarihi'] = self.reset_time
+
             # self.__write_cycle()
             # self.cycle = self.cycle + 1
             # self.mycol.update_one({"_id": self.device_name + "_current"},
             #                       {"$set": {'Döngü': self.cycle}})
 
         elif what == 'bobin':
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Makine Durumu': 'Duruyor - Bobin değişimi'}})
+            self.data['Makine Durumu'] = 'Duruyor - Bobin değişimi'
 
         elif what == 'cozgu':
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Makine Durumu': 'Duruyor - Çözgü'}})
+            self.data['Makine Durumu'] = 'Duruyor - Çözgü'
 
         elif what == 'ariza':
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Makine Durumu': 'Duruyor - Arıza'}})
+            self.data['Makine Durumu'] = 'Duruyor - Arıza'
 
         elif what == 'ayar':
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Duruyor - Ayar'}})
+            self.data['Makine Durumu'] = 'Duruyor - Ayar'
 
         elif what == 'Given_Total_Counter':
             self.total_counter = state
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Toplam düğüm sayısı': state}})
+            self.data['Toplam düğüm sayısı'] = state
 
         elif what == 'Given_Counter':
             self.counter_nr = state
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Counter': state}})
+            self.data['Counter'] = state
 
         elif what == 'write_status_times':
             self.productive_run_time = state[0]
@@ -355,17 +345,14 @@ class JsonFuncs:
                 self.productivity = 0
                 self.logging.log_info('productivity: ' + str(e))
 
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {"Aktiv çalışma süresi": self.productive_run_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {"Durma süresi": self.stop_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Bobin süresi": self.bobin_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Arıza süresi": self.ariza_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Çözgü süresi": self.cozgu_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Ayar süresi": self.ayar_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {"Toplam çalışma süresi": self.total_time}})
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {"Verim": self.productivity}})
+            self.data['Aktiv çalışma süresi'] = self.productive_run_time
+            self.data['Durma süresi'] = self.stop_time
+            self.data['Bobin süresi'] = self.bobin_time
+            self.data['Arıza süresi'] = self.ariza_time
+            self.data['Çözgü süresi'] = self.cozgu_time
+            self.data['Ayar süresi'] = self.ayar_time
+            self.data['Toplam çalışma süresi'] = self.total_time            
+            self.data['Verim'] = self.productivity
 
         # Export as Jsonfile for Monitor
         self.__export_json()

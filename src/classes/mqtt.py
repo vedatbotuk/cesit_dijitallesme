@@ -28,7 +28,7 @@ class MQTTModule:
         self.last_reset_topic = f"devices/{device_id}/last_reset"
         self.software_version_topic = f"devices/{device_id}/software_version"
         self.counter = 0
-        self.status = "off"
+        self.status = "Kapalı"
         self.substatus = None
         self.software_version = "1.0.0"  # Initialversion
         self.last_update_timestamp = None
@@ -148,8 +148,8 @@ class MQTTModule:
             self.substatus = new_substatus if new_status == "stop" else None
             self.publish_status()
 
-    def update_counter(self):
-        self.counter += 1
+    def update_counter(self, cnt):
+        self.counter = cnt
         self.publish_counter()
 
     def update_software_version(self, new_version):
@@ -180,7 +180,7 @@ class MQTTModule:
 #     try:
 #         for _ in range(10):  # Läuft für ca. 30 Sekunden
 #             # Simuliere Hauptstatusänderungen und Unterstatus bei stop
-#             main_status = random.choice(["off", "run", "stop", "reset", "software_update"])
+#             main_status = random.choice(["Kapalı", "start", "stop", "reset", "software_update"])
 #             substatus = random.choice(["bobin", "ayar", "cozgu", "ariza"]) if main_status == "stop" else None
 
 #             device1.update_status(main_status, substatus)

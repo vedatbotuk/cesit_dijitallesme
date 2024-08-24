@@ -19,9 +19,6 @@ class JsonFuncs:
 
     def __init__(self, setup_path="/home/pi/cesit_dijitallesme/setup.json"):
 
-        mqtt_module = MQTTModule("device1")
-        mqtt_module.connect()
-
         config_json = get_setup()
         self.logging = LogInfo(config_json['main']['log'],
                                config_json['main']['log_level'],
@@ -32,6 +29,9 @@ class JsonFuncs:
         self.mac_address = setup_json['main']['mac_address']
         self.path_current_json = setup_json['main']['path_current_json']
         self.path_cycle_json = setup_json['main']['path_cycle_json']
+
+        self.mqtt_module = MQTTModule(self.device_name)
+        self.mqtt_module.connect()
 
         data_js = {
             "device_name": self.device_name,
@@ -261,22 +261,28 @@ class JsonFuncs:
 
         if what == 'kapali':
             self.data['Makine Durumu'] = 'Kapalı'
-
+            self.mqtt_module.update_status('Kapalı')
         elif what == 'start':
             self.data['Makine Durumu'] = 'Çalışıyor'
+            self.mqtt_module.update_status('Çalışıyor')
 
         elif what == 'stop':
             self.data['Makine Durumu'] =  'Duruyor'
+            self.mqtt_module.update_status('Duruyor')
 
         elif what == 'counter':
             self.counter_nr = state[0]
             self.data['Counter'] = state[0]
+            self.mqtt_module.update_counter(state[0])
 
             remainder_counter = self.total_counter - state[0]
             if remainder_counter >= 0:
                 self.data['Kalan düğüm sayısı'] = remainder_counter
+                self.mqtt_module.update_remainder_cnt(remainder_counter)
+
             else:
                 self.data['Kalan düğüm sayısı'] = 0
+                self.mqtt_module.update_counter(state[0])
             try:
                 # Speed: counter time between counters
                 self.time_btw_counter = round(state[2], 3)

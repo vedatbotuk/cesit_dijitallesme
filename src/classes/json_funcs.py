@@ -4,8 +4,7 @@
 import json
 from .time import get_date_time
 from .log_info import LogInfo
-import pymongo
-
+from .mqtt import *
 
 def get_setup(setup_path="/home/pi/cesit_dijitallesme/setup.json"):
     """ Description """
@@ -19,8 +18,10 @@ class JsonFuncs:
 
     def __init__(self, setup_path="/home/pi/cesit_dijitallesme/setup.json"):
 
-        config_json = get_setup()
+        mqtt_module = MQTTModule("device1")
+        mqtt_module.connect()
 
+        config_json = get_setup()
         self.logging = LogInfo(config_json['main']['log'],
                                config_json['main']['log_level'],
                                config_json['main']['log_path'])
@@ -30,56 +31,35 @@ class JsonFuncs:
         self.mac_address = setup_json['main']['mac_address']
         self.path_current_json = setup_json['main']['path_current_json']
         self.path_cycle_json = setup_json['main']['path_cycle_json']
-        data_js = {
-            "device_name": self.device_name,
-            "_id": self.device_name + "_current",
-            "MAC-Adresi": self.mac_address,
-            "Son Reset Tarihi": 0,
-            "Döngü": 0,
-            "Makine Durumu": "Kapalı",
-            "Counter": 0,
-            "Toplam düğüm sayısı": 0,
-            "Kalan düğüm sayısı": 0,
-            "Toplam çalışma süresi": 0,
-            "Aktiv çalışma süresi": 0,
-            "Bobin süresi": 0,
-            "Arıza süresi": 0,
-            "Çözgü süresi": 0,
-            "Ayar süresi": 0, "Çalışma hızı": 0,
-            "Tahmini kalan süre": 0,
-            "Verim": 0
-        }
 
-        #################
-        # mongodb database
-        database_name = 'cesit_mensucat'
-        collection_name = 'cesit_dijitallesme'
+        with open('data.json', 'r') as file:
+            data = json.load(file)
 
-        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-        mydb = myclient.database_names()
-        if database_name in mydb:
-            mydb = myclient[database_name]
-            self.logging.log_info("The database exists.")
-            collist = mydb.collection_names()
-            if collection_name in collist:
-                self.mycol = mydb[collection_name]
-                self.logging.log_info("The collection exists.")
-            else:
-                self.mycol = mydb[collection_name]
-                self.logging.log_info("Creating collection.")
+        # so musst einfach letzte zustand vom device, bevor ausgeschaltet ist importiert werden.
+        data_js = data
+        # data_js = {
+        #     "device_name": self.device_name,
+        #     "_id": self.device_name + "_current",
+        #     "MAC-Adresi": self.mac_address,
+        #     "Son Reset Tarihi": 0,
+        #     "Döngü": 0,
+        #     "Makine Durumu": "Kapalı",
+        #     "Counter": 0,
+        #     "Toplam düğüm sayısı": 0,
+        #     "Kalan düğüm sayısı": 0,
+        #     "Toplam çalışma süresi": 0,
+        #     "Aktiv çalışma süresi": 0,
+        #     "Bobin süresi": 0,
+        #     "Arıza süresi": 0,
+        #     "Çözgü süresi": 0,
+        #     "Ayar süresi": 0, "Çalışma hızı": 0,
+        #     "Tahmini kalan süre": 0,
+        #     "Verim": 0
+        # }
 
-        else:
-            mydb = myclient[database_name]
-            self.mycol = mydb[collection_name]
-            self.logging.log_info("Creating database.")
-            self.logging.log_info("Creating collection.")
-
-        if not self.mycol.find({"_id": self.device_name + "_current"}).count() > 0:
-            self.mycol.insert_one(data_js)
-            self.logging.log_info("Data does not exists, inserting default data.")
-        # ###############
-
-        self.counter_nr = self.mycol.find_one({"_id": self.device_name + "_current"})['Counter']
+        # TODO: hier muss json struktur angepasst werden. Ich brauche data.json from target.
+        self.counter_nr = data['Counter']
+            
         self.time_btw_counter = None
         self.total_counter = self.mycol.find_one({"_id": self.device_name + "_current"})['Toplam düğüm sayısı']
 

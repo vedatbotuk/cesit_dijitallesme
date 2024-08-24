@@ -229,40 +229,41 @@ class JsonFuncs:
         with open(self.path_current_json, 'w') as json_file:
             json.dump(data_js, json_file)
 
-    def __export_cycle(self):
-        cursor = self.mycol.find({"_id": self.device_name + "_cycle_"})
-        data_js = list(cursor)
+    # def __export_cycle(self):
+    #     cursor = self.mycol.find({"_id": self.device_name + "_cycle_"})
+    #     data_js = list(cursor)
 
-        with open(self.path_current_json, 'w') as json_file:
-            json.dump(data_js, json_file)
+    #     with open(self.path_current_json, 'w') as json_file:
+    #         json.dump(data_js, json_file)
 
-    def __write_cycle(self):
-        write_id = {
-            "device_name": self.device_name,
-            "_id": self.device_name + "_cycle_" + str(self.cycle),
-            "Reset Tarihi": self.reset_time,
-            "Tamamlanan Counter": self.counter_nr,
-            "Toplam düğüm sayısı": self.total_counter,
-            "Kalan düğüm sayısı": self.total_counter - self.counter_nr,
-            "Toplam çalışma süresi": self.total_time,
-            "Aktiv çalışma süresi": self.productive_run_time,
-            "Durma süresi": self.stop_time,
-            "Bobin süresi": self.bobin_time,
-            "Arıza süresi": self.ariza_time,
-            "Çözgü süresi": self.cozgu_time,
-            "Ayar süresi": self.ayar_time,
-            "Çalışma hızı": self.time_btw_counter,
-            "Verim": self.productivity
-        }
-        self.mycol.insert_one(write_id)
+    # def __write_cycle(self):
+    #     write_id = {
+    #         "device_name": self.device_name,
+    #         "_id": self.device_name + "_cycle_" + str(self.cycle),
+    #         "Reset Tarihi": self.reset_time,
+    #         "Tamamlanan Counter": self.counter_nr,
+    #         "Toplam düğüm sayısı": self.total_counter,
+    #         "Kalan düğüm sayısı": self.total_counter - self.counter_nr,
+    #         "Toplam çalışma süresi": self.total_time,
+    #         "Aktiv çalışma süresi": self.productive_run_time,
+    #         "Durma süresi": self.stop_time,
+    #         "Bobin süresi": self.bobin_time,
+    #         "Arıza süresi": self.ariza_time,
+    #         "Çözgü süresi": self.cozgu_time,
+    #         "Ayar süresi": self.ayar_time,
+    #         "Çalışma hızı": self.time_btw_counter,
+    #         "Verim": self.productivity
+    #     }
+    #     self.mycol.insert_one(write_id)
 
     def change_json(self, what, state=None):
         """change_json"""
 
         if what == 'kapali':
-            self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Kapalı'}})
+            self.data['Makine Durumu'] = 'Kapalı'
 
         elif what == 'start':
+            self.data['Makine Durumu'] = 'Çalışıyor'
             self.mycol.update_one({"_id": self.device_name + "_current"}, {"$set": {'Makine Durumu': 'Çalışıyor'}})
 
         elif what == 'stop':
@@ -311,10 +312,10 @@ class JsonFuncs:
             self.reset_time = get_date_time()
             self.mycol.update_one({"_id": self.device_name + "_current"},
                                   {"$set": {'Son Reset Tarihi': self.reset_time}})
-            self.__write_cycle()
-            self.cycle = self.cycle + 1
-            self.mycol.update_one({"_id": self.device_name + "_current"},
-                                  {"$set": {'Döngü': self.cycle}})
+            # self.__write_cycle()
+            # self.cycle = self.cycle + 1
+            # self.mycol.update_one({"_id": self.device_name + "_current"},
+            #                       {"$set": {'Döngü': self.cycle}})
 
         elif what == 'bobin':
             self.mycol.update_one({"_id": self.device_name + "_current"},

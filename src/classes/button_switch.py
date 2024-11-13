@@ -18,18 +18,20 @@ class ButtonSwitch:
 
     def __init__(self, gpio_no):
         """ Description """
+        try:
+            config_json = get_setup()
 
-        config_json = get_setup()
+            self.logging = LogInfo(config_json['main']['log'],
+                                   config_json['main']['log_level'],
+                                   config_json['main']['log_path'])
 
-        self.logging = LogInfo(config_json['main']['log'],
-                               config_json['main']['log_level'],
-                               config_json['main']['log_path'])
+            self.gpio_no = gpio_no
+            self.sec_state = None
+            self.btn_state = None
 
-        self.gpio_no = gpio_no
-        self.sec_state = None
-        self.btn_state = None
-
-        GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+            GPIO.setup(self.gpio_no, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+        except Exception as e:
+            print(f"An error occurred during initialization: {e}")
 
     def add_callback(self, mode, callback):
         """ Test """

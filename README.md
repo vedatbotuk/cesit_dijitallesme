@@ -6,15 +6,77 @@
 
 ## Python
 
-# Configure
+### 1. Clone the Repository
+Start by cloning this GitHub repository to your local machine:
+```bash
+git clone https://github.com/username/repository-name.git
+cd repository-name
+```
 
+### 2. Create a Virtual Environment
+It's best to use a virtual environment to manage dependencies and avoid conflicts.
+
+#### Using `venv` (comes with Python)
+Run the following command to create a virtual environment in the project folder:
+```bash
+python3 -m venv env
 ```
-bash configure_app.sh
+
+#### Using `virtualenv` (if preferred)
+If you prefer `virtualenv`, first install it (if you haven't already):
+```bash
+pip install virtualenv
 ```
-Edit ```setup.json```
+Then create a virtual environment:
+```bash
+virtualenv env
 ```
-nano setup.json
+
+### 3. Activate the Virtual Environment
+Activate the virtual environment depending on your operating system:
+
+- **On Windows**:
+  ```bash
+  .\env\Scripts\activate
+  ```
+- **On macOS/Linux**:
+  ```bash
+  source env/bin/activate
+  ```
+
+Once activated, your command line should show the environment name (`env`) at the start of the prompt, indicating you're now using the isolated Python environment.
+
+### 4. Install Dependencies
+Install all required Python packages using `pip`:
+```bash
+pip install -r requirements.txt
 ```
+
+Make sure the `requirements.txt` file is up-to-date with all the necessary packages. If not, you can generate one using:
+```bash
+pip freeze > requirements.txt
+```
+
+## Usage
+After setting up the environment and installing dependencies, you're ready to run the project.
+
+### Running the Project
+Run the main script as follows:
+```bash
+python main.py
+```
+
+Replace `main.py` with the appropriate entry point for your project.
+
+## Deactivating the Virtual Environment
+To exit the virtual environment when you're done, simply type:
+```bash
+deactivate
+```
+
+## Additional Information
+- **Updating Dependencies**: If you need to add new packages, install them with `pip install package_name`, and update the `requirements.txt` file with `pip freeze > requirements.txt`.
+- **Troubleshooting**: If
 
 ## App Service
 ```

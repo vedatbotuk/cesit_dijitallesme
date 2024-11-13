@@ -88,9 +88,11 @@ if KEYPAD_INSTALL is True:
 
 mqtt_module = classes.MQTTModule("device1")
 try:
-   mqtt_module.connect()
-except KeyboardInterrupt:
-   print("MQTT Connection refused!")
+    mqtt_module.connect()
+except Exception as e:
+    LOGGING.log_error(f"MQTT Connection failed: {str(e)}")
+    print("MQTT Connection refused!")
+
 ## TEST ###
 mqtt_module.update_counter()
 # Warte für eingehende Nachrichten (z.B. 10 Sekunden)
@@ -635,16 +637,21 @@ def loop(sleep_time):
 def start_threading():
     """ Description """
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        executor.submit(loop, 0.2)
-        executor.submit(lcd_refresh, 0.3)
-        # executor.submit(json_refresh, 10)
+        try:
+            executor.submit(loop, 0.2)
+            executor.submit(lcd_refresh, 0.3)
+            # executor.submit(json_refresh, 10)
+        except Exception as e:
+            LOGGING.log_error(f"Thread execution failed: {str(e)}")
 
 
 def add_events():
     """ Description """
-    BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
-    BTN_RESET.add_callback(mode='rising', callback=event_reset)
-
+    try:
+        BTN_COUNTER.add_callback(mode='rising', callback=event_counter)
+        BTN_RESET.add_callback(mode='rising', callback=event_reset)
+    except Exception as e:
+        LOGGING.log_error(f"Failed to add GPIO events: {str(e)}")
 
 if __name__ == '__main__':
 

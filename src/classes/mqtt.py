@@ -32,7 +32,7 @@ class MQTTModule:
         self.substatus = None
         self.software_version = "1.0.0"  # Initialversion
         self.last_update_timestamp = None
-        self.check_interval = 5  # Interval für die Statusüberprüfung in Sekunden
+        self.check_interval = 30  # Interval für die Statusüberprüfung in Sekunden
         self.check_thread = None
         self.running = False
 
